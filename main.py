@@ -63,7 +63,7 @@ def main(cfg: DictConfig):
         num_clients=cfg.num_clients,
         config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
         strategy=strategy,
-        client_resources={"num_cpus": 2, "num_gpus": 0},
+        client_resources={"num_cpus": cfg.num_cpus_per_client, "num_gpus": cfg.num_gpus_per_client},
     )
 
     ## 6. Save your results
