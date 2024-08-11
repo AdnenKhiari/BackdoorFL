@@ -2,11 +2,10 @@ from collections import OrderedDict
 from typing import Dict, Tuple
 from flwr.common import NDArrays, Scalar,Context
 from hydra.utils import instantiate
-from dataset import load_datasets
 import torch
 import flwr as fl
 
-from model import train, test
+from models.model import train, test
 
 
 class FlowerClient(fl.client.NumPyClient):
@@ -25,10 +24,11 @@ class FlowerClient(fl.client.NumPyClient):
         self.model = instantiate(model_cfg)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        print("Device Used", self.device)
 
     def set_parameters(self, parameters):
         params_dict = zip(self.model.state_dict().keys(), parameters)
-        state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
+        state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
         self.model.load_state_dict(state_dict, strict=True)
 
     def get_parameters(self, config: Dict[str, Scalar]):
@@ -65,13 +65,14 @@ class FlowerClient(fl.client.NumPyClient):
         return float(loss), len(self.valloader), {"accuracy": accuracy}
 
 
-def generate_client_fn(model_cfg):
+def generate_client_fn(model_cfg,dataset_cfg):
     """Return a function to construct a FlowerClient."""
 
     def client_fn(context: Context):
         partition_id = int(context.node_config["partition-id"])
         num_partitions = int(context.node_config["num-partitions"])
-        trainloader, valloader, _ = load_datasets(partition_id, num_partitions)
+        dataset = instantiate(dataset_cfg)
+        trainloader, valloader, _ = dataset.load_datasets(partition_id, num_partitions)
         return FlowerClient(
             trainloader=trainloader,
             vallodaer=valloader,

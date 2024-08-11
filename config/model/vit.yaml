@@ -1,0 +1,3 @@
+---
+_target_: models.vit.Vit
+num_classes: ${num_classes}

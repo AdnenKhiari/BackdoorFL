@@ -1,10 +1,10 @@
 ---
 
-num_rounds: 5
-num_clients: 12
+num_rounds: 2
+num_clients: 4
 batch_size: 16
 num_classes: 10
-num_clients_per_round_fit: 4
+num_clients_per_round_fit: 2
 num_clients_per_round_eval: 2
 config_fit:
   lr: 0.01
@@ -12,5 +12,6 @@ config_fit:
   local_epochs: 1
 
 defaults:
-  - model: net
+  - model: mobilenet
   - strategy: fedavg # points to conf/strategy/fedavg.yaml
+  - dataset: cifar10

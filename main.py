@@ -9,7 +9,6 @@ from omegaconf import DictConfig, OmegaConf
 import flwr as fl
 
 from client import generate_client_fn
-from dataset import get_test_set
 from server import get_evalulate_fn
 
 
@@ -31,7 +30,7 @@ def main(cfg: DictConfig):
 
     # Let's pass the config node that defines the model. in this way changing models doesn't
     # require any changes to the code (just run the code with a different config)
-    client_fn = generate_client_fn(cfg.model)
+    client_fn = generate_client_fn(cfg.model,cfg.dataset)
 
     ## 4. Define your strategy
     # strategy = fl.server.strategy.FedAvg(fraction_fit=0.00001,
@@ -52,8 +51,9 @@ def main(cfg: DictConfig):
     # The moment you run the experiment (i.e. when the config is parsed) not all field would be defined.
     # for instance, the testloader is not ready so `evaluate_fn` argument cannot be set. You can pass them
     # manually the moment you call `instantiate`. (if you are familiar with Python partials, this is similar)
+    dataset = instantiate(cfg.dataset)
     strategy = instantiate(
-        cfg.strategy, evaluate_fn=get_evalulate_fn(cfg.model, get_test_set(cfg.batch_size))
+        cfg.strategy, evaluate_fn=get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size))
     )
 
     ## 5. Start Simulation
@@ -63,7 +63,7 @@ def main(cfg: DictConfig):
         num_clients=cfg.num_clients,
         config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
         strategy=strategy,
-        client_resources={"num_cpus": 1, "num_gpus": 0.25},
+        client_resources={"num_cpus": 2, "num_gpus": 0},
     )
 
     ## 6. Save your results
