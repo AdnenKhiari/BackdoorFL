@@ -61,8 +61,6 @@ def test(net, testloader, device):
     
     return avg_loss, accuracy
 
-
-
 def model_to_parameters(model):
     """Note that the model is already instantiated when passing it here.
 

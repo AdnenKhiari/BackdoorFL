@@ -1,2 +1,4 @@
 ---
-_target_: dataset.mnist.Mnist
+class:
+  _target_: dataset.mnist.Mnist
+label: image

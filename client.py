@@ -4,9 +4,9 @@ from flwr.common import NDArrays, Scalar,Context
 from hydra.utils import instantiate
 import torch
 import flwr as fl
-
+from dataset.dataset import Dataset
 from models.model import train, test
-
+from flwr_datasets.partitioner import Partitioner
 
 class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
@@ -64,15 +64,23 @@ class FlowerClient(fl.client.NumPyClient):
 
         return float(loss), len(self.valloader), {"accuracy": accuracy}
 
+def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
+    params = {}
+    # if partitioner_cfg.get("seed",None) is not None:
+    #    params.update({"seed":seed_cfg})
+    # if partitioner_cfg.get("partition_by",None) is not None:
+    #    params.update({"partition_by":dataset_cfg.label})
+    return instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
 
-def generate_client_fn(model_cfg,dataset_cfg):
+def generate_client_fn(model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg):
     """Return a function to construct a FlowerClient."""
 
     def client_fn(context: Context):
         partition_id = int(context.node_config["partition-id"])
         num_partitions = int(context.node_config["num-partitions"])
-        dataset = instantiate(dataset_cfg)
-        trainloader, valloader, _ = dataset.load_datasets(partition_id, num_partitions)
+        partitioner : Partitioner = get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions)
+        dataset : Dataset= instantiate(dataset_cfg["class"],partitioner=partitioner)
+        trainloader, valloader, _ = dataset.load_datasets(partition_id,bachsize_cfg,valratio_cfg,seed_cfg)
         return FlowerClient(
             trainloader=trainloader,
             vallodaer=valloader,

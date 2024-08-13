@@ -2,10 +2,13 @@
 
 num_rounds: 2
 num_clients: 4
-batch_size: 16
 num_classes: 10
 num_clients_per_round_fit: 2
 num_clients_per_round_eval: 2
+
+batch_size: 16
+global_seed: 42
+valratio: 0.15
 
 num_cpus_per_client: 1
 num_gpus_per_client: 0
@@ -13,9 +16,10 @@ num_gpus_per_client: 0
 config_fit:
   lr: 0.01
   momentum: 0.9
-  local_epochs: 1
+  local_epochs: 2
 
 defaults:
+  - partitioners: iid
   - model: mobilenet
   - strategy: fedavg # points to conf/strategy/fedavg.yaml
   - dataset: cifar10

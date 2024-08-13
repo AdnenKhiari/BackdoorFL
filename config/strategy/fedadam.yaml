@@ -11,10 +11,10 @@ on_fit_config_fn: # this is a function
   config: ${config_fit}
 # arguments unique to FedAdam
 eta: 0.2
-eta_l: 0.01 # client side learning rate ! so be sure the clients get it (This is not implemented currently in the example code given)
+eta_l: ${config_fit.lr} # client side learning rate ! so be sure the clients get it (This is not implemented currently in the example code given)
 tau: 0.1
 initial_parameters: # This optional for some strategies, but required by FedAdam
-  _target_: model.model_to_parameters
+  _target_: models.model.model_to_parameters
   model: ${model} # note you don't need to do `${defaults.model}`, just `${model}`
 # we could define here evaluate_fn, but since it requires arguments
 # that are defined at runtime (e.g. the test loader), let's better
