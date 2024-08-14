@@ -7,7 +7,6 @@ import flwr as fl
 from dataset.dataset import Dataset
 from models.model import train, test
 from flwr_datasets.partitioner import Partitioner
-
 class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
 
@@ -37,22 +36,15 @@ class FlowerClient(fl.client.NumPyClient):
     def fit(self, parameters, config):
         # copy parameters sent by the server into client's local model
         self.set_parameters(parameters)
-
+        print("CONF:", config)
         lr = config["lr"]
         momentum = config["momentum"]
         epochs = config["local_epochs"]
+        optimizer = config["optimizer"]
 
-        # You could also set this optimiser from a config file. That would make it
-        # easy to run experiments considering different optimisers and set one or another
-        # directly from the command line (you can use as inspiration what we did for adding
-        # support for FedAvg and FedAdam strategies)
-        optim = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
 
-        # do local training
-        # similarly, you can set this via a config. For example, imagine you have different
-        # experiments using wildly different training protocols (e.g. vision, speech). You can
-        # toggle between different training functions directly from the config without having
-        # to clutter your code with if/else statements all over the place :)
+        optim = instantiate(optimizer,params=self.model.parameters(), lr=lr, momentum=momentum)
+
         train(self.model, self.trainloader, optim, epochs, self.device)
 
         return self.get_parameters({}), len(self.trainloader), {}

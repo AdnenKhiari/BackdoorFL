@@ -17,9 +17,11 @@ config_fit:
   lr: 0.01
   momentum: 0.9
   local_epochs: 2
+  optimizer: ${optimizers}
 
 defaults:
   - partitioners: iid
   - model: mobilenet
   - strategy: fedavg # points to conf/strategy/fedavg.yaml
   - dataset: cifar10
+  - optimizers: sgd
