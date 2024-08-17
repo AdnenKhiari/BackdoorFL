@@ -10,7 +10,7 @@ from flwr_datasets.partitioner import Partitioner
 class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
 
-    def __init__(self, trainloader, vallodaer, model_cfg) -> None:
+    def __init__(self, trainloader, vallodaer, model_cfg,optimizer) -> None:
         super().__init__()
 
         self.trainloader = trainloader
@@ -21,6 +21,7 @@ class FlowerClient(fl.client.NumPyClient):
         # (unless you changed the default) and by then `num_classes` would already be auto-resolved
         # to `num_classes=10` (since this was known right from the moment you launched the experiment)
         self.model = instantiate(model_cfg)
+        self.optimizer = instantiate(optimizer)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print("Device Used", self.device)
@@ -40,11 +41,8 @@ class FlowerClient(fl.client.NumPyClient):
         lr = config["lr"]
         momentum = config["momentum"]
         epochs = config["local_epochs"]
-        optimizer = config["optimizer"]
 
-
-        optim = instantiate(optimizer,params=self.model.parameters(), lr=lr, momentum=momentum)
-
+        optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         train(self.model, self.trainloader, optim, epochs, self.device)
 
         return self.get_parameters({}), len(self.trainloader), {}
@@ -64,7 +62,7 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"partition_by":dataset_cfg.label})
     return instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
 
-def generate_client_fn(model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg):
+def generate_client_fn(optimizer_cfg,model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg):
     """Return a function to construct a FlowerClient."""
 
     def client_fn(context: Context):
@@ -77,6 +75,7 @@ def generate_client_fn(model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valrat
             trainloader=trainloader,
             vallodaer=valloader,
             model_cfg=model_cfg,
+            optimizer=optimizer_cfg
         ).to_client()
 
     return client_fn

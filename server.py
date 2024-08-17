@@ -13,7 +13,6 @@ def get_on_fit_config(config: DictConfig):
             "lr": config.lr,
             "momentum": config.momentum,
             "local_epochs": config.local_epochs,
-            "optimizer": config.optimizer,
         }
 
     return fit_config_fn

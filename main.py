@@ -23,7 +23,7 @@ def main(cfg: DictConfig):
     
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
-    client_fn = generate_client_fn(cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed)
+    client_fn = generate_client_fn(cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed)
     
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
     dataset = instantiate(cfg.dataset["class"],test_partitioner)

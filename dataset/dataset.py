@@ -50,7 +50,7 @@ class Dataset():
         partition_train_test = partition.train_test_split(test_size=val_ratio, seed=seed)
 
         partition_train_test = partition_train_test.with_transform(self.apply_transforms())
-        trainloader = DataLoader(partition_train_test["train"], batch_size=batch_size, shuffle=True,collate_fn=self.collate())
+        trainloader = DataLoader(partition_train_test["train"], batch_size=batch_size, shuffle=True,collate_fn=self.collate(),drop_last=True)
         valloader = DataLoader(partition_train_test["test"], batch_size=batch_size,collate_fn=self.collate())
         testset = fds.load_split("test").with_transform(self.apply_transforms())
         testloader = DataLoader(testset, batch_size=batch_size,collate_fn=self.collate())
