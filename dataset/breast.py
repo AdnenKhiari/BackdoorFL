@@ -10,8 +10,9 @@ class Breast(Dataset):
         super(Breast,self).__init__(partitioner)
         
     def get_federated_dataset(self,partitioners):
-        return FederatedDataset(dataset="EulerianKnight/breast-histopathology-images-train-test-valid-split",partitioners=partitioners)
-    
+        fd= FederatedDataset(dataset="EulerianKnight/breast-histopathology-images-train-test-valid-split",partitioners=partitioners)
+        print("SP",fd._check_if_split_present("train"))
+        print("SP",fd._check_if_split_present("test"))
     def apply_transforms(self):
         def tr(batch):
             print("BB",batch)
