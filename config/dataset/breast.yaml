@@ -1,4 +1,4 @@
 ---
 class:
   _target_: dataset.breast.Breast
-label: img
+label: image

@@ -7,6 +7,7 @@ import flwr as fl
 from dataset.dataset import Dataset
 from models.model import train, test
 from flwr_datasets.partitioner import Partitioner
+
 class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
 

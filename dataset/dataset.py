@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from flwr_datasets import FederatedDataset
 from hydra.utils import instantiate, call
+import numpy as np
 import torch
 from torchvision.transforms import Compose, ToTensor
 from torch.utils.data import  DataLoader
@@ -8,7 +9,6 @@ from flwr_datasets.partitioner import Partitioner
 class Dataset():
     def __init__(self,partitioner):
         self.partitioner : Partitioner = partitioner
-        
         
     def apply_transforms(self):
         def tr(batch):

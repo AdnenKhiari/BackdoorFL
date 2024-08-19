@@ -8,14 +8,8 @@ from omegaconf import DictConfig, OmegaConf
 
 import flwr as fl
 
-from client import generate_client_fn, get_partitioner
+from clients.client import generate_client_fn, get_partitioner
 from server import get_evalulate_fn
-
-
-# !!!! The code in this directory is the result of adpating the project first shown
-# in <LINK> to make better use of Hydra's config system. It is recommended to first
-# check the original code. There you'll find also additional comments walking you
-# through in detail what each part of the code does.
 
 
 @hydra.main(config_path="config", config_name="base", version_base=None)
