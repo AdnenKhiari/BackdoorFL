@@ -35,7 +35,7 @@ class Dataset():
                 }
             except Exception as e:
                 print(f"Error in collate: {e}")
-                print(f"Sizes: {set(sizes)}")
+                print(f"Sizes: {list(set(sizes))}")
                 raise e
         return col    
     @abstractmethod
