@@ -21,15 +21,3 @@ class Cifar10(Dataset):
             del batch["img"]
             return batch
         return tr
-    def collate(self):
-        def col(batch):
-            images = []
-            labels = []
-            for item in batch:
-                images.append(item["image"])
-                labels.append(torch.tensor(item["label"]))
-            return {
-                "image": torch.stack(images),
-                "label": torch.stack(labels)
-            }
-        return col

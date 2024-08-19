@@ -11,3 +11,15 @@ class Mnist(Dataset):
         super(Mnist,self).__init__(partitioner)
     def get_federated_dataset(self,partitioners):
         return FederatedDataset(dataset="mnist",partitioners=partitioners)
+    def collate(self):
+        def col(batch):
+            images = []
+            labels = []
+            for item in batch:
+                images.append(torch.cat([item["image"],item["image"],item["image"]]))
+                labels.append(torch.tensor(item["label"]))
+            return {
+                "image": torch.stack(images),
+                "label": torch.stack(labels)
+            }
+        return col
