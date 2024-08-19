@@ -21,22 +21,17 @@ class Dataset():
     
     def collate(self):
         def col(batch):
-            sizes = []
-            try:
-                images = []
-                labels = []
-                for item in batch:
+            images = []
+            labels = []
+            for item in batch:
+                if item["image"].shape == (3,50,50) :
                     images.append(item["image"])
                     labels.append(torch.tensor(item["label"]))
-                    sizes.append({item["image"].shape})
-                return {
-                    "image": torch.stack(images),
-                    "label": torch.stack(labels)
-                }
-            except Exception as e:
-                print(f"Error in collate: {e}")
-                print(f"Sizes: {np.unique(sizes)}")
-                raise e
+            return {
+                "image": torch.stack(images),
+                "label": torch.stack(labels)
+            }
+
         return col    
     @abstractmethod
     def get_federated_dataset(self) -> FederatedDataset:
