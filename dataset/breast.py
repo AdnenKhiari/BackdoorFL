@@ -11,3 +11,19 @@ class Breast(Dataset):
         
     def get_federated_dataset(self,partitioners):
         return FederatedDataset(dataset="dbzadnen/breast-histopathology-images",partitioners=partitioners)
+    def collate(self):
+        def col(batch):
+            images = []
+            labels = []
+            for item in batch:
+                if item["image"].shape == (3,50,50) :
+                    print(item["image"].max())
+                    print(item["image"].min())
+                    images.append(item["image"])
+                    labels.append(torch.tensor(item["label"]))
+            return {
+                "image": torch.stack(images),
+                "label": torch.stack(labels)
+            }
+
+        return col  

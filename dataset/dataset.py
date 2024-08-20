@@ -13,7 +13,7 @@ class Dataset():
     def apply_transforms(self):
         def tr(batch):
             pytorch_transforms = Compose(
-                [ToTensor(),Normalize()]
+                [ToTensor()]
             )
             batch["image"] = [pytorch_transforms(image) for image in batch["image"]]
             return batch
@@ -24,9 +24,8 @@ class Dataset():
             images = []
             labels = []
             for item in batch:
-                if item["image"].shape == (3,50,50) :
-                    images.append(item["image"])
-                    labels.append(torch.tensor(item["label"]))
+                images.append(item["image"])
+                labels.append(torch.tensor(item["label"]))
             return {
                 "image": torch.stack(images),
                 "label": torch.stack(labels)
