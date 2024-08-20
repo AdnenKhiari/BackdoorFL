@@ -15,7 +15,7 @@ class Cifar10(Dataset):
     def apply_transforms(self):
         def tr(batch):
             pytorch_transforms = Compose(
-                [ToTensor()]
+                [ToTensor(),Normalize()]
             )
             batch["image"] = [pytorch_transforms(image) for image in batch["img"]]
             del batch["img"]

@@ -9,9 +9,8 @@ class ResNet(ModelBase):
         super(ResNet, self).__init__(num_classes)
         self.model = resnet50()
         self.model.fc = nn.Sequential(
-            nn.Linear(2048, 512),
             nn.ReLU(),
-            nn.Linear(512,num_classes),
+            nn.Linear(2048, num_classes),
             nn.Softmax(dim=1),
         )
     def forward(self, x: torch.Tensor) -> torch.Tensor:

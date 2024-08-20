@@ -3,7 +3,7 @@ from flwr_datasets import FederatedDataset
 from hydra.utils import instantiate, call
 import numpy as np
 import torch
-from torchvision.transforms import Compose, ToTensor
+from torchvision.transforms import Compose, ToTensor,Normalize
 from torch.utils.data import  DataLoader
 from flwr_datasets.partitioner import Partitioner
 class Dataset():
@@ -13,7 +13,7 @@ class Dataset():
     def apply_transforms(self):
         def tr(batch):
             pytorch_transforms = Compose(
-                [ToTensor()]
+                [ToTensor(),Normalize()]
             )
             batch["image"] = [pytorch_transforms(image) for image in batch["image"]]
             return batch
