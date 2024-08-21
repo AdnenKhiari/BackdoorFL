@@ -48,12 +48,10 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> float:
     if total_items == 0:
         return 0.0  # Avoid division by zero if no items are present
     
-    result =  {
+    return {
         "PoisonedClients": poisoned_items,
         "RoundPoisoningPercentage": poisoned_items / total_items
     }
-    print("Fit Stats :", result)
-    return result
 
 def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> Dict[str, float]:
     """
