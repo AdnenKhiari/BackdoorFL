@@ -21,7 +21,7 @@ def get_on_fit_config(config: DictConfig):
     return fit_config_fn
 
 
-def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> float:
+def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
     """
     Calculate the proportion of poisoned items in the round.
 
