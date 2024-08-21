@@ -88,7 +88,7 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
             aggregated_metrics[key] = weighted_sums[key] / total_weights[key]
     
     return {
-        **aggregated_metrics,
+        **poisoning_stats,
         "metrics": aggregated_metrics
     }
 

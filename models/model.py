@@ -33,7 +33,7 @@ def train(net: ModelBase, trainloader, optimizer, epochs, device: str):
         with torch.no_grad():
             avg_loss = total_loss / len(trainloader)
             epoch_acc = accuracy_metric.compute().item()
-            print(f"Epoch {epoch+1}: train loss {avg_loss}, accuracy {epoch_acc}")
+            print(f"Epoch {epoch+1}: train loss {avg_loss}, train accuracy {epoch_acc}")
 
 
 def test(net, testloader, device):

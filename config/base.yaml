@@ -23,6 +23,6 @@ config_fit:
 defaults:
   - partitioners: iid
   - model: mobilenet
-  - strategy: fedavg # points to conf/strategy/fedavg.yaml
+  - strategy: fedavg
   - dataset: cifar10
   - optimizers: sgd
