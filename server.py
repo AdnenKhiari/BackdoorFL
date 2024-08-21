@@ -91,7 +91,7 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
         "poisoning_stats": poisoning_stats,
         "metrics": aggregated_metrics
     }
-    return aggregated_metrics
+    return result
 
 def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
     """Return a function to evaluate the global model."""
