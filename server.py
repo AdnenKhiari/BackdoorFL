@@ -89,7 +89,7 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
     
     return {
         **aggregated_metrics,
-        metrics: aggregated_metrics
+        "metrics": aggregated_metrics
     }
 
 
