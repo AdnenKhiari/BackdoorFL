@@ -89,9 +89,8 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
     
     result = {
         **poisoning_stats,
-        **aggregated_metrics
+        "metrics": aggregated_metrics
     }
-    print("Aggregated metrics Test:", result)
     return result
 
 def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
