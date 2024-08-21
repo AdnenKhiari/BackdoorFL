@@ -1,35 +1,48 @@
+import os
 import pickle
 from pathlib import Path
-
+import ray
+from flwr.simulation.app import _create_node_id_to_partition_mapping
 import hydra
 from hydra.utils import instantiate, call
 from hydra.core.hydra_config import HydraConfig
 from omegaconf import DictConfig, OmegaConf
-
 import flwr as fl
 
 from clients.client import generate_client_fn, get_partitioner
-from server import get_evalulate_fn
-
+from custom_simulation.simulation import get_client_ids, start_simulation
+from poisoning_transforms.data.datapoisoner import PoisoningPipeline
+from server import aggregation_metrics, fit_stats, get_evalulate_fn
+import numpy as np
 
 @hydra.main(config_path="config", config_name="base", version_base=None)
 def main(cfg: DictConfig):
     
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
-    client_fn = generate_client_fn(cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed)
+    client_ids = get_client_ids(cfg.num_clients)
+    honest_clients = np.random.choice(client_ids, int(cfg.num_clients * (1-cfg.poisoned_clients_ratio)), replace=False)
     
-    test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
-    dataset = instantiate(cfg.dataset["class"],test_partitioner)
-    strategy = instantiate(
-        cfg.strategy, evaluate_fn=get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size))
-    )
+    client_fn = generate_client_fn(honest_clients,cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed)
+    
+    data_poisoner = PoisoningPipeline([])
+    
+    # dataset = instantiate(cfg.dataset["class"],test_partitioner)
+    # evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),data_poisoner)
+    # test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
 
+    strategy = instantiate(
+        cfg.strategy,
+        evaluate_fn=None,
+        fit_metrics_aggregation_fn=fit_stats,
+        evaluate_metrics_aggregation_fn=aggregation_metrics,
+    )
+   
     ## 5. Start Simulation
     # As you'll notice, we can start the simulation in exactly the same way as we did in the previous project.
-    history = fl.simulation.start_simulation(
+    history = start_simulation(
         client_fn=client_fn,
-        num_clients=cfg.num_clients,
+        clients_ids=client_ids,
         config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
         strategy=strategy,
         client_resources={"num_cpus": cfg.num_cpus_per_client, "num_gpus": cfg.num_gpus_per_client},
@@ -43,7 +56,8 @@ def main(cfg: DictConfig):
 
     with open(str(results_path), "wb") as h:
         pickle.dump(results, h, protocol=pickle.HIGHEST_PROTOCOL)
-
+    with open(os.path.join(str(save_path),"report.txt"), "wb") as h:
+        pickle.dump(results, h, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
     main()

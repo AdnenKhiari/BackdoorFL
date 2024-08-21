@@ -13,6 +13,8 @@ valratio: 0.15
 num_cpus_per_client: 1
 num_gpus_per_client: 0
 
+poisoned_clients_ratio: 0
+
 config_fit:
   lr: 0.01
   momentum: 0.9

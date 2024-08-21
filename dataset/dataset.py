@@ -42,7 +42,7 @@ class Dataset():
 
         data_with_transforms = data.with_transform(self.apply_transforms())
         return DataLoader(data_with_transforms,batch_size=batch_size,collate_fn=self.collate())
-
+    
     def load_datasets(self,partition_id: int, batch_size: int = 16, val_ratio: float = 0.15,seed=42):
         fds = self.get_federated_dataset({"train": self.partitioner})
         partition = fds.load_partition(partition_id)

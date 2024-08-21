@@ -17,8 +17,6 @@ class Breast(Dataset):
             labels = []
             for item in batch:
                 if item["image"].shape == (3,50,50) :
-                    print(item["image"].max())
-                    print(item["image"].min())
                     images.append(item["image"])
                     labels.append(torch.tensor(item["label"]))
             return {
