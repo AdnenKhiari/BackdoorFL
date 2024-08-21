@@ -89,7 +89,7 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
     
     result = {
         **poisoning_stats,
-        "metrics": aggregated_metrics
+        **aggregated_metrics
     }
     print("Aggregated metrics Test:", result)
     return result
