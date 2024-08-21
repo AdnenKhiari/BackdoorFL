@@ -48,10 +48,12 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> float:
     if total_items == 0:
         return 0.0  # Avoid division by zero if no items are present
     
-    return {
+    result =  {
         "PoisonedClients": poisoned_items,
         "RoundPoisoningPercentage": poisoned_items / total_items
     }
+    print("Fit Stats :", result)
+    return result
 
 def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> Dict[str, float]:
     """
@@ -87,11 +89,12 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
         if total_weights[key] > 0:
             aggregated_metrics[key] = weighted_sums[key] / total_weights[key]
     
-    return {
+    result = {
         **poisoning_stats,
         "metrics": aggregated_metrics
     }
-
+    print("Aggregated metrics Test:", result)
+    return result
 
 def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
     """Return a function to evaluate the global model."""
