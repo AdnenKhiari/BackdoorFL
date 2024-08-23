@@ -62,7 +62,7 @@ class DataPoisoner(ABC):
             yield self.fit(batch)
             
 
-class PoisoningPipeline(DataPoisoner):
+class DataPoisoningPipeline(DataPoisoner):
     def __init__(self, poisoners: List[DataPoisoner]):
         """
         Initializes the PoisoningPipeline with a list of DataPoisoners.

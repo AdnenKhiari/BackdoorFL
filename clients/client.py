@@ -1,9 +1,11 @@
 from clients.clean_client import FlowerClient
 from clients.poisoned_client import PoisonedFlowerClient
+from clients.simple_poisoned_client import SimplePoisonedClient
 from dataset.dataset import Dataset
 from flwr_datasets.partitioner import Partitioner
 from flwr.common import Context
 from hydra.utils import instantiate
+
 def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     params = {}
     # if partitioner_cfg.get("seed",None) is not None:
@@ -34,7 +36,7 @@ def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partit
         partitioner : Partitioner = get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions)
         dataset : Dataset= instantiate(dataset_cfg["class"],partitioner=partitioner)
         trainloader, valloader, _ = dataset.load_datasets(partition_id,bachsize_cfg,valratio_cfg,seed_cfg)
-        return PoisonedFlowerClient(
+        return SimplePoisonedClient(
             trainloader=trainloader,
             vallodaer=valloader,
             model_cfg=model_cfg,

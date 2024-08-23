@@ -3,29 +3,26 @@ from clients.client import FlowerClient
 from models.model import train, test
 from flwr.common import NDArrays, Scalar,Context
 
-from poisoning_transforms.data.datapoisoner import DataPoisoner
-from poisoning_transforms.model.model_poisoner import ModelPoisoner
+from poisoning_transforms.data.datapoisoner import DataPoisoner, DataPoisoningPipeline
+from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
+from poisoning_transforms.model import model_poisoner
+from poisoning_transforms.model.model_poisoner import ModelPoisoner, ModelPoisoningPipeline
+from poisoning_transforms.model.model_replacement import ModelReplacement
 
 class PoisonedFlowerClient(FlowerClient):
-    def __init__(self,trainloader, vallodaer,model_cfg,optimizer,data_poisoner : DataPoisoner,model_poisoner: ModelPoisoner) -> None:
-        super(PoisonedFlowerClient).__init__(trainloader,vallodaer,model_cfg,optimizer)
-        self.data_poisoner = data_poisoner
-        self.model_poisoner = model_poisoner
-    def set_parameters(self, parameters):
-        self.global_params = parameters
-        return super().set_parameters(parameters)
-    
-    def get_parameters(self, config: Dict[str, bool | bytes | float | int | str]):
-        params = super().get_parameters(config)
-        return params
-    
+    def __init__(self,trainloader, vallodaer,model_cfg,optimizer) -> None:
+        super(PoisonedFlowerClient,self).__init__(trainloader,vallodaer,model_cfg,optimizer)
+        self.data_poisoner : DataPoisoner = None
+        self.model_poisoner : ModelPoisoner = None
     def fit(self, parameters, config):
         # copy parameters sent by the server into client's local model
         self.set_parameters(parameters)
         
         # Inject Backdoor
-        self.data_poisoner.fit(self.trainloader) 
-        backdoored_train = self.data_poisoner.transform(self.trainloader) 
+        if self.data_poisoner is None:
+            raise Exception("Implement a data poisoner")
+        [_ for _ in iter(self.data_poisoner.wrap_fit_iterator(self.trainloader))] 
+        backdoored_train = iter(self.data_poisoner.wrap_transform_iterator(self.trainloader))
         
         # Get Config
         lr = config["lr"]
@@ -37,16 +34,18 @@ class PoisonedFlowerClient(FlowerClient):
         
         # Poison Weights
         params = self.get_parameters({})
+        if self.model_poisoner is None:
+            raise Exception("Implement a model poisoner")
         self.model_poisoner.fit(params)
         backdoored_params = self.model_poisoner.transform(params)
         
-        return backdoored_params, len(backdoored_train), {"Poisoned": True}
+        return backdoored_params, len(self.trainloader), {"Poisoned": True}
     
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
 
         mt_loss, mta_metrics = test(self.model, self.valloader, self.device)
-        backdoored_valid = self.data_poisoner.transform(self.valloader) 
+        backdoored_valid = iter(self.data_poisoner.wrap_transform_iterator(self.valloader))
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
 
         return float(mt_loss), len(self.valloader), {"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}

@@ -10,7 +10,7 @@ class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
 
     def __init__(self, trainloader, vallodaer, model_cfg,optimizer) -> None:
-        super().__init__()
+        super(FlowerClient,self).__init__()
 
         self.trainloader = trainloader
         self.valloader = vallodaer

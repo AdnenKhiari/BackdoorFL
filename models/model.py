@@ -31,7 +31,7 @@ def train(net: ModelBase, trainloader, optimizer, epochs, device: str):
                 total_loss += loss.item()
                 accuracy_metric.update(outputs, labels)
         with torch.no_grad():
-            avg_loss = total_loss / len(trainloader)
+            avg_loss = total_loss / sum([1 for _ in trainloader])
             epoch_acc = accuracy_metric.compute().item()
             print(f"Epoch {epoch+1}: train loss {avg_loss}, train accuracy {epoch_acc}")
 
@@ -58,7 +58,7 @@ def test(net, testloader, device):
             accuracy_metric.update(outputs, labels)
             # precision_metric.update(outputs, labels)
 
-    avg_loss = total_loss / len(testloader)
+    avg_loss = total_loss / sum([1 for _ in testloader])
     accuracy = accuracy_metric.compute().cpu().item()
     # precision = precision_metric.compute().cpu().item()
     
