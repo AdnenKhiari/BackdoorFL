@@ -1,8 +1,6 @@
 import numpy as np
 from typing import List
 
-from torch._tensor import Tensor
-
 from poisoning_transforms.model.model_poisoner import ModelPoisoner
 
 class ModelReplacement(ModelPoisoner):
@@ -11,24 +9,32 @@ class ModelReplacement(ModelPoisoner):
         Initializes the ModelReplacement poisoner.
 
         Args:
-            global_weights (np.ndarray): global model's weight arrays (G^t).
+            global_weights (np.ndarray): Global model's weight array (G^t).
             gamma (float): The scaling factor (Γ).
         """
         super().__init__()
         self.global_weights = global_weights
         self.gamma = gamma
 
-    def fit(self, weights: List[Tensor]) -> None:
-        pass
-    def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
+    def fit(self, weights: np.ndarray) -> None:
         """
-        Applies weight replacement poisoning to the list of weights.
+        This method is not used in this poisoner but is required by the abstract base class.
 
         Args:
-            weights (List[np.ndarray]): List of weight arrays to be poisoned.
+            weights (np.ndarray): weight to fit the poisoner.
+        """
+        # No fitting logic required for this poisoner
+        pass
+
+    def transform(self, weights: np.ndarray) -> np.ndarray:
+        """
+        Applies weight replacement poisoning to the weights.
+
+        Args:
+            weights (np.ndarray): weight array to be poisoned.
 
         Returns:
-            List[np.ndarray]: List of poisoned weight arrays.
+            np.ndarray: weights arrays.
         """
-        poisoned_weights = self.gamma * (weights - self.global_weights) + self.global_weights
+        poisoned_weights =self.gamma * (weights - self.global_weights) + self.global_weights
         return poisoned_weights
