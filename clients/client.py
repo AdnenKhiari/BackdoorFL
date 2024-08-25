@@ -14,7 +14,7 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"partition_by":dataset_cfg.label})
     return instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
 
-def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg):
+def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg,poisoned_bachsize_cfg,poisoned_target_cfg):
     """Return a function to construct a FlowerClient."""
 
     def good_client_fn(context: Context):
@@ -40,7 +40,9 @@ def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partit
             trainloader=trainloader,
             vallodaer=valloader,
             model_cfg=model_cfg,
-            optimizer=optimizer_cfg
+            optimizer=optimizer_cfg,
+            batch_poison_num=poisoned_bachsize_cfg,
+            target_poisoned=poisoned_target_cfg
         ).to_client()
         
     def client_fn(context: Context):

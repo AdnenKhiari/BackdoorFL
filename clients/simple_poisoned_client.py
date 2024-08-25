@@ -1,14 +1,14 @@
 from clients.poisoned_client import PoisonedFlowerClient
-from poisoning_transforms.data.datapoisoner import DataPoisoner, DataPoisoningPipeline
+from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline
 from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
 from poisoning_transforms.model import model_poisoner
 from poisoning_transforms.model.model_poisoner import ModelPoisoner, ModelPoisoningPipeline
 from poisoning_transforms.model.model_replacement import ModelReplacement
 
 class SimplePoisonedClient(PoisonedFlowerClient):
-    def __init__(self,trainloader, vallodaer,model_cfg,optimizer) -> None:
+    def __init__(self,trainloader, vallodaer,model_cfg,optimizer,batch_poison_num,target_poisoned) -> None:
         super(SimplePoisonedClient,self).__init__(trainloader,vallodaer,model_cfg,optimizer)
-        self.data_poisoner = DataPoisoningPipeline([SimplePatchPoisoner((20,20),(5,5),1,1)])
+        self.data_poisoner = BatchPoisoner(DataPoisoningPipeline([SimplePatchPoisoner((20,20),(5,5),1)]),batch_poison_num,target_poisoned)
     def set_parameters(self, parameters):
         # self.model_poisoner = ModelPoisoningPipeline([ModelReplacement(parameters)])
         self.model_poisoner = ModelPoisoningPipeline([])

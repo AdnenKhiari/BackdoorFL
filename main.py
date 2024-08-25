@@ -23,11 +23,14 @@ def main(cfg: DictConfig):
     honest_clients = np.random.choice(client_ids, int(cfg.num_clients * (1-cfg.poisoned_clients_ratio)), replace=False)
     poisoned_clients = list(set(client_ids) - set(honest_clients))
     
+    # Generate Classes for poisoned clients with partitions and poisons ready
+    
+    
     # dataset = instantiate(cfg.dataset["class"],test_partitioner)
     # evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),data_poisoner)
     # test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
     
-    client_fn = generate_client_fn(honest_clients,cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed)
+    client_fn = generate_client_fn(honest_clients,cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,cfg.poisoned_batch_size,cfg.poisoned_target)
     strategy = instantiate(
         cfg.strategy,
         evaluate_fn=None,

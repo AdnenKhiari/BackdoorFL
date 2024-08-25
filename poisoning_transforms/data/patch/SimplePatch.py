@@ -4,7 +4,7 @@ import torch.utils
 from poisoning_transforms.data.datapoisoner import DataPoisoner
 
 class SimplePatchPoisoner(DataPoisoner):
-    def __init__(self, patch_location: tuple, patch_dimension: tuple, patch_value: float,label: int):
+    def __init__(self, patch_location: tuple, patch_dimension: tuple, patch_value: float):
         """
         Initializes the SimplePatchPoisoner with the location, dimension, and value of the patch.
 
@@ -17,7 +17,6 @@ class SimplePatchPoisoner(DataPoisoner):
         self.patch_location = patch_location
         self.patch_dimension = patch_dimension
         self.patch_value = patch_value
-        self.label = label
         
     def fit(self, data: dict) -> None:
         """
@@ -49,7 +48,6 @@ class SimplePatchPoisoner(DataPoisoner):
         
         # Update the data dictionary with the poisoned images
         data['image'] = images
-        data['label'] = torch.tensor([self.label]*images.shape[0])
         return data
 
 
@@ -64,7 +62,7 @@ if __name__ == "__main__":
     patch_dimension = (5, 5)
     patch_value = 1.0  # Set the patch to a bright value
     
-    poisoner = SimplePatchPoisoner(patch_location, patch_dimension, patch_value,1)
+    poisoner = SimplePatchPoisoner(patch_location, patch_dimension, patch_value)
     
     # Apply the patch to the batch of images
     poisoned_images = poisoner.transform(images)
