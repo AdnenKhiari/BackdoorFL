@@ -50,4 +50,4 @@ class FlowerClient(fl.client.NumPyClient):
 
         loss, metrics = test(self.model, lambda : self.valloader, self.device)
 
-        return float(loss), len(self.valloader), {"MTA": metrics["accuracy"]}
+        return float(loss), len(self.valloader), {"MTA": metrics["accuracy"],"Poisoned": 0}

@@ -48,4 +48,4 @@ class PoisonedFlowerClient(FlowerClient):
         backdoored_valid = lambda :self.data_poisoner.wrap_transform_iterator(self.valloader)
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
 
-        return float(mt_loss), len(self.valloader), {"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+        return float(mt_loss), len(self.valloader), {"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
