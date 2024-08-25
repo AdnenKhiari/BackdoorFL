@@ -46,7 +46,7 @@ def test(net, get_testloader, device):
 
     total_loss = 0.0
     with torch.no_grad():
-        for batch in get_testloader:
+        for batch in get_testloader():
             batch = net.transform_input(batch)
 
             images, labels = batch["image"], batch["label"]
@@ -58,7 +58,7 @@ def test(net, get_testloader, device):
             accuracy_metric.update(outputs, labels)
             # precision_metric.update(outputs, labels)
 
-    avg_loss = total_loss / sum([1 for _ in get_testloader])
+    avg_loss = total_loss / sum([1 for _ in get_testloader()])
     accuracy = accuracy_metric.compute().cpu().item()
     # precision = precision_metric.compute().cpu().item()
     
