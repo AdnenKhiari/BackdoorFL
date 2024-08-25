@@ -36,6 +36,8 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
     total_items = 0.0
     poisoned_items = 0.0
     
+    print("METRICSSS",client_metrics)
+    
     # Count poisoned items
     for _, metrics in client_metrics:
         for key, value in metrics.items():
@@ -46,7 +48,10 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
     
     # Calculate the proportion of poisoned items
     if total_items == 0.0:
-        return 0.0  # Avoid division by zero if no items are present
+        return {
+            "PoisonedClients": 0.0,
+            "RoundPoisoningPercentage": 0.0
+        }  # Avoid division by zero if no items are present
     
     return {
         "PoisonedClients": poisoned_items,
