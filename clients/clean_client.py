@@ -43,7 +43,7 @@ class FlowerClient(fl.client.NumPyClient):
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         train(self.model, lambda : self.trainloader, optim, epochs, self.device)
 
-        return self.get_parameters({}), len(self.trainloader), {"Poisoned": False}
+        return self.get_parameters({}), len(self.trainloader), {"Poisoned": 0}
 
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)

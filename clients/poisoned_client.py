@@ -39,7 +39,7 @@ class PoisonedFlowerClient(FlowerClient):
         self.model_poisoner.fit(params)
         backdoored_params = self.model_poisoner.transform(params)
         
-        return backdoored_params, len(self.trainloader), {"Poisoned": True}
+        return backdoored_params, len(self.trainloader), {"Poisoned": 1}
     
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
