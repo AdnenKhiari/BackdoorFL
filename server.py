@@ -105,9 +105,9 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
         model.load_state_dict(state_dict, strict=True)
 
-        backdoored_set = data_poisoner.transform(testloader)
+        backdoored_set = lambda : data_poisoner.transform(testloader)
         
-        mt_loss, mt_metrics = test(model, testloader, device)
+        mt_loss, mt_metrics = test(model, lambda : testloader, device)
         attack_loss, attack_metrics = test(model, backdoored_set, device)
 
         return mt_loss, {

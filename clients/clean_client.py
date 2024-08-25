@@ -48,6 +48,6 @@ class FlowerClient(fl.client.NumPyClient):
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
 
-        loss, metrics = test(self.model, self.valloader, self.device)
+        loss, metrics = test(self.model, lambda : self.valloader, self.device)
 
         return float(loss), len(self.valloader), {"MTA": metrics["accuracy"]}

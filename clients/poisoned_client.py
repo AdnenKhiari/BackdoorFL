@@ -44,8 +44,8 @@ class PoisonedFlowerClient(FlowerClient):
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
 
-        mt_loss, mta_metrics = test(self.model, self.valloader, self.device)
+        mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
         backdoored_valid = lambda :self.data_poisoner.wrap_transform_iterator(self.valloader)
-        attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
+        attack_loss, attack_metrics = test(self.model, lambda : backdoored_valid, self.device)
 
         return float(mt_loss), len(self.valloader), {"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
