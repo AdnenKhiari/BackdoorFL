@@ -41,7 +41,7 @@ class FlowerClient(fl.client.NumPyClient):
         epochs = config["local_epochs"]
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
-        train(self.model, lambda d: self.trainloader, optim, epochs, self.device)
+        train(self.model, lambda : self.trainloader, optim, epochs, self.device)
 
         return self.get_parameters({}), len(self.trainloader), {"Poisoned": False}
 
