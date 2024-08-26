@@ -18,7 +18,24 @@ import wandb
 def main(cfg: DictConfig):
     
     global_run = wandb.init(project="federated-1", notes="test", tags=[])
-    # global_run.config = OmegaConf.to_object(cfg)
+    global_run.config = {
+        "num_clients": cfg.num_clients,
+        "num_rounds": cfg.num_rounds,
+        "num_cpus_per_client": cfg.num_cpus_per_client,
+        "num_gpus_per_client": cfg.num_gpus_per_client,
+        "poisoned_clients_ratio": cfg.poisoned_clients_ratio,
+        "global_seed": cfg.global_seed,
+        "batch_size": cfg.batch_size,
+        "valratio": cfg.valratio,
+        "poisoned_batch_size": cfg.poisoned_batch_size,
+        "poisoned_target": cfg.poisoned_target,
+        "dataset": cfg.dataset,
+        "model": cfg.model,
+        "optimizers": cfg.optimizers,
+        "partitioners": cfg.partitioners,
+        "strategy": cfg.strategy,
+        "num_classes": cfg.num_classes,
+    }
     
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
@@ -61,6 +78,7 @@ def main(cfg: DictConfig):
         pickle.dump(results, h, protocol=pickle.HIGHEST_PROTOCOL)
     with open(os.path.join(str(save_path),"report.txt"), "wb") as h:
         pickle.dump(results, h, protocol=pickle.HIGHEST_PROTOCOL)
-
+        
+    global_run.finish()
 if __name__ == "__main__":
     main()
