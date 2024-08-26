@@ -122,25 +122,28 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
         model.load_state_dict(state_dict, strict=True)
 
-        data_poisoner : DataPoisoner = data_poisoner_fn()
-        backdoored_set = lambda : data_poisoner.transform(testloader)
-        
         mt_loss, mt_metrics = test(model, lambda : testloader, device)
-        attack_loss, attack_metrics = test(model, backdoored_set, device)
-
-        wandb.log({
-            "global_loss": mt_loss,
-            "global_MTA": mt_metrics["accuracy"],
-            "global_ASR": attack_metrics["accuracy"],
-            "global_AttackLoss": attack_loss,
-            "current_round": server_round
-        })
-
-        return mt_loss, {
-            "global_MTA": mt_metrics["accuracy"],
-            "global_ASR": attack_metrics["accuracy"],
-            "global_AttackLoss": attack_loss,
-            "current_round": server_round
+        
+        data_poisoner : DataPoisoner = data_poisoner_fn()
+        
+        global_asr = 0
+        
+        if data_poisoner is not None:
+            backdoored_set = lambda : data_poisoner.transform(testloader)
+            attack_loss, attack_metrics = test(model, backdoored_set, device)
+            global_asr = attack_metrics["accuracy"]
+    
+        result = {
+            "metrics":{
+                "global_loss": mt_loss,
+                "global_MTA": mt_metrics["accuracy"],
+                "global_ASR": global_asr ,
+                "global_AttackLoss": attack_loss,
+                "current_round": server_round
+            }
         }
+        wandb.log(result)
+
+        return mt_loss, result
 
     return evaluate_fn
