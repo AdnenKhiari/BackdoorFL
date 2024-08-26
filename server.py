@@ -111,7 +111,7 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
     print("Evaluation Result :",result)
     return result
 
-def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
+def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
     """Return a function to evaluate the global model."""
 
     def evaluate_fn(server_round: int, parameters, config):
@@ -122,6 +122,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
         model.load_state_dict(state_dict, strict=True)
 
+        data_poisoner : DataPoisoner = data_poisoner_fn()
         backdoored_set = lambda : data_poisoner.transform(testloader)
         
         mt_loss, mt_metrics = test(model, lambda : testloader, device)

@@ -52,3 +52,17 @@ class PoisonedFlowerClient(FlowerClient):
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
 
         return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+    
+    
+    
+def get_global_data_poisoner(clients: dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
+    def get_poisoner():
+        data_poisoner = []
+        for client in clients["malicious"].values():
+            if len(data_poisoner) == 0:
+                data_poisoner = [client.test_data_poisoner]
+            else:
+                pass
+                # data_poisoner = DataPoisoningPipeline(data_poisoner, client.train_data_poisoner)
+        return DataPoisoningPipeline(data_poisoner) 
+    return get_poisoner
