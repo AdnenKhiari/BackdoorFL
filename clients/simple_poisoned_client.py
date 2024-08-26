@@ -7,8 +7,8 @@ from poisoning_transforms.model.model_replacement import ModelReplacement
 
 class SimplePoisonedClient(PoisonedFlowerClient):
     def __init__(self,trainloader, vallodaer,model_cfg,optimizer,batch_poison_num,target_poisoned,batch_size) -> None:
-        super(SimplePoisonedClient,self).__init__(trainloader,vallodaer,model_cfg,optimizer,batch_poison_num,target_poisoned,batch_size)
-        self.data_poisoner = DataPoisoningPipeline([SimplePatchPoisoner((20,20),(5,5),1)])
+        data_poisoner = DataPoisoningPipeline([SimplePatchPoisoner((20,20),(5,5),1)])
+        super(SimplePoisonedClient,self).__init__(trainloader,vallodaer,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size)
     def set_parameters(self, parameters):
         # self.model_poisoner = ModelPoisoningPipeline([ModelReplacement(parameters)])
         self.model_poisoner = ModelPoisoningPipeline([])
