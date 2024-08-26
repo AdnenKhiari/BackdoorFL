@@ -8,3 +8,6 @@ min_available_clients: ${num_clients}
 on_fit_config_fn: # this is a function
   _target_: server.get_on_fit_config
   config: ${config_fit}
+on_evaluate_config_fn: # this is a function
+  _target_: server.get_on_eval_config
+  config: ${config_eval}

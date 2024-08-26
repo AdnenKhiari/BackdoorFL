@@ -21,6 +21,15 @@ def get_on_fit_config(config: DictConfig):
 
     return fit_config_fn
 
+def get_on_eval_config(config: DictConfig):
+    """Return a function to configure the client's evaluate."""
+
+    def eval_config_fn(server_round: int):
+        return {
+            "current_round": server_round
+        }
+
+    return eval_config_fn
 
 def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
     """
@@ -130,7 +139,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
             "global_MTA": mt_metrics["accuracy"],
             "global_ASR": attack_metrics["accuracy"],
             "global_AttackLoss": attack_loss,
-            "global_server_round": server_round
+            "current_round": server_round
         }
 
     return evaluate_fn

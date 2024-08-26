@@ -22,6 +22,11 @@ config_fit:
   momentum: 0.9
   local_epochs: 2
 
+config_eval: # condif availabvle when evaluating
+  lr: 0.01
+  momentum: 0.9
+  local_epochs: 2
+
 defaults:
   - partitioners: iid
   - model: mobilenet
