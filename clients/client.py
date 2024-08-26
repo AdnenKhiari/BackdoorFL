@@ -42,7 +42,8 @@ def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partit
             model_cfg=model_cfg,
             optimizer=optimizer_cfg,
             batch_poison_num=poisoned_bachsize_cfg,
-            target_poisoned=poisoned_target_cfg
+            target_poisoned=poisoned_target_cfg,
+            batch_size=bachsize_cfg
         ).to_client()
         
     def client_fn(context: Context):

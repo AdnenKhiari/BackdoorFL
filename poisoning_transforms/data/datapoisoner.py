@@ -1,3 +1,4 @@
+from collections import defaultdict
 import torch
 from torch.utils.data import DataLoader
 from typing import Dict, Iterator, List, Optional, Any, Union
@@ -189,3 +190,98 @@ class BatchPoisoner(DataPoisoner):
             
         # Return the updated data
         return {'label': poisoned_labels, 'image': poisoned_images}
+    
+class IgnoreLabel(DataPoisoner):
+
+    def __init__(self, poisoner: DataPoisoner, target: int, batch_size: int):
+        """
+        Initializes the IgnoreLabel with a specific target label to ignore during poisoning.
+
+        Args:
+            poisoner (DataPoisoner): The underlying poisoner to apply to selected items.
+            target (int): The label to ignore during poisoning.
+            batch_size (int): The size of the batch to accumulate before yielding.
+        """
+        super().__init__()
+        self.target = target
+        self.poisoner = poisoner
+        self.batch_size = batch_size
+
+    def fit(self, data: Dict[str, torch.Tensor]) -> None:
+        """
+        No specific fitting needed for this class, just fits the underlying poisoner on the relevant data.
+
+        Args:
+            data (Dict[str, torch.Tensor]): Dictionary containing 'label' and 'image' tensors.
+        """
+        # Extract labels and images
+        labels = data['label']
+        images = data['image']
+        
+        # Select data where the label is not the target label
+        mask = labels != self.target
+        selected_images = images[mask]
+        selected_labels = labels[mask]
+        
+        # If there are any selected items, fit the underlying poisoner
+        if selected_images.size(0) > 0:
+            self.poisoner.fit({'label': selected_labels, 'image': selected_images})
+
+    def transform(self, data: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
+        """
+        Applies the underlying poisoner to data where the label is not the target label.
+
+        Args:
+            data (Dict[str, torch.Tensor]): Dictionary containing 'label' and 'image' tensors.
+
+        Returns:
+            Dict[str, torch.Tensor]: The dictionary with poisoned images where the label is not the target label.
+        """
+        # Extract labels and images
+        labels = data['label']
+        images = data['image']
+        
+        # Select data where the label is not the target label
+        mask = labels != self.target
+        selected_images = images[mask]
+        selected_labels = labels[mask]
+        
+        # If no data is selected, return the original data unchanged
+        if selected_images.size(0) == 0:
+            return {}
+        else:
+            return self.poisoner.transform({'label': selected_labels, 'image': selected_images})
+
+    def wrap_transform_iterator(self, dataloader: DataLoader) -> Iterator:
+        """
+        Wraps around a DataLoader (or any iterator) and applies the transform method to each batch.
+        Accumulates the transformed data until the desired batch size is reached, then yields it.
+
+        Args:
+            dataloader (DataLoader): DataLoader to be wrapped and poisoned.
+
+        Returns:
+            Iterator: Iterator over poisoned batches.
+        """
+        accumulated_data = defaultdict(list)
+        current_batch_size = 0
+
+        for batch in dataloader:
+            poisoned_batch = self.transform(batch)
+            if len(poisoned_batch) > 0:
+                for key, value in poisoned_batch.items():
+                    accumulated_data[key].append(value)
+                current_batch_size += len(poisoned_batch['label'])
+
+                # Check if we've reached the desired batch size
+                if current_batch_size >= self.batch_size:
+                    # Concatenate accumulated tensors and yield the batch
+                    yield {key: torch.cat(value) for key, value in accumulated_data.items()}
+
+                    # Reset the accumulator and current batch size
+                    accumulated_data = defaultdict(list)
+                    current_batch_size = 0
+
+        # Yield any remaining data if there's no more data left in the iterator
+        if current_batch_size > 0:
+            yield {key: torch.cat(value) for key, value in accumulated_data.items()}
