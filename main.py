@@ -18,7 +18,7 @@ import wandb
 def main(cfg: DictConfig):
     
     global_run = wandb.init(project="federated-1", notes="test", tags=[])
-    global_run.config = OmegaConf.to_object(cfg)
+    # global_run.config = OmegaConf.to_object(cfg)
     
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
