@@ -13,9 +13,12 @@ from clients.client import generate_client_fn, get_partitioner
 from custom_simulation.simulation import get_client_ids, start_simulation
 from server import aggregation_metrics, fit_stats, get_evalulate_fn
 import numpy as np
-
+import wandb
 @hydra.main(config_path="config", config_name="base", version_base=None)
 def main(cfg: DictConfig):
+    
+    global_run = wandb.init(project="federated-1", notes="test", tags=[])
+    global_run.config = cfg
     
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir

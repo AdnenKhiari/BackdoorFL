@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 from omegaconf import DictConfig
 from hydra.utils import instantiate
 import torch
+import wandb
 from models.model import test
 from poisoning_transforms.data.datapoisoner import DataPoisoner
 
@@ -96,6 +97,8 @@ def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> D
         "poisoning_stats": poisoning_stats,
         "metrics": aggregated_metrics
     }
+    wandb.log(result)
+
     print("Evaluation Result :",result)
     return result
 
