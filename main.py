@@ -48,9 +48,10 @@ def main(cfg: DictConfig):
     
     global_data_poisoner = get_global_data_poisoner(clients_dict)
     
+    
+    test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
     dataset = instantiate(cfg.dataset["class"],partitioner=test_partitioner)
     evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),global_data_poisoner)
-    test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
 
     strategy = instantiate(
         cfg.strategy,
