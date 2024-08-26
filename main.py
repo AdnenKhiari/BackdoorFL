@@ -17,8 +17,7 @@ import wandb
 @hydra.main(config_path="config", config_name="base", version_base=None)
 def main(cfg: DictConfig):
     
-    global_run = wandb.init(project="federated-1", notes="test", tags=[])
-    global_run.config = {
+    wandb_config = {
         "num_clients": cfg.num_clients,
         "num_rounds": cfg.num_rounds,
         "num_cpus_per_client": cfg.num_cpus_per_client,
@@ -36,7 +35,8 @@ def main(cfg: DictConfig):
         "strategy": cfg.strategy,
         "num_classes": cfg.num_classes,
     }
-    
+    global_run = wandb.init(project="federated-1", notes="test", tags=[],config=wandb_config)
+
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
     client_ids = get_client_ids(cfg.num_clients)

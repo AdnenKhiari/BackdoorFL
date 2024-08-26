@@ -118,10 +118,19 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner):
         mt_loss, mt_metrics = test(model, lambda : testloader, device)
         attack_loss, attack_metrics = test(model, backdoored_set, device)
 
+        wandb.log({
+            "global_loss": mt_loss,
+            "global_MTA": mt_metrics["accuracy"],
+            "global_ASR": attack_metrics["accuracy"],
+            "global_AttackLoss": attack_loss,
+            "current_round": server_round
+        })
+
         return mt_loss, {
-            "MTA": mt_metrics["accuracy"],
-            "ASR": attack_metrics["accuracy"],
-            "AttackLoss": attack_loss
+            "global_MTA": mt_metrics["accuracy"],
+            "global_ASR": attack_metrics["accuracy"],
+            "global_AttackLoss": attack_loss,
+            "global_server_round": server_round
         }
 
     return evaluate_fn

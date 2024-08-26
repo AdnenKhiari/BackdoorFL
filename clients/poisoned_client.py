@@ -29,6 +29,7 @@ class PoisonedFlowerClient(FlowerClient):
         lr = config["lr"]
         momentum = config["momentum"]
         epochs = config["local_epochs"]
+        current_round = config["current_round"]
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         
         train(self.model,backdoored_train, optim, epochs, self.device)
@@ -40,13 +41,14 @@ class PoisonedFlowerClient(FlowerClient):
         self.model_poisoner.fit(params)
         backdoored_params = self.model_poisoner.transform(params)
         
-        return backdoored_params, len(self.trainloader), {"Poisoned": 1}
+        return backdoored_params, len(self.trainloader), {"Poisoned": 1,"current_round":current_round}
     
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
+        current_round = config["current_round"]
 
         mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
 
-        return float(mt_loss), len(self.valloader), {"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+        return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}

@@ -39,15 +39,17 @@ class FlowerClient(fl.client.NumPyClient):
         lr = config["lr"]
         momentum = config["momentum"]
         epochs = config["local_epochs"]
+        current_round = config["current_round"]
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         train(self.model, lambda : self.trainloader, optim, epochs, self.device)
 
-        return self.get_parameters({}), len(self.trainloader), {"Poisoned": 0}
+        return self.get_parameters({}), len(self.trainloader), {"current_round": current_round,"Poisoned": 0}
 
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
+        current_round = config["current_round"]
 
         loss, metrics = test(self.model, lambda : self.valloader, self.device)
 
-        return float(loss), len(self.valloader), {"MTA": metrics["accuracy"],"Poisoned": 0}
+        return float(loss), len(self.valloader), {"current_round": current_round,"MTA": metrics["accuracy"],"Poisoned": 0}
