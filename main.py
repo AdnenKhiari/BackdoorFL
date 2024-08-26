@@ -44,9 +44,7 @@ def main(cfg: DictConfig):
     poisoned_clients = list(set(client_ids) - set(honest_clients))
     
     # Generate Classes for poisoned clients with partitions and poisons ready
-    
-    
-    # dataset = instantiate(cfg.dataset["class"],test_partitioner)
+    # dataset = instantiate(cfg.dataset["class"],partitioner=test_partitioner)
     # evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),data_poisoner)
     # test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
     
