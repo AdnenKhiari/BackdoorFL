@@ -127,18 +127,20 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
         data_poisoner : DataPoisoner = data_poisoner_fn()
         
         global_asr = 0
+        global_attack_loss = None
         
         if data_poisoner is not None:
             backdoored_set = lambda : data_poisoner.transform(testloader)
             attack_loss, attack_metrics = test(model, backdoored_set, device)
             global_asr = attack_metrics["accuracy"]
+            global_attack_loss= attack_loss
     
         result = {
             "metrics":{
                 "global_loss": mt_loss,
                 "global_MTA": mt_metrics["accuracy"],
                 "global_ASR": global_asr ,
-                "global_AttackLoss": attack_loss,
+                "global_AttackLoss": global_attack_loss,
                 "current_round": server_round
             }
         }
