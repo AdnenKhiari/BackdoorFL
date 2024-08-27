@@ -44,9 +44,10 @@ def main(cfg: DictConfig):
     client_ids = get_client_ids(cfg.num_clients)
     honest_clients = np.random.choice(client_ids, int(cfg.num_clients * (1-cfg.poisoned_clients_ratio)), replace=False)
     poisoned_clients = list(set(client_ids) - set(honest_clients))
-    clients_dict,client_fn = generate_client_fn(honest_clients,cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,cfg.poisoned_batch_size,cfg.poisoned_target)
     
-    global_data_poisoner = get_global_data_poisoner(clients_dict)
+    clients_dict,global_data_poisoner = get_global_data_poisoner()
+
+    client_fn = generate_client_fn(honest_clients,cfg.optimizers,cfg.model,cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,cfg.poisoned_batch_size,cfg.poisoned_target,clients_dict)
     
     
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)

@@ -55,7 +55,9 @@ class PoisonedFlowerClient(FlowerClient):
     
     
     
-def get_global_data_poisoner(clients: dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
+def get_global_data_poisoner() -> DataPoisoner:
+    clients : dict[str,dict[str,PoisonedFlowerClient]]= {"malicious": {},"honest": {}}
+
     def get_poisoner():
         data_poisoner = []
         for client in clients["malicious"].values():
@@ -68,4 +70,4 @@ def get_global_data_poisoner(clients: dict[str,dict[str,PoisonedFlowerClient]]) 
         if len(data_poisoner) == 0:
             return None
         return DataPoisoningPipeline(data_poisoner) 
-    return get_poisoner
+    return clients,get_poisoner

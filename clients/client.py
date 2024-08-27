@@ -14,34 +14,33 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"partition_by":dataset_cfg.label})
     return instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
 
-def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg,poisoned_bachsize_cfg,poisoned_target_cfg):
+def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg,poisoned_bachsize_cfg,poisoned_target_cfg,clients_dict):
     """Return a function to construct a FlowerClient."""
-    all_clients = {"malicious": {},"honest": {}}
     def good_client_fn(context: Context):
         partition_id = int(context.node_config["partition-id"])
         num_partitions = int(context.node_config["num-partitions"])
         node_id = context.node_id
-        if node_id not in all_clients["honest"]:
+        if node_id not in clients_dict["honest"]:
             partitioner : Partitioner = get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions)
             dataset : Dataset= instantiate(dataset_cfg["class"],partitioner=partitioner)
             trainloader, valloader, _ = dataset.load_datasets(partition_id,bachsize_cfg,valratio_cfg,seed_cfg)
-            all_clients["honest"][node_id] = FlowerClient(
+            clients_dict["honest"][node_id] = FlowerClient(
                 trainloader=trainloader,
                 vallodaer=valloader,
                 model_cfg=model_cfg,
                 optimizer=optimizer_cfg
             )
-        return all_clients["honest"][node_id].to_client()
+        return clients_dict["honest"][node_id].to_client()
     
     def poisoned_client_fn(context: Context):
         partition_id = int(context.node_config["partition-id"])
         num_partitions = int(context.node_config["num-partitions"])
         node_id = context.node_id
-        if node_id not in all_clients["malicious"]:
+        if node_id not in clients_dict["malicious"]:
             partitioner : Partitioner = get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions)
             dataset : Dataset= instantiate(dataset_cfg["class"],partitioner=partitioner)
             trainloader, valloader, _ = dataset.load_datasets(partition_id,bachsize_cfg,valratio_cfg,seed_cfg)
-            all_clients["malicious"][node_id] =  SimplePoisonedClient(
+            clients_dict["malicious"][node_id] =  SimplePoisonedClient(
                 trainloader=trainloader,
                 vallodaer=valloader,
                 model_cfg=model_cfg,
@@ -50,11 +49,11 @@ def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partit
                 target_poisoned=poisoned_target_cfg,
                 batch_size=bachsize_cfg
             )
-        return all_clients["malicious"][node_id].to_client()
+        return clients_dict["malicious"][node_id].to_client()
     
     def client_fn(context: Context):
         node_id = context.node_id
         if node_id in honest_clients:
             return good_client_fn(context)
         return poisoned_client_fn(context)
-    return all_clients,client_fn
+    return clients_dict,client_fn
