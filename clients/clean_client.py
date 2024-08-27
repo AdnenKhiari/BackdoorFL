@@ -9,21 +9,23 @@ from models.model import train, test
 class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
 
-    def __init__(self, trainloader, vallodaer, model_cfg,optimizer) -> None:
+    def __init__(self,node_id,model_cfg,optimizer) -> None:
         super(FlowerClient,self).__init__()
-
-        self.trainloader = trainloader
-        self.valloader = vallodaer
-
         # For further flexibility, we don't hardcode the type of model we use in
         # federation. Here we are instantiating the object defined in `conf/model/net.yaml`
         # (unless you changed the default) and by then `num_classes` would already be auto-resolved
         # to `num_classes=10` (since this was known right from the moment you launched the experiment)
         self.model = instantiate(model_cfg)
         self.optimizer = instantiate(optimizer)
+        self.node_id = node_id
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         print("Device Used", self.device)
+        
+    def with_loaders(self,trainloader, vallodaer):
+        self.trainloader = trainloader
+        self.valloader = vallodaer
+        return self
 
     def set_parameters(self, parameters):
         params_dict = zip(self.model.state_dict().keys(), parameters)

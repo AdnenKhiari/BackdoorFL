@@ -10,8 +10,8 @@ from poisoning_transforms.model.model_poisoner import ModelPoisoner, ModelPoison
 from poisoning_transforms.model.model_replacement import ModelReplacement
 
 class PoisonedFlowerClient(FlowerClient):
-    def __init__(self,trainloader, vallodaer,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size) -> None:
-        super(PoisonedFlowerClient,self).__init__(trainloader,vallodaer,model_cfg,optimizer)
+    def __init__(self,node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size) -> None:
+        super(PoisonedFlowerClient,self).__init__(node_id,model_cfg,optimizer)
         self.train_data_poisoner : DataPoisoner = BatchPoisoner(data_poisoner,batch_poison_num,target_poisoned)
         self.test_data_poisoner : DataPoisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,target_poisoned),target_poisoned,batch_size)
         self.model_poisoner : ModelPoisoner = None
@@ -55,9 +55,7 @@ class PoisonedFlowerClient(FlowerClient):
     
     
     
-def get_global_data_poisoner() -> DataPoisoner:
-    clients : dict[str,dict[str,PoisonedFlowerClient]]= {"malicious": {},"honest": {}}
-
+def get_global_data_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
     def get_poisoner():
         data_poisoner = []
         for client in clients["malicious"].values():
@@ -66,8 +64,7 @@ def get_global_data_poisoner() -> DataPoisoner:
             else:
                 pass
                 # data_poisoner = DataPoisoningPipeline(data_poisoner, client.train_data_poisoner)
-        print("DataPoisoner",clients)
         if len(data_poisoner) == 0:
             return None
         return DataPoisoningPipeline(data_poisoner) 
-    return clients,get_poisoner
+    return get_poisoner
