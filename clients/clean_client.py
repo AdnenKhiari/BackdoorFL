@@ -30,7 +30,7 @@ class FlowerClient(fl.client.NumPyClient):
         return self
     
     def report_data(self,global_run: Run):
-        self.client_run = wandb.init(name=self.node_id,project=global_run.project,group=global_run.group,notes=global_run.notes, tags=["client"],config={
+        self.client_run = wandb.init(name=str(self.node_id),project=global_run.project,group=global_run.group,notes=global_run.notes, tags=["client"],config={
             "node_id": self.node_id,
             "poisoned": False
         })
