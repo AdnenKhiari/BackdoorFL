@@ -53,6 +53,7 @@ def generate_client_fn(honest_clients,optimizer_cfg,model_cfg,dataset_cfg,partit
     
     def client_fn(context: Context):
         node_id = context.node_id
+        print("I'm seeing :! ",clients_dict)
         if node_id in honest_clients:
             return good_client_fn(context)
         return poisoned_client_fn(context)
