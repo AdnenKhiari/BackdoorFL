@@ -1,5 +1,5 @@
 from typing import Dict
-from clients.client import FlowerClient
+from clients.clean_client import FlowerClient
 from models.model import train, test
 from flwr.common import NDArrays, Scalar,Context
 
