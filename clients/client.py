@@ -15,7 +15,7 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"partition_by":dataset_cfg.label})
     return instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
 
-def get_clients(cfg):
+def get_clients(cfg,global_run):
     client_ids = get_client_ids(cfg.num_clients)
     honest_clients_ids = np.random.choice(client_ids, int(cfg.num_clients * (1-cfg.poisoned_clients_ratio)), replace=False)
     poisoned_clients_ids = list(set(client_ids) - set(honest_clients_ids))
@@ -26,6 +26,8 @@ def get_clients(cfg):
             model_cfg=cfg.model,
             optimizer=cfg.optimizers
         )
+        if cfg.wandb.active and cfg.wandb.report_clients:
+            clients_dict["honest"][node_id].report_data(global_run)
     for node_id in poisoned_clients_ids:
         clients_dict["malicious"][node_id] =  SimplePoisonedClient(
             node_id,
@@ -35,6 +37,8 @@ def get_clients(cfg):
             target_poisoned=cfg.poisoned_target,
             batch_size=cfg.batch_size
         )
+        if cfg.wandb.active and cfg.wandb.report_clients:
+            clients_dict["malicious"][node_id].report_data(global_run)
     return client_ids,clients_dict
 
 def generate_client_fn(dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg,clients_dict):

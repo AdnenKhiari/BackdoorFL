@@ -1,7 +1,10 @@
 from typing import Dict
+
+import wandb
 from clients.clean_client import FlowerClient
 from models.model import train, test
 from flwr.common import NDArrays, Scalar,Context
+from wandb.sdk.wandb_run import Run
 
 from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline, IgnoreLabel
 from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
@@ -15,6 +18,12 @@ class PoisonedFlowerClient(FlowerClient):
         self.train_data_poisoner : DataPoisoner = BatchPoisoner(data_poisoner,batch_poison_num,target_poisoned)
         self.test_data_poisoner : DataPoisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,target_poisoned),target_poisoned,batch_size)
         self.model_poisoner : ModelPoisoner = None
+        self.target_poisoned = target_poisoned
+    def report_data(self,global_run: Run):
+        super().report_data(global_run)
+        self.client_run._set_config_wandb("Poisoned",True)
+        self.client_run._set_config_wandb("target_poisoned",self.target_poisoned)
+        
     def fit(self, parameters, config):
         # copy parameters sent by the server into client's local model
         self.set_parameters(parameters)
@@ -50,7 +59,9 @@ class PoisonedFlowerClient(FlowerClient):
         mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
-
+        self.client_run.log(
+            {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+        )
         return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
     
     

@@ -67,51 +67,52 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
         "PoisonedClients": poisoned_items,
         "RoundPoisoningPercentage": poisoned_items / total_items
     }
+def get_aggregation_metrics(global_run):
+    def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> Dict[str, float]:
+        """
+        Aggregate metrics from all clients with individual weights for each metric.
 
-def aggregation_metrics(client_metrics: List[Tuple[int, Dict[str, float]]]) -> Dict[str, float]:
-    """
-    Aggregate metrics from all clients with individual weights for each metric.
+        Args:
+            client_metrics (List[Tuple[int, Dict[str, float]]]): A list of tuples where each tuple contains a weight and a dictionary of metrics.
 
-    Args:
-        client_metrics (List[Tuple[int, Dict[str, float]]]): A list of tuples where each tuple contains a weight and a dictionary of metrics.
+        Returns:
+            Dict[str, float]: A dictionary with aggregated metrics.
+        """
+        
+        poisoning_stats = fit_stats(client_metrics)
+        
+        # Initialize dictionaries for weighted sums and total weights per metric
+        weighted_sums = {}
+        total_weights = {}
+        
+        # Aggregate metrics
+        for weight, metrics in client_metrics:
+            for key, value in metrics.items():
+                if key == 'Poisoned':
+                    continue
+                if key not in weighted_sums:
+                    weighted_sums[key] = 0
+                    total_weights[key] = 0
+                weighted_sums[key] += value * weight
+                total_weights[key] += weight
 
-    Returns:
-        Dict[str, float]: A dictionary with aggregated metrics.
-    """
-    
-    poisoning_stats = fit_stats(client_metrics)
-    
-    # Initialize dictionaries for weighted sums and total weights per metric
-    weighted_sums = {}
-    total_weights = {}
-    
-    # Aggregate metrics
-    for weight, metrics in client_metrics:
-        for key, value in metrics.items():
-            if key == 'Poisoned':
-                continue
-            if key not in weighted_sums:
-                weighted_sums[key] = 0
-                total_weights[key] = 0
-            weighted_sums[key] += value * weight
-            total_weights[key] += weight
+        # Calculate the weighted average for each metric
+        aggregated_metrics = {}
+        for key in weighted_sums:
+            if total_weights[key] > 0:
+                aggregated_metrics[key] = weighted_sums[key] / total_weights[key]
+        
+        result = {
+            "poisoning_stats": poisoning_stats,
+            "metrics": aggregated_metrics
+        }
+        if global_run is not None:
+            wandb.log(result)
 
-    # Calculate the weighted average for each metric
-    aggregated_metrics = {}
-    for key in weighted_sums:
-        if total_weights[key] > 0:
-            aggregated_metrics[key] = weighted_sums[key] / total_weights[key]
-    
-    result = {
-        "poisoning_stats": poisoning_stats,
-        "metrics": aggregated_metrics
-    }
-    wandb.log(result)
-
-    print("Evaluation Result :",result)
-    return result
-
-def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
+        print("Evaluation Result :",result)
+        return result
+    return aggregation_metrics
+def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn,global_run):
     """Return a function to evaluate the global model."""
 
     def evaluate_fn(server_round: int, parameters, config):
@@ -144,7 +145,8 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
                 "current_round": server_round
             }
         }
-        wandb.log(result)
+        if global_run is not None:
+            global_run.log(result)
 
         return mt_loss, result
 

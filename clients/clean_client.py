@@ -4,6 +4,8 @@ from flwr.common import NDArrays, Scalar,Context
 from hydra.utils import instantiate
 import torch
 import flwr as fl
+import wandb
+from wandb.sdk.wandb_run import Run
 from models.model import train, test
 
 class FlowerClient(fl.client.NumPyClient):
@@ -26,7 +28,13 @@ class FlowerClient(fl.client.NumPyClient):
         self.trainloader = trainloader
         self.valloader = vallodaer
         return self
-
+    
+    def report_data(self,global_run: Run):
+        self.client_run = wandb.init(name=self.node_id,project=global_run.project,group=global_run.group,notes=global_run.notes, tags=["client"],config={
+            "node_id": self.node_id,
+            "poisoned": False
+        })
+        
     def set_parameters(self, parameters):
         params_dict = zip(self.model.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
@@ -53,5 +61,8 @@ class FlowerClient(fl.client.NumPyClient):
         current_round = config["current_round"]
 
         loss, metrics = test(self.model, lambda : self.valloader, self.device)
-
+        self.client_run.log({
+            "current_round": current_round,
+            "MTA": metrics["accuracy"]
+        })
         return float(loss), len(self.valloader), {"current_round": current_round,"MTA": metrics["accuracy"],"Poisoned": 0}

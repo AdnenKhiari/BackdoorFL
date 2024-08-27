@@ -27,6 +27,10 @@ config_eval: # condif availabvle when evaluating
   momentum: 0.9
   local_epochs: 2
 
+wandb:
+  active: true
+  report_clients: false
+  group_name: null
 defaults:
   - partitioners: iid
   - model: mobilenet
