@@ -10,6 +10,7 @@ import flwr as fl
 from clients.client import generate_client_fn, get_clients, get_partitioner
 from clients.poisoned_client import get_global_data_poisoner
 from custom_simulation.simulation import start_simulation
+from dataset.dataset import Dataset
 from server import aggregation_metrics, fit_stats, get_evalulate_fn
 import numpy as np
 import wandb
@@ -45,7 +46,7 @@ def main(cfg: DictConfig):
     client_fn = generate_client_fn(cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,clients_dict)
 
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
-    dataset = instantiate(cfg.dataset["class"],partitioner=test_partitioner)
+    dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner)
     evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),global_data_poisoner)
 
     strategy = instantiate(

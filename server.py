@@ -130,7 +130,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
         global_attack_loss = np.inf
         
         if data_poisoner is not None:
-            backdoored_set = lambda : data_poisoner.transform(testloader)
+            backdoored_set = lambda : data_poisoner.wrap_transform_iterator(testloader)
             attack_loss, attack_metrics = test(model, backdoored_set, device)
             global_asr = attack_metrics["accuracy"]
             global_attack_loss= attack_loss
