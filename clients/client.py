@@ -1,6 +1,5 @@
 import numpy as np
 from clients.clean_client import FlowerClient
-from clients.poisoned_client import PoisonedFlowerClient
 from clients.simple_poisoned_client import SimplePoisonedClient
 from custom_simulation.simulation import get_client_ids
 from dataset.dataset import Dataset
