@@ -23,7 +23,7 @@ def get_clients(cfg):
     clients_dict = {"malicious": {},"honest": {}}
     for node_id in honest_clients_ids:
         clients_dict["honest"][node_id] = FlowerClient(
-            node_id;
+            node_id,
             model_cfg=cfg.model,
             optimizer=cfg.optimizers
         )
