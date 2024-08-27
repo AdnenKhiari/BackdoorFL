@@ -64,6 +64,7 @@ def get_global_data_poisoner(clients: dict[str,dict[str,PoisonedFlowerClient]]) 
             else:
                 pass
                 # data_poisoner = DataPoisoningPipeline(data_poisoner, client.train_data_poisoner)
+        print("DataPoisoner",len(data_poisoner))
         if len(data_poisoner) == 0:
             return None
         return DataPoisoningPipeline(data_poisoner) 

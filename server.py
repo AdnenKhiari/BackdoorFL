@@ -6,7 +6,7 @@ import torch
 import wandb
 from models.model import test
 from poisoning_transforms.data.datapoisoner import DataPoisoner
-
+import numpy as np
 
 def get_on_fit_config(config: DictConfig):
     """Return a function to configure the client's fit."""
@@ -127,7 +127,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner_fn):
         data_poisoner : DataPoisoner = data_poisoner_fn()
         
         global_asr = 0
-        global_attack_loss = None
+        global_attack_loss = np.inf
         
         if data_poisoner is not None:
             backdoored_set = lambda : data_poisoner.transform(testloader)
