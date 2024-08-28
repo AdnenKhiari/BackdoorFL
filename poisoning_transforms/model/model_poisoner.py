@@ -1,68 +1,68 @@
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Union, List
 import numpy as np
 
 class ModelPoisoner(ABC):
     """
-    Base class for model poisoning that can fit and transform a NumPy array of weights.
+    Base class for model poisoning that can fit and transform a list of NumPy arrays of weights.
     """
 
     def __init__(self):
         pass
 
     @abstractmethod
-    def fit(self, weights: Union[np.ndarray,list]) -> None:
+    def fit(self, weights: List[np.ndarray]) -> None:
         """
         Fits the poisoner to the weights.
 
         Args:
-            weights (np.ndarray): Weight array to fit the poisoner.
+            weights (List[np.ndarray]): List of weight arrays to fit the poisoner.
         """
         pass
 
     @abstractmethod
-    def transform(self, weights: Union[np.ndarray,list]) -> np.ndarray:
+    def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """
         Transforms the weights by injecting poison.
 
         Args:
-            weights (np.ndarray): Weight array to be transformed.
+            weights (List[np.ndarray]): List of weight arrays to be transformed.
 
         Returns:
-            np.ndarray: Poisoned weight array.
+            List[np.ndarray]: List of poisoned weight arrays.
         """
         pass
 
 class ModelPoisoningPipeline(ModelPoisoner):
-    def __init__(self, poisoners: list[ModelPoisoner]):
+    def __init__(self, poisoners: List[ModelPoisoner]):
         """
         Initializes the ModelPoisoningPipeline with a list of ModelPoisoners.
 
         Args:
-            poisoners (list[ModelPoisoner]): A list of ModelPoisoner instances to apply sequentially.
+            poisoners (List[ModelPoisoner]): A list of ModelPoisoner instances to apply sequentially.
         """
         super().__init__()
         self.poisoners = poisoners
 
-    def fit(self, weights: Union[np.ndarray,list]) -> None:
+    def fit(self, weights: List[np.ndarray]) -> None:
         """
         Fits each ModelPoisoner in the pipeline to the weights in sequence.
 
         Args:
-            weights (np.ndarray): Weight array to fit each poisoner.
+            weights (List[np.ndarray]): List of weight arrays to fit each poisoner.
         """
         for poisoner in self.poisoners:
             poisoner.fit(weights)
 
-    def transform(self, weights: Union[np.ndarray,list]) -> np.ndarray:
+    def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """
         Applies each ModelPoisoner in the pipeline to the weights in sequence.
 
         Args:
-            weights (np.ndarray): Weight array to be transformed.
+            weights (List[np.ndarray]): List of weight arrays to be transformed.
 
         Returns:
-            np.ndarray: Poisoned weight array.
+            List[np.ndarray]: List of poisoned weight arrays.
         """
         for poisoner in self.poisoners:
             weights = poisoner.transform(weights)
@@ -75,20 +75,20 @@ class IdentityModelPoisoner(ModelPoisoner):
         """
         super().__init__()
 
-    def fit(self, weights: np.ndarray) -> None:
+    def fit(self, weights: List[np.ndarray]) -> None:
         """
         This method is intentionally left blank as no fitting is required.
         """
         pass
 
-    def transform(self, weights: np.ndarray) -> np.ndarray:
+    def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """
         Returns the weights unmodified.
 
         Args:
-            weights (np.ndarray): Weight array to be transformed.
+            weights (List[np.ndarray]): List of weight arrays to be transformed.
 
         Returns:
-            np.ndarray: Unmodified weight array.
+            List[np.ndarray]: List of unmodified weight arrays.
         """
         return weights
