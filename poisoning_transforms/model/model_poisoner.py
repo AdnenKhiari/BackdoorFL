@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Union
 import numpy as np
 
 class ModelPoisoner(ABC):
@@ -10,7 +11,7 @@ class ModelPoisoner(ABC):
         pass
 
     @abstractmethod
-    def fit(self, weights: np.ndarray) -> None:
+    def fit(self, weights: Union[np.ndarray,list]) -> None:
         """
         Fits the poisoner to the weights.
 
@@ -20,7 +21,7 @@ class ModelPoisoner(ABC):
         pass
 
     @abstractmethod
-    def transform(self, weights: np.ndarray) -> np.ndarray:
+    def transform(self, weights: Union[np.ndarray,list]) -> np.ndarray:
         """
         Transforms the weights by injecting poison.
 
@@ -43,7 +44,7 @@ class ModelPoisoningPipeline(ModelPoisoner):
         super().__init__()
         self.poisoners = poisoners
 
-    def fit(self, weights: np.ndarray) -> None:
+    def fit(self, weights: Union[np.ndarray,list]) -> None:
         """
         Fits each ModelPoisoner in the pipeline to the weights in sequence.
 
@@ -53,7 +54,7 @@ class ModelPoisoningPipeline(ModelPoisoner):
         for poisoner in self.poisoners:
             poisoner.fit(weights)
 
-    def transform(self, weights: np.ndarray) -> np.ndarray:
+    def transform(self, weights: Union[np.ndarray,list]) -> np.ndarray:
         """
         Applies each ModelPoisoner in the pipeline to the weights in sequence.
 

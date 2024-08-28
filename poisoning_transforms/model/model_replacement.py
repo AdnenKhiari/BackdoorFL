@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List
+from typing import List, Union
 
 from poisoning_transforms.model.model_poisoner import ModelPoisoner
 
@@ -16,7 +16,7 @@ class   ModelReplacement(ModelPoisoner):
         self.global_weights = global_weights
         self.gamma = gamma
 
-    def fit(self, weights: np.ndarray) -> None:
+    def fit(self, weights:Union[np.ndarray,list]) -> None:
         """
         This method is not used in this poisoner but is required by the abstract base class.
 
@@ -26,7 +26,7 @@ class   ModelReplacement(ModelPoisoner):
         # No fitting logic required for this poisoner
         pass
 
-    def transform(self, weights: np.ndarray) -> np.ndarray:
+    def transform(self, weights: Union[np.ndarray,list]) -> np.ndarray:
         """
         Applies weight replacement poisoning to the weights.
 
@@ -36,6 +36,5 @@ class   ModelReplacement(ModelPoisoner):
         Returns:
             np.ndarray: weights arrays.
         """
-        print("Weights Type",type(weights))
-        poisoned_weights =self.gamma * (weights - self.global_weights) + self.global_weights
+        poisoned_weights =self.gamma * (np.array(weights) - self.global_weights) + self.global_weights
         return poisoned_weights
