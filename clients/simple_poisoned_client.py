@@ -12,7 +12,7 @@ class SimplePoisonedClient(PoisonedFlowerClient):
         data_poisoner = DataPoisoningPipeline([SimplePatchPoisoner((20,20),(5,5),1)])
         super(SimplePoisonedClient,self).__init__(node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size)
     def set_parameters(self, parameters):
-        self.model_poisoner = ModelPoisoningPipeline([])
+        self.model_poisoner = ModelPoisoningPipeline([ModelReplacement(parameters,3)])
         # self.model_poisoner = ModelPoisoningPipeline([])
         return super().set_parameters(parameters)
     def report_data(self):
