@@ -27,6 +27,7 @@ def get_clients(cfg,global_run):
             optimizer=cfg.optimizers
         )
         if cfg.wandb.active and cfg.wandb.report_clients:
+            print("Using Wandb for honest client",node_id)
             clients_dict["honest"][node_id].report_data(global_run)
     for node_id in poisoned_clients_ids:
         clients_dict["malicious"][node_id] =  SimplePoisonedClient(
@@ -38,6 +39,7 @@ def get_clients(cfg,global_run):
             batch_size=cfg.batch_size
         )
         if cfg.wandb.active and cfg.wandb.report_clients:
+            print("Using Wandb for maliciours client",node_id)
             clients_dict["malicious"][node_id].report_data(global_run)
     return client_ids,clients_dict
 
