@@ -41,7 +41,7 @@ def main(cfg: DictConfig):
         group_name = cfg.wandb.group_name
         if group_name is None:
             group_name = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            
+            print("Group Name",group_name)
         global_run = wandb.init(project="federated-1",group=cfg.wandb.group_name, tags=[],config=wandb_config)
 
 
