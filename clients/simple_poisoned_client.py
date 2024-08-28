@@ -1,3 +1,4 @@
+import wandb
 from clients.poisoned_client import PoisonedFlowerClient
 from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline
 from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
@@ -15,4 +16,4 @@ class SimplePoisonedClient(PoisonedFlowerClient):
         return super().set_parameters(parameters)
     def report_data(self,global_run):
         super().report_data(global_run)
-        self.client_run._set_config_wandb("SimplePatchPoisoner",((20,20),(5,5)))
+        wandb.run._set_config_wandb("SimplePatchPoisoner",((20,20),(5,5)))

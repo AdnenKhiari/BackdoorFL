@@ -21,10 +21,14 @@ class PoisonedFlowerClient(FlowerClient):
         self.target_poisoned = target_poisoned
     def report_data(self,global_run: Run):
         super().report_data(global_run)
-        self.client_run._set_config_wandb("Poisoned",True)
-        self.client_run._set_config_wandb("target_poisoned",self.target_poisoned)
+        wandb.run._set_config_wandb("Poisoned",True)
+        wandb.run._set_config_wandb("target_poisoned",self.target_poisoned)
         
     def fit(self, parameters, config):
+        
+        self.report_data()
+
+        
         # copy parameters sent by the server into client's local model
         self.set_parameters(parameters)
         
@@ -53,13 +57,17 @@ class PoisonedFlowerClient(FlowerClient):
         return backdoored_params, len(self.trainloader), {"Poisoned": 1,"current_round":current_round}
     
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
+        
+        self.report_data()
+
+        
         self.set_parameters(parameters)
         current_round = config["current_round"]
 
         mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
-        self.client_run.log(
+        wandb.run.log(
             {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
         )
         return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}

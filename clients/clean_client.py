@@ -30,7 +30,7 @@ class FlowerClient(fl.client.NumPyClient):
         return self
     
     def report_data(self,global_run: Run):
-        self.client_run = wandb.init(name=str(self.node_id),project=global_run.project,group=global_run.group,notes=global_run.notes, tags=["client"],config={
+        wandb.init(name=str(self.node_id),project=global_run.project,group=global_run.group,notes=global_run.notes, tags=["client"],config={
             "node_id": self.node_id,
             "poisoned": False
         })
@@ -45,6 +45,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         # copy parameters sent by the server into client's local model
+        self.report_data()
         self.set_parameters(parameters)
         lr = config["lr"]
         momentum = config["momentum"]
@@ -57,11 +58,14 @@ class FlowerClient(fl.client.NumPyClient):
         return self.get_parameters({}), len(self.trainloader), {"current_round": current_round,"Poisoned": 0}
 
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
+        self.report_data()
+
+        
         self.set_parameters(parameters)
         current_round = config["current_round"]
 
         loss, metrics = test(self.model, lambda : self.valloader, self.device)
-        self.client_run.log({
+        wandb.run.log({
             "current_round": current_round,
             "MTA": metrics["accuracy"]
         })

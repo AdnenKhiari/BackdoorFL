@@ -107,7 +107,7 @@ def get_aggregation_metrics(global_run):
             "metrics": aggregated_metrics
         }
         if global_run is not None:
-            wandb.log(result)
+            wandb.run.log(result)
 
         print("Evaluation Result :",result)
         return result
