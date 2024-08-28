@@ -19,11 +19,13 @@ class PoisonedFlowerClient(FlowerClient):
         self.test_data_poisoner : DataPoisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,target_poisoned),target_poisoned,batch_size)
         self.model_poisoner : ModelPoisoner = None
         self.target_poisoned = target_poisoned
-    def report_data(self,global_run: Run):
-        super().report_data(global_run)
-        wandb.run._set_config_wandb("Poisoned",True)
-        wandb.run._set_config_wandb("target_poisoned",self.target_poisoned)
         
+    def report_data(self):
+        if self.global_run:
+            super().report_data()
+            wandb.run._set_config_wandb("Poisoned",True)
+            wandb.run._set_config_wandb("target_poisoned",self.target_poisoned)
+            
     def fit(self, parameters, config):
         
         self.report_data()
@@ -67,9 +69,10 @@ class PoisonedFlowerClient(FlowerClient):
         mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
-        wandb.run.log(
-            {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
-        )
+        if self.global_run:
+            wandb.run.log(
+                {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+            )
         return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
     
     

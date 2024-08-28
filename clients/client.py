@@ -28,7 +28,7 @@ def get_clients(cfg,global_run):
         )
         if cfg.wandb.active and cfg.wandb.report_clients:
             print("Using Wandb for honest client",node_id)
-            clients_dict["honest"][node_id].report_data(global_run)
+            clients_dict["honest"][node_id].register_report_data(global_run)
     for node_id in poisoned_clients_ids:
         clients_dict["malicious"][node_id] =  SimplePoisonedClient(
             node_id,
@@ -40,7 +40,7 @@ def get_clients(cfg,global_run):
         )
         if cfg.wandb.active and cfg.wandb.report_clients:
             print("Using Wandb for maliciours client",node_id)
-            clients_dict["malicious"][node_id].report_data(global_run)
+            clients_dict["malicious"][node_id].register_report_data(global_run)
     return client_ids,clients_dict
 
 def generate_client_fn(dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,seed_cfg,clients_dict):

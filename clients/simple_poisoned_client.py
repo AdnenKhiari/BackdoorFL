@@ -14,6 +14,7 @@ class SimplePoisonedClient(PoisonedFlowerClient):
         # self.model_poisoner = ModelPoisoningPipeline([ModelReplacement(parameters)])
         self.model_poisoner = ModelPoisoningPipeline([])
         return super().set_parameters(parameters)
-    def report_data(self,global_run):
-        super().report_data(global_run)
-        wandb.run._set_config_wandb("SimplePatchPoisoner",((20,20),(5,5)))
+    def report_data(self):
+        if self.global_run:
+            super().report_data()
+            wandb.run._set_config_wandb("SimplePatchPoisoner",((20,20),(5,5)))

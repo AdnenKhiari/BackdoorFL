@@ -29,12 +29,14 @@ class FlowerClient(fl.client.NumPyClient):
         self.valloader = vallodaer
         return self
     
-    def report_data(self,global_run: Run):
-        wandb.init(name=str(self.node_id),project=global_run.project,group=global_run.group,notes=global_run.notes, tags=["client"],config={
-            "node_id": self.node_id,
-            "poisoned": False
-        })
-        
+    def report_data(self):
+        if self.global_run:
+            wandb.init(name=str(self.node_id),project=self.global_run.project,group=self.global_run.group,notes=self.global_run.notes, tags=["client"],config={
+                "node_id": self.node_id,
+                "poisoned": False
+            })
+    def register_report_data(self,global_run: Run):
+        self.global_run = global_run
     def set_parameters(self, parameters):
         params_dict = zip(self.model.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
@@ -65,8 +67,9 @@ class FlowerClient(fl.client.NumPyClient):
         current_round = config["current_round"]
 
         loss, metrics = test(self.model, lambda : self.valloader, self.device)
-        wandb.run.log({
-            "current_round": current_round,
-            "MTA": metrics["accuracy"]
-        })
+        if self.global_run:
+            wandb.run.log({
+                "current_round": current_round,
+                "MTA": metrics["accuracy"]
+            })
         return float(loss), len(self.valloader), {"current_round": current_round,"MTA": metrics["accuracy"],"Poisoned": 0}
