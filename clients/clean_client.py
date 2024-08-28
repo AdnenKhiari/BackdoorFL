@@ -13,10 +13,6 @@ class FlowerClient(fl.client.NumPyClient):
 
     def __init__(self,node_id,model_cfg,optimizer) -> None:
         super(FlowerClient,self).__init__()
-        # For further flexibility, we don't hardcode the type of model we use in
-        # federation. Here we are instantiating the object defined in `conf/model/net.yaml`
-        # (unless you changed the default) and by then `num_classes` would already be auto-resolved
-        # to `num_classes=10` (since this was known right from the moment you launched the experiment)
         self.model = instantiate(model_cfg)
         self.optimizer = instantiate(optimizer)
         self.node_id = node_id

@@ -3,7 +3,7 @@ from typing import List
 
 from poisoning_transforms.model.model_poisoner import ModelPoisoner
 
-class ModelReplacement(ModelPoisoner):
+class   ModelReplacement(ModelPoisoner):
     def __init__(self, global_weights: np.ndarray, gamma: float = 1):
         """
         Initializes the ModelReplacement poisoner.
@@ -36,5 +36,6 @@ class ModelReplacement(ModelPoisoner):
         Returns:
             np.ndarray: weights arrays.
         """
+        print("Weights Type",type(weights))
         poisoned_weights =self.gamma * (weights - self.global_weights) + self.global_weights
         return poisoned_weights
