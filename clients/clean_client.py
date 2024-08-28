@@ -31,6 +31,7 @@ class FlowerClient(fl.client.NumPyClient):
     
     def report_data(self):
         if self.global_run:
+            print("Found Group",self.global_run.group)
             wandb.init(name=str(self.node_id),project=self.global_run.project,group=self.global_run.group,notes=self.global_run.notes, tags=["client"],config={
                 "node_id": self.node_id,
                 "poisoned": False
