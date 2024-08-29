@@ -15,7 +15,7 @@ class SimplePoisonedClient(PoisonedFlowerClient):
     def set_parameters(self, parameters):
         # self.model_poisoner = ModelPoisoningPipeline([ModelReplacement(parameters,3)])
         # self.model_poisoner = ModelPoisoningPipeline([])
-        self.model_poisoner = ModelPoisoningPipeline([NormScaling(parameters,5)])
+        self.model_poisoner = ModelPoisoningPipeline([NormScaling(parameters,1)])
 
         return super().set_parameters(parameters)
     def report_data(self):

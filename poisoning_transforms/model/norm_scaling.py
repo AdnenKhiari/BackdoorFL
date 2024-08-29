@@ -26,7 +26,7 @@ class NormScaling(ModelPoisoner):
         # No fitting logic required for this scaler
         pass
 
-    def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
+def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """
         Applies norm scaling to each weight array in the list.
 
@@ -36,10 +36,21 @@ class NormScaling(ModelPoisoner):
         Returns:
             List[np.ndarray]: List of scaled weight arrays.
         """
+        # Step 1: Compute the total difference vector
+        diff_vectors = [w - gw for w, gw in zip(weights, self.global_weights)]
+        
+        # Step 2: Flatten all differences into a single vector
+        concatenated_diff = np.concatenate([diff.flatten() for diff in diff_vectors])
+        
+        # Step 3: Compute the norm of the concatenated difference vector
+        total_norm = np.linalg.norm(concatenated_diff)
+        
+        print("Old Norm",total_norm)
+        
+        # Step 4: Normalize and scale each weight array using the total norm
         scaled_weights = []
-        for w, gw in zip(weights, self.global_weights):
-            diff = w - gw  # Compute the difference X - G
-            norm_diff = diff / np.linalg.norm(diff)  # Normalize the difference
+        for diff, gw in zip(diff_vectors, self.global_weights):
+            norm_diff = diff / total_norm  # Normalize using the total norm
             scaled_w = self.gamma * norm_diff + gw  # Scale by gamma and add G back
             scaled_weights.append(scaled_w)
         
