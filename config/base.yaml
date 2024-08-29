@@ -31,6 +31,8 @@ wandb:
   active: true
   report_clients: false
   group_name: null
+  main_run_name: null
+  
 defaults:
   - partitioners: iid
   - model: mobilenet
