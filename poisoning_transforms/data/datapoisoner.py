@@ -177,7 +177,7 @@ class IgnoreLabel(DataPoisoner):
         self.poisoner = poisoner
         self.batch_size = batch_size
 
-    def fit(self) -> None:
+    def train(self) -> None:
         self.poisoner.train()
 
     def transform(self, data: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
