@@ -7,4 +7,5 @@ cfg:
   poisoned_batch_size: ${poisoned_batch_size}
   poisoned_target: ${poisoned_target}
   batch_size: ${batch_size}
-  dataset.size: ${dataset.size}
+  dataset:
+    size: ${dataset.size}
