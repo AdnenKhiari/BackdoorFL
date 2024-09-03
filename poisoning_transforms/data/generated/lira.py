@@ -87,7 +87,7 @@ class LiraGenerator(DataPoisoner):
         attacked_labels = tmp_model(poisoned_images)
         predicted_labels = tmp_model(images)
         
-        poisoned_target = torch.full(attacked_labels.shape,self.label_replacement)
+        poisoned_target = torch.full(attacked_labels.shape,self.label_replacement,dtype=torch.float16).to(device)
         
         tmp_optimizer.zero_grad()
         mixed_loss = self.alpha * self.criterion(attacked_labels,poisoned_target) + (1- self.alpha)*self.criterion(predicted_labels,labels)
