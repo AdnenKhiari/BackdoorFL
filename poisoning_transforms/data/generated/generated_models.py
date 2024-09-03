@@ -15,7 +15,7 @@ def double_conv(in_channels, out_channels):
 
 class UNet(nn.Module):
 
-    def __init__(self, out_channel):
+    def __init__(self, shape):
         super().__init__()
 
         self.dconv_down1 = double_conv(3, 64)
@@ -32,8 +32,8 @@ class UNet(nn.Module):
         self.dconv_up1 = double_conv(128 + 64, 64)
 
         self.conv_last = nn.Sequential(
-            nn.Conv2d(64, out_channel, 1),
-            nn.BatchNorm2d(out_channel),
+            nn.Conv2d(64, shape[0], 1),
+            nn.BatchNorm2d(shape[0]),
         )
 
     def forward(self, x):
