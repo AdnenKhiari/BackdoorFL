@@ -49,7 +49,6 @@ class UNet(nn.Module):
         x = self.dconv_down4(x)
 
         x = self.upsample(x)
-        print("SHAPE,",x.shape,conv3.shape)
         x = torch.cat([x, conv3], dim=1)
 
         x = self.dconv_up3(x)
