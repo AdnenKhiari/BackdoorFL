@@ -1,4 +1,5 @@
 _target_: clients.client.iba_client_fn
+_recursive_ : false
 cfg:
   model: ${model}
   optimizers: ${optimizers}
