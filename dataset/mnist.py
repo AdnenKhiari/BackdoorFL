@@ -5,10 +5,13 @@ from hydra.utils import instantiate, call
 import  torch
 
 from dataset.dataset import Dataset
+from torchvision import transforms
 
 class Mnist(Dataset):
     def __init__(self,partitioner):
         super(Mnist,self).__init__(partitioner)
+        self.resizer = transforms.Resize((32,32))
+
     def get_federated_dataset(self,partitioners):
         return FederatedDataset(dataset="mnist",partitioners=partitioners)
     def collate(self):
@@ -19,7 +22,7 @@ class Mnist(Dataset):
                 images.append(torch.cat([item["image"],item["image"],item["image"]]))
                 labels.append(torch.tensor(item["label"]))
             return {
-                "image": torch.stack(images),
+                "image": self.resizer(torch.stack(images)),
                 "label": torch.stack(labels)
             }
         return col
