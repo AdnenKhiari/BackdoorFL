@@ -2,4 +2,4 @@
 class:
   _target_: dataset.breast.Breast
 label: image
-size: [3,50,50]
+size: ${as_tuple:3,50,50}

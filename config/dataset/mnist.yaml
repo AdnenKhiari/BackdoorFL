@@ -2,4 +2,4 @@
 class:
   _target_: dataset.mnist.Mnist
 label: image
-size: [1,28,28]
+size: ${as_tuple:1,28,28}
