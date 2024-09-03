@@ -14,9 +14,9 @@ class DataPoisoner(ABC):
         pass
 
     @abstractmethod
-    def fit(self, data: Any) -> None:
+    def train(self) -> None:
         """
-        Fits the poisoner to the data.
+        Trains the data poisoner.
 
         Args:
             data (Any): Data to fit the poisoner.
@@ -49,19 +49,6 @@ class DataPoisoner(ABC):
         for batch in dataloader:
             yield self.transform(batch)
             
-    def wrap_fit_iterator(self, dataloader: DataLoader) -> Iterator:
-        """
-        Wraps around a DataLoader (or any iterator) and applies the fit method to each batch.
-
-        Args:
-            dataloader (DataLoader): DataLoader to be wrapped and poisoned.
-
-        Returns:
-            Iterator: Iterator over poisoned batches.
-        """
-        for batch in dataloader:
-            yield self.fit(batch)
-            
 
 class DataPoisoningPipeline(DataPoisoner):
     def __init__(self, poisoners: List[DataPoisoner]):
@@ -74,7 +61,7 @@ class DataPoisoningPipeline(DataPoisoner):
         super().__init__()
         self.poisoners = poisoners
     
-    def fit(self, data: Any) -> Any:
+    def train(self) -> Any:
         """
         Fits each DataPoisoner in the pipeline to the data in sequence.
 
@@ -85,8 +72,7 @@ class DataPoisoningPipeline(DataPoisoner):
             Any: The data after fitting all poisoners.
         """
         for poisoner in self.poisoners:
-            data = poisoner.fit(data)
-        return data
+            poisoner.train()
     
     def transform(self, data: Any) -> Any:
         """
@@ -137,24 +123,8 @@ class BatchPoisoner(DataPoisoner):
         self.k = k
         self.label_replacement = label_replacement
 
-    def fit(self, data: Dict[str, torch.Tensor]) -> None:
-        """
-        Fits the poisoner to the first K items in the data, or to the entire batch if K is -1.
-
-        Args:
-            data (Dict[str, torch.Tensor]): Dictionary containing 'label' and 'image' tensors.
-        """
-        # Extract images and determine the subset to fit on
-        images = data['image']
-        if self.k == -1:
-            k_images = images
-        else:
-            k = min(self.k, images.size(0))
-            k_images = images[:k]
-        
-        # Fit the poisoner to the selected items
-        self.poisoner.fit({'image': k_images, 'label': data['label'][:k]})
-
+    def train(self) -> None:
+        self.poisoner.train()
     def transform(self, data: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """
         Applies the poisoner to the first K items in the batch, or to the entire batch if K is -1.
@@ -207,25 +177,8 @@ class IgnoreLabel(DataPoisoner):
         self.poisoner = poisoner
         self.batch_size = batch_size
 
-    def fit(self, data: Dict[str, torch.Tensor]) -> None:
-        """
-        No specific fitting needed for this class, just fits the underlying poisoner on the relevant data.
-
-        Args:
-            data (Dict[str, torch.Tensor]): Dictionary containing 'label' and 'image' tensors.
-        """
-        # Extract labels and images
-        labels = data['label']
-        images = data['image']
-        
-        # Select data where the label is not the target label
-        mask = labels != self.target
-        selected_images = images[mask]
-        selected_labels = labels[mask]
-        
-        # If there are any selected items, fit the underlying poisoner
-        if selected_images.size(0) > 0:
-            self.poisoner.fit({'label': selected_labels, 'image': selected_images})
+    def fit(self) -> None:
+        self.poisoner.train()
 
     def transform(self, data: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """

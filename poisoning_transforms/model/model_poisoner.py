@@ -10,15 +10,6 @@ class ModelPoisoner(ABC):
     def __init__(self):
         pass
 
-    @abstractmethod
-    def fit(self, weights: List[np.ndarray]) -> None:
-        """
-        Fits the poisoner to the weights.
-
-        Args:
-            weights (List[np.ndarray]): List of weight arrays to fit the poisoner.
-        """
-        pass
 
     @abstractmethod
     def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
@@ -44,15 +35,6 @@ class ModelPoisoningPipeline(ModelPoisoner):
         super().__init__()
         self.poisoners = poisoners
 
-    def fit(self, weights: List[np.ndarray]) -> None:
-        """
-        Fits each ModelPoisoner in the pipeline to the weights in sequence.
-
-        Args:
-            weights (List[np.ndarray]): List of weight arrays to fit each poisoner.
-        """
-        for poisoner in self.poisoners:
-            poisoner.fit(weights)
 
     def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """
@@ -74,12 +56,6 @@ class IdentityModelPoisoner(ModelPoisoner):
         Initializes an IdentityModelPoisoner that does not modify the weights.
         """
         super().__init__()
-
-    def fit(self, weights: List[np.ndarray]) -> None:
-        """
-        This method is intentionally left blank as no fitting is required.
-        """
-        pass
 
     def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """

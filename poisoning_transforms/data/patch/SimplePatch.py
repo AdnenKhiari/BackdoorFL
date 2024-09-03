@@ -18,14 +18,7 @@ class SimplePatchPoisoner(DataPoisoner):
         self.patch_dimension = patch_dimension
         self.patch_value = patch_value
         
-    def fit(self, data: dict) -> None:
-        """
-        Fits the poisoner to the data.
-
-        Args:
-            data (dict): A dictionary with "image" and "label". 
-                         "image" contains a batch of images with shape (batch_size, channels, height, width).
-        """
+    def train(self) -> None:
         pass
     
     def transform(self, data: dict) -> dict:

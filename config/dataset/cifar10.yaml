@@ -2,3 +2,4 @@
 class:
   _target_: dataset.cifar10.Cifar10
 label: img
+size: (3,32,32)

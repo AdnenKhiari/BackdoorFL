@@ -37,5 +37,6 @@ defaults:
   - partitioners: iid
   - model: mobilenet
   - strategy: fedavg
-  - dataset: cifar10
-  - optimizers: sgd
+  - dataset: mnist
+  - optimizers: sgd  
+  - poisoned_client: iba

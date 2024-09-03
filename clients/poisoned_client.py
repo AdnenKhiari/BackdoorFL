@@ -37,9 +37,7 @@ class PoisonedFlowerClient(FlowerClient):
         # Inject Backdoor
         if self.train_data_poisoner is None:
             raise Exception("Implement a data poisoner")
-        [_ for _ in self.train_data_poisoner.wrap_fit_iterator(self.trainloader)]
         backdoored_train = lambda : self.train_data_poisoner.wrap_transform_iterator(self.trainloader)
-        
         # Get Config
         lr = config["lr"]
         momentum = config["momentum"]
@@ -47,13 +45,13 @@ class PoisonedFlowerClient(FlowerClient):
         current_round = config["current_round"]
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         
+        self.train_data_poisoner.train()
         train(self.model,backdoored_train, optim, epochs, self.device)
         
         # Poison Weights
         params = self.get_parameters({})
         if self.model_poisoner is None:
             raise Exception("Implement a model poisoner")
-        self.model_poisoner.fit(params)
         backdoored_params = self.model_poisoner.transform(params)
         
         return backdoored_params, len(self.trainloader), {"Poisoned": 1,"current_round":current_round}
@@ -83,10 +81,19 @@ def get_global_data_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]])
         for client in clients["malicious"].values():
             if len(data_poisoner) == 0:
                 data_poisoner = [client.test_data_poisoner]
-            else:
-                pass
-                # data_poisoner = DataPoisoningPipeline(data_poisoner, client.train_data_poisoner)
+            break
         if len(data_poisoner) == 0:
             return None
-        return DataPoisoningPipeline(data_poisoner) 
-    return get_poisoner
+        return DataPoisoningPipeline(data_poisoner)
+    
+    def merge_poisoners():
+        data_poisoner = []
+        for client in clients["malicious"].values():
+            if len(data_poisoner) == 0:
+                data_poisoner = [client.test_data_poisoner]
+            else:
+                data_poisoner.append(client.test_data_poisoner)
+        if len(data_poisoner) == 0:
+            return None
+        return DataPoisoningPipeline(data_poisoner)  
+    return merge_poisoners

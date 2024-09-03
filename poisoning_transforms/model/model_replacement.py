@@ -16,16 +16,6 @@ class ModelReplacement(ModelPoisoner):
         self.global_weights = global_weights
         self.gamma = gamma
 
-    def fit(self, weights: List[np.ndarray]) -> None:
-        """
-        This method is not used in this poisoner but is required by the abstract base class.
-
-        Args:
-            weights (List[np.ndarray]): List of weight arrays to fit the poisoner.
-        """
-        # No fitting logic required for this poisoner
-        pass
-
     def transform(self, weights: List[np.ndarray]) -> List[np.ndarray]:
         """
         Applies weight replacement poisoning to each weight array in the list.
