@@ -102,4 +102,4 @@ class LiraGenerator(DataPoisoner):
         attack_loss.backward()
         lira_optimizer.step()
     
-        return mixed_loss.item().detach().cpu(),attack_loss.item().item().detach().cpu()
+        return mixed_loss.detach().cpu().item(),attack_loss.detach().cpu().item()
