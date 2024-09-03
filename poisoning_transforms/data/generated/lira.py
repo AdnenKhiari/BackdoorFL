@@ -41,7 +41,10 @@ class LiraGenerator(DataPoisoner):
         self.attack_model.to(device)
         img = data["image"].to(device)
         with torch.no_grad():
-            return self.get_poisoned_batch(self.attack_model,img)
+            return {
+                "image": self.get_poisoned_batch(self.attack_model,img),
+                "label": data["label"]
+            }
     
     def train(self):
         
