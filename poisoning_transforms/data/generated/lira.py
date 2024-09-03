@@ -38,6 +38,7 @@ class LiraGenerator(DataPoisoner):
     def transform(self, data):
         self.attack_model.eval()
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.attack_model.to(device)
         img = data["image"].to(device)
         with torch.no_grad():
             return self.get_poisoned_batch(self.attack_model,img)
