@@ -58,7 +58,7 @@ class KrumFilter(StrategyWrapper):
         closest_indices = []
         for distance in distance_matrix:
             closest_indices.append(
-                np.argsort(distance)[1:num_closest + 1]  # noqa: E203
+                np.argsort(distance)[1:num_closest + 1] 
             )
 
         # Compute the score for each client, which is the sum of the distances
@@ -70,7 +70,7 @@ class KrumFilter(StrategyWrapper):
 
         if to_keep > 0:
             # Choose to_keep clients and return their weights
-            best_indices = np.argsort(scores)[::-1][len(scores) - to_keep:]  # noqa: E203
+            best_indices = np.argsort(scores)[::-1][len(scores) - to_keep:] 
             best_results = [results[i] for i in best_indices]
             return [weights for weights, _ in best_results]
 

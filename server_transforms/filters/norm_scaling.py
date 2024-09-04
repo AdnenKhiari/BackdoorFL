@@ -24,7 +24,6 @@ class NormScalingFilter(StrategyWrapper):
         """
         super().__init__(strategy)
         self.clamp_value = clamp_value
-        self._global_weights = None  # This will hold the global model weights
 
     def process_weights(self, weights: List[Tuple[NDArrays, int]]) -> List[Tuple[NDArrays, int]]:
         """
@@ -36,8 +35,6 @@ class NormScalingFilter(StrategyWrapper):
         Returns:
             List[Tuple[NDArrays, int]]: The list of tuples with clamped weights and the number of examples.
         """
-        if self._global_weights is None:
-            raise ValueError("Global weights not initialized. Ensure `aggregate_fit` has been called.")
 
         clamped_weights = []
         
@@ -45,7 +42,7 @@ class NormScalingFilter(StrategyWrapper):
             # Compute the clamped weights
             clamped_model_weights = []
             
-            for global_array, client_array in zip(self._global_weights, model_weights):
+            for global_array, client_array in zip(self._global_model, model_weights):
                 # Compute the difference
                 difference = client_array - global_array
                 # Clamp the difference
@@ -75,8 +72,5 @@ class NormScalingFilter(StrategyWrapper):
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
         new_global_parameters, metrics = self._strategy.aggregate_fit(server_round, processed_results, failures)
-        
-        # Store the new global weights
-        self._global_weights = parameters_to_ndarrays(new_global_parameters) if new_global_parameters else None
         
         return new_global_parameters, metrics

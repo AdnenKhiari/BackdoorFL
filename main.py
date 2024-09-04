@@ -68,7 +68,7 @@ def main(cfg: DictConfig):
     dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner)
     evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),global_data_poisoner,global_run)
 
-    strategy = instantiate(
+    strategy : fl.server.strategy.Strategy= instantiate(
         cfg.strategy,
         evaluate_fn=evaluate_fn,
         fit_metrics_aggregation_fn=fit_stats,

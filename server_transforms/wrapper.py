@@ -21,9 +21,10 @@ class StrategyWrapper(Strategy, ABC):
             strategy (Strategy): The strategy to wrap.
         """
         self._strategy = strategy
-
+        self._global_model = None
     def initialize_parameters(self, client_manager) -> Optional[Parameters]:
-        return self._strategy.initialize_parameters(client_manager)
+        params=self._strategy.initialize_parameters(client_manager)
+        self._global_model = parameters_to_ndarrays(params)
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager
@@ -60,7 +61,9 @@ class StrategyWrapper(Strategy, ABC):
         ]
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
-        return self._strategy.aggregate_fit(server_round, processed_results, failures)
+        params,metrics= self._strategy.aggregate_fit(server_round, processed_results, failures)
+        self._global_model = parameters_to_ndarrays(params)
+        return params,metrics
 
     def configure_evaluate(
         self, server_round: int, parameters: Parameters, client_manager

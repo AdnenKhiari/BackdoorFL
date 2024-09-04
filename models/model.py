@@ -5,7 +5,7 @@ import torchmetrics
 from models.modelbase import ModelBase
 
 
-def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str):
+def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd):
     """Train the network on the training set using torchmetrics."""
     criterion = torch.nn.CrossEntropyLoss().to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
@@ -24,8 +24,12 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str):
             outputs = net(images)
             loss = criterion(outputs, labels)
             loss.backward()
-            optimizer.step()
             
+            if pgd.active:
+                torch.nn.utils.clip_grad_norm_(net.parameters(), pgd.clip_value,error_if_nonfinite =True)
+
+            optimizer.step()
+
             # Metrics
             with torch.no_grad():
                 total_loss += loss.item()
