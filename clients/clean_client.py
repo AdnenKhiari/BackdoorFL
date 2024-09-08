@@ -11,13 +11,15 @@ from models.model import train, test
 class FlowerClient(fl.client.NumPyClient):
     """A standard FlowerClient."""
 
-    def __init__(self,node_id,model_cfg,optimizer) -> None:
+    def __init__(self,node_id,model_cfg,optimizer,pgd_conf,grad_filter) -> None:
         super(FlowerClient,self).__init__()
         self.model = instantiate(model_cfg)
         self.optimizer = instantiate(optimizer)
         self.node_id = node_id
         self.global_run = None
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.pgd_conf = pgd_conf
+        self.grad_filter = grad_filter
         
     def with_loaders(self,trainloader, vallodaer):
         self.trainloader = trainloader
@@ -51,7 +53,7 @@ class FlowerClient(fl.client.NumPyClient):
         current_round = config["current_round"]
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
-        train(self.model, lambda : self.trainloader, optim, epochs, self.device,{"active":False},{"active":False})
+        train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
 
         return self.get_parameters({}), len(self.trainloader), {"current_round": current_round,"Poisoned": 0}
 

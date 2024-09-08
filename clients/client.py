@@ -29,8 +29,8 @@ def simple_poisoned_client_fn(node_id,cfg):
                 patch_loc=cfg.patch_loc,
                 patch_val=cfg.patch_val,
                 norm_scaling_factor=cfg.norm_scaling_factor,
-                pgd_conf=cfg.pgd_conf,
-                mask_conf=cfg.mask_conf
+                grad_filter=cfg.grad_filter,
+                pgd_conf=cfg.pgd_conf
         )
     
 def iba_client_fn(node_id,cfg):
@@ -47,7 +47,7 @@ def iba_client_fn(node_id,cfg):
                 lira_eps=0.2,
                 lira_train_lr=0.008,
                 pgd_conf=cfg.pgd_conf,
-                mask_conf=cfg.mask_conf,
+                grad_filter=cfg.grad_filter,
                 norm_scaling_factor=cfg.norm_scaling_factor
         )
     
@@ -61,7 +61,9 @@ def get_clients(cfg,global_run):
         clients_dict["honest"][node_id] = FlowerClient(
             node_id,
             model_cfg=cfg.model,
-            optimizer=cfg.optimizers
+            optimizer=cfg.optimizers,
+            pgd_conf=cfg.pgd_conf,
+            grad_filter=cfg.grad_filter
         )
         if cfg.wandb.active and cfg.wandb.report_clients:
             print("Using Wandb for honest client",node_id)

@@ -10,5 +10,5 @@ cfg:
   patch_loc: ${as_tuple:5,5}
   patch_val: 1 
   norm_scaling_factor: 1.2
-  mask_grad: ${mask_grad}
+  grad_filter: ${grad_filter}
   pgd: ${pgd}

@@ -23,7 +23,7 @@ pgd:
   norm_type: "inf"
 
 # TODO
-mask_grad:
+grad_filter:
   active: false
 
 config_fit:

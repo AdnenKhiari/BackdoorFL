@@ -11,5 +11,5 @@ cfg:
   norm_scaling_factor: 1.2
   dataset:
     size: ${dataset.size}
-  mask_conf: ${mask_grad}
+  grad_filter: ${grad_filter}
   pgd_conf: ${pgd}
