@@ -7,6 +7,7 @@ from models.modelbase import ModelBase
 
 def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad):
     """Train the network on the training set using torchmetrics."""
+    print("PGD",pgd)
     criterion = torch.nn.CrossEntropyLoss().to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
     net.train()
