@@ -178,7 +178,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
             diffs = [torch.clamp((poisoned - clean) * 10, 0, 1) for clean, poisoned in zip(clean_images, poisoned_images)]
 
             # Stack them into a single grid
-            grid = make_grid(clean_images + poisoned_images + diffs , nrow=4, normalize=True)
+            grid = make_grid(torch.tensor(clean_images) + poisoned_images + torch.tensor(diffs) , nrow=4, normalize=True)
 
             # Log to wandb
             global_run.log({"evaluation_images": wandb.Image(grid)})
