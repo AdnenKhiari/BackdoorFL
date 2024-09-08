@@ -25,6 +25,8 @@ class GradMask(BaseMask):
         mask_grad_list should be an iterable of masks (1 to keep, 0 to mask out).
         """
         mask_grad_list_copy = iter(self.mask)
+
         for name, param in model.named_parameters():
             if param.requires_grad and param.grad is not None:
-                param.grad = param.grad * next(mask_grad_list_copy)
+                device = param.grad.device
+                param.grad = param.grad * next(mask_grad_list_copy).to(device)
