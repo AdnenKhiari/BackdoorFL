@@ -34,8 +34,7 @@ def simple_poisoned_client_fn(node_id,cfg):
                 patch_val=cfg.patch_val,
                 norm_scaling_factor=cfg.norm_scaling_factor,
                 grad_filter=cfg.grad_filter,
-                pgd_conf=cfg.pgd_conf,
-                poison_between=cfg.poison_between
+                pgd_conf=cfg.pgd_conf
         )
     
 def randomized_simple_poisoned_client_fn(node_id,cfg):
@@ -52,8 +51,7 @@ def randomized_simple_poisoned_client_fn(node_id,cfg):
                 patch_location_range=cfg.patch_location_range,
                 patch_size_range=cfg.patch_size_range,
                 patch_val=cfg.patch_val,
-                seed=cfg.global_seed,
-                poison_between=cfg.poison_between
+                seed=cfg.global_seed
 
         )
     
@@ -72,8 +70,7 @@ def iba_client_fn(node_id,cfg):
                 lira_train_lr=0.008,
                 pgd_conf=cfg.pgd_conf,
                 grad_filter=cfg.grad_filter,
-                norm_scaling_factor=cfg.norm_scaling_factor,
-                poison_between=cfg.poison_between
+                norm_scaling_factor=cfg.norm_scaling_factor
         )
     
 
