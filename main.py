@@ -9,7 +9,6 @@ import flwr as fl
 from datetime import datetime
 
 from clients.client import generate_client_fn, get_clients, get_partitioner
-from clients.poisoned_client import get_global_data_poisoner
 from custom_simulation.simulation import start_simulation
 from dataset.dataset import Dataset
 from server import fit_stats, get_aggregation_metrics, get_evalulate_fn
