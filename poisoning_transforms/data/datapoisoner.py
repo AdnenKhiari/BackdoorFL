@@ -137,7 +137,6 @@ class BatchPoisoner(DataPoisoner):
             Dict[str, torch.Tensor]: Updated dictionary with poisoned items and optionally updated labels.
         """
         # Extract labels and images
-        print("DATATA",data)
         labels = data['label']
         images = data['image']
         
@@ -192,6 +191,7 @@ class IgnoreLabel(DataPoisoner):
             Dict[str, torch.Tensor]: The dictionary with poisoned images where the label is not the target label.
         """
         # Extract labels and images
+        print("DATATA",data)
         labels = data['label']
         images = data['image']
         
