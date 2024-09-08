@@ -3,7 +3,7 @@ _target_: flwr_datasets.partitioner.DirichletPartitioner
 num_partitions: ${num_partitions}
 seed: ${global_seed}
 shuffle: true
-partition_by: ${dataset.label}
+partition_by: label
 alpha: 0.3
 min_partition_size: 20
 self_balancing : true
