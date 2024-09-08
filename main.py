@@ -48,7 +48,7 @@ def main(cfg: DictConfig):
         if group_name is None:
             group_name = curr_datetime
             print("Group Name",group_name)
-        global_run = wandb.init(project="federated-1",name=run_name,group=group_name, tags=[],config=wandb_config)
+        global_run = wandb.init(project="federated-2",name=run_name,group=group_name, tags=[],config=wandb_config)
 
 
     print(OmegaConf.to_yaml(cfg))

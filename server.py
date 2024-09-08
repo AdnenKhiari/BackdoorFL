@@ -166,6 +166,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
                 images = batch["image"]
                 for j in range(4):
                     clean_images.append(images[j].to(device))
+                break
 
             # Create poisoned versions
             poisoned_images =data_poisoner.transform({  
