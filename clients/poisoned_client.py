@@ -21,6 +21,7 @@ class PoisonedFlowerClient(FlowerClient):
         self.target_poisoned = target_poisoned
         self.pgd_conf = pgd_conf
         self.grad_filter = grad_filter
+        self.data_poisoner = data_poisoner
         
     def report_data(self):
         if self.global_run:
@@ -75,9 +76,7 @@ class PoisonedFlowerClient(FlowerClient):
             )
         return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
     
-    
-    
-def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
+def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]],poisoned_target,batch_size) -> DataPoisoner:
     data_poisoner = []
     for client in clients["malicious"].values():
         if len(data_poisoner) == 0:
@@ -85,9 +84,12 @@ def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]
         break
     if len(data_poisoner) == 0:
         return None
-    return DataPoisoningPipeline(data_poisoner)
+    data_poisoner = DataPoisoningPipeline(data_poisoner)
+    data_poisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,poisoned_target),poisoned_target,batch_size)
 
-def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
+    return data_poisoner
+
+def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]],poisoned_target,batch_size) -> DataPoisoner:
     data_poisoner = []
     for client in clients["malicious"].values():
         if len(data_poisoner) == 0:
@@ -96,4 +98,6 @@ def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerCl
             data_poisoner.append(client.test_data_poisoner)
     if len(data_poisoner) == 0:
         return None
-    return DataPoisoningPipeline(data_poisoner)  
+    data_poisoner = DataPoisoningPipeline(data_poisoner)
+    data_poisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,poisoned_target),poisoned_target,batch_size)
+    return data_poisoner

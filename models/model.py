@@ -65,9 +65,7 @@ def test(net, get_testloader, device):
     total_loss = 0.0
     with torch.no_grad():
         for batch in get_testloader():
-            print("Batch",batch.keys())
             batch = net.transform_input(batch)
-            print("Batch After",batch.keys())
 
             images, labels = batch["image"], batch["label"]
             images, labels = images.to(device), labels.to(device)

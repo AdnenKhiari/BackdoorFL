@@ -1,3 +1,5 @@
 ---
 _target_: clients.poisoned_client.get_single_global_poisoner
 _partial_: true
+poisoned_target: ${poisoned_target}
+batch_size: ${batch_size}
