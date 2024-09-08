@@ -50,7 +50,7 @@ def randomized_simple_poisoned_client_fn(node_id,cfg):
                 patch_location_range=cfg.patch_location_range,
                 patch_size_range=cfg.patch_size_range,
                 patch_val=cfg.patch_val,
-                                seed=cfg.global_seed,
+                seed=cfg.global_seed,
 
         )
     
