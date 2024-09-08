@@ -22,19 +22,18 @@ pgd_conf:
   eps: 0.03
   norm_type: "inf"
 
-# TODO
 grad_filter:
-  active: false
+  active: true
+  filter:
+    _target_: poisoning_transforms.model.masks.neurotoxin_poisoner.NeuroToxinPoisoner
+    ratio: 0.5
 
 config_fit:
   lr: 0.01
   momentum: 0.9
   local_epochs: 2
 
-config_eval: # condif availabvle when evaluating
-  lr: 0.01
-  momentum: 0.9
-  local_epochs: 2
+config_eval: ${config_fit}
 
 evaluate_metrics_aggregation_fn: false
 

@@ -5,7 +5,7 @@ class GradMask(BaseMask):
     def __init__(self):
         super().__init__()
 
-    def fit(self, model):
+    def fit(self, model,dataset_clean):
         """
         Learns which gradients to mask. Overrides the BaseMask fit method to learn a mask
         specifically for gradients.

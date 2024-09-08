@@ -4,7 +4,7 @@ class BaseMask:
     def __init__(self):
         self.mask = None
 
-    def fit(self, model: torch.nn.Module):
+    def fit(self, model: torch.nn.Module,dataset_clean):
         """
         Learns which weights to mask by creating a mask for each parameter that requires gradients.
         For simplicity, let's mask out small weights by creating a binary mask.

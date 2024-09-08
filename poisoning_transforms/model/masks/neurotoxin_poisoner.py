@@ -3,12 +3,11 @@ import numpy as np
 from poisoning_transforms.model.masks.grad_masker import GradMask
 
 class NeuroToxinPoisoner(GradMask):
-    def __init__(self, dataset_clean, ratio=0.5):
+    def __init__(self,ratio=0.5):
         super().__init__()
         self.ratio = ratio
-        self.dataset_clean = dataset_clean
 
-    def fit(self, model: torch.nn.Module):
+    def fit(self, model: torch.nn.Module,dataset_clean):
         criterion = torch.nn.CrossEntropyLoss()
         model.train()
         model.zero_grad()
@@ -16,7 +15,7 @@ class NeuroToxinPoisoner(GradMask):
         # Determine the device from the model's first parameter
         device = next(model.parameters()).device
 
-        for inputs, labels in self.dataset_clean:
+        for inputs, labels in dataset_clean:
             inputs, labels = inputs.to(device), labels.to(device)
 
             output = model(inputs)
