@@ -28,7 +28,7 @@ class PoisonedFlowerClient(FlowerClient):
             super().report_data()
 
            
-    def can_poison(poisoning_rounds, current_round):
+    def can_poison(self,poisoning_rounds, current_round):
         """
         Determines if poisoning is allowed in the current round.
 
