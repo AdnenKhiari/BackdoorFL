@@ -19,7 +19,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.global_run = None
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.pgd_conf = pgd_conf
-        self.grad_filter = grad_filter
+        self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
         
     def with_loaders(self,trainloader, vallodaer):
         self.trainloader = trainloader

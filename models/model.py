@@ -5,9 +5,10 @@ import torch
 import torchmetrics
 
 from models.modelbase import ModelBase
+from poisoning_transforms.model.masks.grad_masker import GradMask
 
 
-def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad):
+def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad: GradMask | None):
     """Train the network on the training set using torchmetrics."""
     criterion = torch.nn.CrossEntropyLoss().to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)

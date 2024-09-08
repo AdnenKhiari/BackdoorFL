@@ -20,8 +20,6 @@ class PoisonedFlowerClient(FlowerClient):
         self.test_data_poisoner : DataPoisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,target_poisoned),target_poisoned,batch_size)
         self.model_poisoner : ModelPoisoner = None
         self.target_poisoned = target_poisoned
-        self.pgd_conf = pgd_conf
-        self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
         self.data_poisoner = data_poisoner
         
     def report_data(self):
