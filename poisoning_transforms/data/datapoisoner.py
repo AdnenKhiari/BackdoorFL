@@ -191,7 +191,6 @@ class IgnoreLabel(DataPoisoner):
             Dict[str, torch.Tensor]: The dictionary with poisoned images where the label is not the target label.
         """
         # Extract labels and images
-        print("DATATA",data)
         labels = data['label']
         images = data['image']
         
@@ -221,6 +220,7 @@ class IgnoreLabel(DataPoisoner):
         current_batch_size = 0
 
         for batch in dataloader:
+            print("BTCH",batch)
             poisoned_batch = self.transform(batch)
             if len(poisoned_batch) > 0:
                 for key, value in poisoned_batch.items():
