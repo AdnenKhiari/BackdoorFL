@@ -17,7 +17,7 @@ poisoned_clients_ratio: 0
 poisoned_batch_size: ${batch_size}
 poisoned_target: 1
 
-pgd:
+pgd_conf:
   active: true
   eps: 0.03
   norm_type: "inf"

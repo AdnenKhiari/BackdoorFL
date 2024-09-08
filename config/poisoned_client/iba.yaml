@@ -12,4 +12,4 @@ cfg:
   dataset:
     size: ${dataset.size}
   grad_filter: ${grad_filter}
-  pgd_conf: ${pgd}
+  pgd_conf: ${pgd_conf}

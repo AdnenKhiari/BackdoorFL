@@ -11,4 +11,4 @@ cfg:
   patch_val: 1 
   norm_scaling_factor: 1.2
   grad_filter: ${grad_filter}
-  pgd_conf: ${pgd}
+  pgd_conf: ${pgd_conf}
