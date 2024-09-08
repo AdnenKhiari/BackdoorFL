@@ -47,7 +47,6 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
                     # Compute the difference between the current and reference model
                     delta = current_params - reference_params
 
-                    print("Old Delta Norm",delta.norm(p=pgd.norm_type) if pgd.norm_type !="inf" else delta.abs().max())
                     # Check norm type and project accordingly
                     if pgd.norm_type == 'inf':
                         delta = delta.clamp(-pgd.eps, pgd.eps)  # L-infinity projection
@@ -55,7 +54,6 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
                         norm = delta.norm(p=pgd.norm_type)
                         if norm > pgd.eps:
                             delta = delta * (pgd.eps / norm)  # Lp projection for p != inf
-                    print("New Delta Norm",delta.norm(p=pgd.norm_type) if pgd.norm_type !="inf" else delta.abs().max())
 
                     # Update model parameters with the projected values
                     updated_params = reference_params + delta
