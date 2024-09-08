@@ -47,7 +47,8 @@ def iba_client_fn(node_id,cfg):
                 lira_eps=0.2,
                 lira_train_lr=0.008,
                 pgd_conf=cfg.pgd_conf,
-                mask_conf=cfg.mask_conf
+                mask_conf=cfg.mask_conf,
+                norm_scaling_factor=cfg.norm_scaling_factor
         )
     
 
