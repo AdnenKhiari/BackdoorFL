@@ -15,8 +15,8 @@ class NeuroToxinPoisoner(GradMask):
         # Determine the device from the model's first parameter
         device = next(model.parameters()).device
 
-        for inputs, labels in dataset_clean:
-            inputs, labels = inputs.to(device), labels.to(device)
+        for batch in dataset_clean:
+            inputs, labels = batch["image"].to(device), batch["label"].to(device)
 
             output = model(inputs)
             loss = criterion(output, labels)
