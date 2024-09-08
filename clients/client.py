@@ -50,7 +50,7 @@ def randomized_simple_poisoned_client_fn(node_id,cfg):
                 pgd_conf=cfg.pgd_conf,
                 patch_location_range=cfg.patch_location_range,
                 patch_size_range=cfg.patch_size_range,
-                patch_value=cfg.patch_value
+                patch_val=cfg.patch_val
         )
     
 def iba_client_fn(node_id,cfg):
