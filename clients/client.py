@@ -16,7 +16,6 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"partition_by":dataset_cfg.label})
     
     res = instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
-    print("INST",res,res._partition_by)
     return res
 
 

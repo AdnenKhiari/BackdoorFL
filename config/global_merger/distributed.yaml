@@ -1,0 +1,2 @@
+---
+_target_: clients.poisoned_client.get_distributed_global_poisoner

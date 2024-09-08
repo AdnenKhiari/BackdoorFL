@@ -13,10 +13,7 @@ from clients.poisoned_client import get_global_data_poisoner
 from custom_simulation.simulation import start_simulation
 from dataset.dataset import Dataset
 from server import fit_stats, get_aggregation_metrics, get_evalulate_fn
-import numpy as np
 import wandb
-
-
 
 def resolve_tuple(*args):
     return tuple(args)
@@ -61,7 +58,7 @@ def main(cfg: DictConfig):
     
     client_ids,clients_dict = get_clients(cfg,global_run)
     
-    global_data_poisoner = get_global_data_poisoner(clients_dict)
+    global_data_poisoner = instantiate(cfg.global_merger,clients=clients_dict)
     client_fn = generate_client_fn(cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,clients_dict)
 
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)

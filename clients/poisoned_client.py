@@ -77,25 +77,23 @@ class PoisonedFlowerClient(FlowerClient):
     
     
     
-def get_global_data_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
-    def get_poisoner():
-        data_poisoner = []
-        for client in clients["malicious"].values():
-            if len(data_poisoner) == 0:
-                data_poisoner = [client.test_data_poisoner]
-            break
+def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
+    data_poisoner = []
+    for client in clients["malicious"].values():
         if len(data_poisoner) == 0:
-            return None
-        return DataPoisoningPipeline(data_poisoner)
-    
-    def merge_poisoners():
-        data_poisoner = []
-        for client in clients["malicious"].values():
-            if len(data_poisoner) == 0:
-                data_poisoner = [client.test_data_poisoner]
-            else:
-                data_poisoner.append(client.test_data_poisoner)
+            data_poisoner = [client.test_data_poisoner]
+        break
+    if len(data_poisoner) == 0:
+        return None
+    return DataPoisoningPipeline(data_poisoner)
+
+def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]]) -> DataPoisoner:
+    data_poisoner = []
+    for client in clients["malicious"].values():
         if len(data_poisoner) == 0:
-            return None
-        return DataPoisoningPipeline(data_poisoner)  
-    return merge_poisoners
+            data_poisoner = [client.test_data_poisoner]
+        else:
+            data_poisoner.append(client.test_data_poisoner)
+    if len(data_poisoner) == 0:
+        return None
+    return DataPoisoningPipeline(data_poisoner)  

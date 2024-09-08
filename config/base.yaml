@@ -49,3 +49,4 @@ defaults:
   - dataset: mnist
   - optimizers: sgd  
   - poisoned_client: iba
+  - global_merger: single
