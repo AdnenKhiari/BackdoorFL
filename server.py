@@ -7,6 +7,7 @@ import wandb
 from models.model import test
 from poisoning_transforms.data.datapoisoner import DataPoisoner
 import numpy as np
+from torchvision.utils import make_grid
 
 def get_on_fit_config(config: DictConfig):
     """Return a function to configure the client's fit."""
@@ -145,6 +146,32 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
             }
         }
         if global_run is not None:
+            # Randomly sample 4 clean images
+            clean_images = []
+            poisoned_images = []
+            for i, (images, _) in enumerate(testloader):
+                if len(clean_images) >= 4:
+                    break
+                clean_images.extend([images[j].to(device) for j in range(min(len(images), 4))])
+
+            # Create poisoned versions
+            poisoned_images = [data_poisoner.poison(img.unsqueeze(0)).squeeze(0).to(device) for img in clean_images]
+
+            # Compute the differences and amplify
+            diffs = [torch.clamp((poisoned - clean) * 10, 0, 1) for clean, poisoned in zip(clean_images, poisoned_images)]
+
+            # Stack them into a single grid
+            clean_grid = make_grid(clean_images, nrow=1, normalize=True)
+            poisoned_grid = make_grid(poisoned_images, nrow=1, normalize=True)
+            diff_grid = make_grid(diffs, nrow=1, normalize=True)
+
+            # Concatenate grids vertically
+            grid = torch.cat((clean_grid, poisoned_grid, diff_grid), dim=1)
+
+            # Log to wandb
+            global_run.log({"evaluation_images": wandb.Image(grid)})
+
+            # Log other metrics
             global_run.log(result)
 
         return mt_loss, result
