@@ -176,7 +176,9 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
 
             # Compute the differences and amplify
             diffs = [torch.clamp((poisoned - clean) * 10, 0, 1) for clean, poisoned in zip(clean_images, poisoned_images)]
-
+            print("TP",type(clean_images))
+            print("TP",type(poisoned_images))
+            print("TP",type(diffs))
             # Stack them into a single grid
             grid = make_grid(torch.cat[torch.tensor(clean_images),poisoned_images,torch.tensor(diffs)] , nrow=4, normalize=True)
 
