@@ -9,9 +9,9 @@ from poisoning_transforms.model.model_replacement import ModelReplacement
 from poisoning_transforms.model.norm_scaling import NormScaling
 
 class SimplePoisonedClient(PoisonedFlowerClient):
-    def __init__(self, node_id,model_cfg,optimizer,batch_poison_num,target_poisoned,batch_size,patch_size,patch_loc,patch_val,norm_scaling_factor,pgd_conf,grad_filter) -> None:
+    def __init__(self, node_id,model_cfg,optimizer,batch_poison_num,target_poisoned,batch_size,patch_size,patch_loc,patch_val,norm_scaling_factor,pgd_conf,grad_filter,poison_between) -> None:
         data_poisoner = DataPoisoningPipeline([SimplePatchPoisoner(patch_size,patch_loc,patch_val)])
-        super(SimplePoisonedClient,self).__init__(node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,grad_filter)
+        super(SimplePoisonedClient,self).__init__(node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,grad_filter,poison_between)
         self.norm_scaling_factor = norm_scaling_factor
     def set_parameters(self, parameters):
         # self.model_poisoner = ModelPoisoningPipeline([ModelReplacement(parameters,3)])

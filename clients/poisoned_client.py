@@ -14,21 +14,46 @@ from poisoning_transforms.model.model_poisoner import ModelPoisoner, ModelPoison
 from poisoning_transforms.model.model_replacement import ModelReplacement
 
 class PoisonedFlowerClient(FlowerClient):
-    def __init__(self,node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,grad_filter) -> None:
+    def __init__(self,node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,grad_filter,poison_between) -> None:
         super(PoisonedFlowerClient,self).__init__(node_id,model_cfg,optimizer,pgd_conf,grad_filter)
         self.train_data_poisoner : DataPoisoner = BatchPoisoner(data_poisoner,batch_poison_num,target_poisoned)
         self.test_data_poisoner : DataPoisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,target_poisoned),target_poisoned,batch_size)
         self.model_poisoner : ModelPoisoner = None
         self.target_poisoned = target_poisoned
         self.data_poisoner = data_poisoner
+        self.poison_between =poison_between
         
     def report_data(self):
         if self.global_run:
             super().report_data()
-            wandb.run._set_config_wandb("Poisoned",True)
-            wandb.run._set_config_wandb("target_poisoned",self.target_poisoned)
-            
+
+           
+    def can_poison(poisoning_rounds, current_round):
+        """
+        Determines if poisoning is allowed in the current round.
+
+        Parameters:
+        poisoning_rounds (list of tuples): Each tuple contains a start and end round (inclusive) where poisoning is allowed.
+        current_round (int): The current round number.
+
+        Returns:
+        bool: True if poisoning is allowed, False otherwise.
+        """
+        for start_round, end_round in poisoning_rounds:
+            if start_round <= current_round <= end_round:
+                return True
+        return False
+ 
     def fit(self, parameters, config):
+        
+        # Get Config
+        lr = config["lr"]
+        momentum = config["momentum"]
+        epochs = config["local_epochs"]
+        current_round = config["current_round"]
+        
+        if not self.can_poison(self.poison_between, current_round):
+            super().fit(parameters,config)
         
         self.report_data()
 
@@ -40,11 +65,7 @@ class PoisonedFlowerClient(FlowerClient):
         if self.train_data_poisoner is None:
             raise Exception("Implement a data poisoner")
         backdoored_train = lambda : self.train_data_poisoner.wrap_transform_iterator(self.trainloader)
-        # Get Config
-        lr = config["lr"]
-        momentum = config["momentum"]
-        epochs = config["local_epochs"]
-        current_round = config["current_round"]
+
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         
         self.train_data_poisoner.train()
@@ -61,12 +82,16 @@ class PoisonedFlowerClient(FlowerClient):
         return backdoored_params, len(self.trainloader), {"Poisoned": 1,"current_round":current_round}
     
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
-        
-        self.report_data()
+       
+        current_round = config["current_round"]
 
+        if not self.can_poison(self.poison_between, current_round):
+            super().fit(parameters,config) 
+            
+            
+        self.report_data()
         
         self.set_parameters(parameters)
-        current_round = config["current_round"]
 
         mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)

@@ -22,6 +22,10 @@ pgd_conf:
   eps: 0.03
   norm_type: "inf"
 
+poison_between:
+  - ${as_tuple:5,35}
+  - ${as_tuple:55,80}
+
 grad_filter:
   active: true
   filter:
@@ -35,7 +39,7 @@ config_fit:
 
 config_eval: ${config_fit}
 
-evaluate_metrics_aggregation_fn: false
+evaluate_metrics_aggregation_fn: true
 
 wandb:
   active: true
