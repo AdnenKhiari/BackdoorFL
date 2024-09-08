@@ -14,7 +14,10 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"seed":seed_cfg})
     # if partitioner_cfg.get("partition_by",None) is not None:
     #    params.update({"partition_by":dataset_cfg.label})
-    return instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
+    
+    res = instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
+    print("INST",res,res._partition_by)
+    return res
 
 
 def simple_poisoned_client_fn(node_id,cfg):
