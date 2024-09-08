@@ -119,6 +119,7 @@ def get_aggregation_metrics(global_run):
         if global_run is not None:
             wandb.run.log({
                 "poisoning_stats": poisoning_stats,
+                "current_round": client_metrics[0][1]["current_round"],
                 "best_local_asr": None,
                 "worst_local_asr": None,
             })
