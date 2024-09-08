@@ -220,7 +220,6 @@ class IgnoreLabel(DataPoisoner):
         current_batch_size = 0
 
         for batch in dataloader:
-            print("BTCH",batch)
             poisoned_batch = self.transform(batch)
             if len(poisoned_batch) > 0:
                 for key, value in poisoned_batch.items():
