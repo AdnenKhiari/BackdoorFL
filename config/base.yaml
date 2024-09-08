@@ -36,6 +36,8 @@ config_eval: # condif availabvle when evaluating
   momentum: 0.9
   local_epochs: 2
 
+evaluate_metrics_aggregation_fn: false
+
 wandb:
   active: true
   report_clients: false

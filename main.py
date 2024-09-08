@@ -67,7 +67,7 @@ def main(cfg: DictConfig):
         cfg.strategy,
         evaluate_fn=evaluate_fn,
         fit_metrics_aggregation_fn=fit_stats,
-        evaluate_metrics_aggregation_fn=get_aggregation_metrics(global_run),
+        evaluate_metrics_aggregation_fn=get_aggregation_metrics(global_run) if cfg.evaluate_metrics_aggregation_fn else None,
     )
    
     ## 5. Start Simulation
