@@ -1,3 +1,4 @@
+import copy
 from flwr.common.parameter import ndarrays_to_parameters
 import numpy as np
 import torch
@@ -13,6 +14,8 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
     net.train()
     net.to(device)
     
+    reference_model = copy.deepcopy(net)
+    
     for epoch in range(epochs):
         total_loss = 0.0
         accuracy_metric.reset()
@@ -23,27 +26,42 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
             images, labels = images.to(device), labels.to(device)
             
             optimizer.zero_grad()
+            
             outputs = net(images)
             loss = criterion(outputs, labels)
             loss.backward()
-            
-            if pgd.active:
-                with torch.no_grad():
-                    # Compute and print old norm of gradients before PGD
-                    old_grad_norm = torch.norm(torch.stack([p.grad.norm() for p in net.parameters() if p.grad is not None]),np.Infinity if pgd.norm_type == "inf" else pgd.norm_type)
-                    print(f"Old gradient norm before PGD: {old_grad_norm}")
-
-                    # Apply PGD by clipping gradient norms
-                    torch.nn.utils.clip_grad_norm_(net.parameters(), pgd.eps, pgd.norm_type, error_if_nonfinite=True)
-
-                    # Compute and print new norm of gradients after PGD
-                    new_grad_norm = torch.norm(torch.stack([p.grad.norm() for p in net.parameters() if p.grad is not None]), np.Infinity if pgd.norm_type == "inf" else pgd.norm_type)
-                    print(f"New gradient norm after PGD: {new_grad_norm}")
                     
             if mask_grad.active:
                 mask_grad.apply(net)
-            
+                
             optimizer.step()
+                
+                
+            # PGD projection step
+            if pgd.active:
+                with torch.no_grad():
+                    # Flatten both the current model and reference model parameters
+                    current_params = torch.nn.utils.parameters_to_vector(net.parameters())
+                    reference_params = torch.nn.utils.parameters_to_vector(reference_model.parameters())
+
+                    # Compute the difference between the current and reference model
+                    delta = current_params - reference_params
+
+                    print("Old Delta Norm",delta.norm)
+                    # Check norm type and project accordingly
+                    if pgd.norm_type == 'inf':
+                        delta = delta.clamp(-pgd.eps, pgd.eps)  # L-infinity projection
+                    else:
+                        norm = delta.norm(p=pgd.norm_type)
+                        if norm > pgd.eps:
+                            delta = delta * (pgd.eps / norm)  # Lp projection for p != inf
+                    print("New Delta Norm",delta.norm)
+
+                    # Update model parameters with the projected values
+                    updated_params = reference_params + delta
+
+                    # Update net with projected parameters (copy them over after PGD)
+                    torch.nn.utils.vector_to_parameters(updated_params, net.parameters())
 
             # Metrics
             with torch.no_grad():
