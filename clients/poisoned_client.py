@@ -48,6 +48,8 @@ class PoisonedFlowerClient(FlowerClient):
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         
         self.train_data_poisoner.train()
+        if self.grad_filter != None:
+            self.grad_filter.fit(self.model,self.trainloader)        
         train(self.model,backdoored_train, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
         
         # Poison Weights

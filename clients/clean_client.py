@@ -53,6 +53,8 @@ class FlowerClient(fl.client.NumPyClient):
         current_round = config["current_round"]
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
+        if self.grad_filter != None:
+            self.grad_filter.fit(self.model,self.trainloader)
         train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
 
         return self.get_parameters({}), len(self.trainloader), {"current_round": current_round,"Poisoned": 0}

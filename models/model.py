@@ -16,10 +16,7 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
     net.to(device)
     
     reference_model = copy.deepcopy(net)
-    
-    if mask_grad!= None:
-        mask_grad.fit(net,get_trainloader())
-        
+
     for epoch in range(epochs):
         total_loss = 0.0
         accuracy_metric.reset()
