@@ -1,4 +1,5 @@
 import numpy as np
+from omegaconf import OmegaConf
 from clients.attackers.randomized_simple_poisoned_client import RandomizedSimplePoisonedClient
 from clients.clean_client import FlowerClient
 from clients.attackers.iba_client import IbaClient
@@ -9,6 +10,11 @@ from flwr_datasets.partitioner import Partitioner
 from flwr.common import Context
 from hydra.utils import instantiate
 
+
+def resolve_tuple(*args):
+    return tuple(args)
+
+OmegaConf.register_new_resolver("as_tuple", resolve_tuple)
 def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     params = {}
     # if partitioner_cfg.get("seed",None) is not None:
