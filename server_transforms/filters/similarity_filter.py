@@ -20,53 +20,24 @@ class SimilarityFilter(StrategyWrapper):
         self.threshold = threshold
         self.p = p
 
-    def process_weights(self, weights: List[Tuple[NDArrays, int]]) -> List[Tuple[NDArrays, int]]:
-        """
-        Filter weights based on the similarity metric.
+    def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
+        filtered_weights = []
+        global_weights = self._global_model
 
-        Args:
-            weights (List[Tuple[NDArrays, int]]): The list of tuples where each tuple contains numpy arrays (model weights) and the number of examples.
+        for client_weights, num_examples, client_id in weights:
+            if self.similarity_metric == "cosine":
+                similarity = self._cosine_similarity(global_weights, client_weights)
+                if similarity >= self.threshold:
+                    filtered_weights.append((client_weights, num_examples, client_id))
+            elif self.similarity_metric == "lp":
+                distance = self._lp_distance(global_weights, client_weights, self.p)
+                if distance <= self.threshold:
+                    filtered_weights.append((client_weights, num_examples, client_id))
+            else:
+                raise ValueError(f"Unknown similarity metric: {self.similarity_metric}")
 
-        Returns:
-            List[Tuple[NDArrays, int]]: The list of tuples with the filtered weights and the number of examples.
-        """
-        # Calculate the filtered weights based on similarity
-        filtered_weights = self._filter_weights(weights)
-        
-        # Return the filtered weights
         return filtered_weights
 
-    def _filter_weights(self, weights: List[Tuple[NDArrays, int]]) -> List[Tuple[NDArrays, int]]:
-        """
-        Apply the similarity metric to filter weights.
-
-        Args:
-            weights (List[Tuple[NDArrays, int]]): The list of tuples where each tuple contains numpy arrays (model weights) and the number of examples.
-
-        Returns:
-            List[Tuple[NDArrays, int]]: The list of tuples with the filtered weights and the number of examples.
-        """
-        # Convert the weights to a list of NDArrays
-        weight_arrays = [weights for weights, _ in weights]
-        
-        # Select the reference weights (first one in the list)
-        reference_weights = weight_arrays[0]
-        
-        # Compute similarities or distances
-        if self.similarity_metric == "cosine":
-            similarities = [self._cosine_similarity(reference_weights, w) for w in weight_arrays]
-        elif self.similarity_metric == "lp":
-            if self.p is None:
-                raise ValueError("Parameter 'p' must be specified for Lp distance.")
-            similarities = [self._lp_distance(reference_weights, w, self.p) for w in weight_arrays]
-        else:
-            raise ValueError("Unsupported similarity metric. Choose 'cosine' or 'lp'.")
-
-        # Apply the threshold to filter weights
-        filtered_indices = [i for i, sim in enumerate(similarities) if sim >= self.threshold]
-        
-        # Return the filtered weights
-        return [(weight_arrays[i], sum(num_examples for _, num_examples in weights)) for i in filtered_indices]
 
     def _cosine_similarity(self, weights1: NDArrays, weights2: NDArrays) -> float:
         """Compute cosine similarity between two sets of weights."""

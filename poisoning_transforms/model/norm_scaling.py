@@ -4,7 +4,7 @@ from typing import List
 from poisoning_transforms.model.model_poisoner import ModelPoisoner
 
 class NormScaling(ModelPoisoner):
-    def __init__(self, global_weights: List[np.ndarray], gamma: float = 1):
+    def __init__(self, global_weights: List[np.ndarray], gamma: float = 1.1):
         """
         Initializes the NormScaling object.
 
@@ -33,15 +33,17 @@ class NormScaling(ModelPoisoner):
             concatenated_diff = np.concatenate([diff.flatten() for diff in diff_vectors])
             
             # Step 3: Compute the norm of the concatenated difference vector
-            total_norm = np.linalg.norm(concatenated_diff)
-            
-            print("Old Norm",total_norm)
-            
+            # total_norm = np.linalg.norm(concatenated_diff)
+
             # Step 4: Normalize and scale each weight array using the total norm
+            # scaled_weights = []
+            # for diff, gw in zip(diff_vectors, self.global_weights):
+            #     norm_diff = diff / total_norm  # Normalize using the total norm
+            #     scaled_w = self.gamma * norm_diff + gw  # Scale by gamma and add G back
+            #     scaled_weights.append(scaled_w)
+                
             scaled_weights = []
             for diff, gw in zip(diff_vectors, self.global_weights):
-                norm_diff = diff / total_norm  # Normalize using the total norm
-                scaled_w = self.gamma * norm_diff + gw  # Scale by gamma and add G back
+                scaled_w = self.gamma * diff + gw  # Scale by gamma and add G back
                 scaled_weights.append(scaled_w)
-            
             return scaled_weights

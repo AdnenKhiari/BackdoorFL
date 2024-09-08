@@ -1,15 +1,14 @@
-_target_: clients.client.iba_client_fn
+_target_: clients.client.simple_poisoned_client_fn
 _recursive_ : false
 cfg:
   model: ${model}
   optimizers: ${optimizers}
-  config_fit:
-    lr: ${config_fit.lr}
   poisoned_batch_size: ${poisoned_batch_size}
   poisoned_target: ${poisoned_target}
   batch_size: ${batch_size}
+  patch_size: ${as_tuple:5,5}  
+  patch_loc: ${as_tuple:5,5}
+  patch_val: 1 
   norm_scaling_factor: 1.2
-  dataset:
-    size: ${dataset.size}
   mask_grad: ${mask_grad}
   pgd: ${pgd}

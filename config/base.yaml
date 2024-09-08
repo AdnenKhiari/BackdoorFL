@@ -22,6 +22,10 @@ pgd:
   eps: 0.03
   norm_type: "inf"
 
+# TODO
+mask_grad:
+  active: false
+
 config_fit:
   lr: 0.01
   momentum: 0.9

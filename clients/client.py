@@ -1,7 +1,7 @@
 import numpy as np
 from clients.clean_client import FlowerClient
-from clients.iba_client import IbaClient
-from clients.simple_poisoned_client import SimplePoisonedClient
+from clients.attackers.iba_client import IbaClient
+from clients.attackers.simple_poisoned_client import SimplePoisonedClient
 from custom_simulation.simulation import get_client_ids
 from dataset.dataset import Dataset
 from flwr_datasets.partitioner import Partitioner
@@ -24,7 +24,13 @@ def simple_poisoned_client_fn(node_id,cfg):
                 optimizer=cfg.optimizers,
                 batch_poison_num=cfg.poisoned_batch_size,
                 target_poisoned=cfg.poisoned_target,
-                batch_size=cfg.batch_size
+                batch_size=cfg.batch_size,
+                patch_size=cfg.patch_size,
+                patch_loc=cfg.patch_loc,
+                patch_val=cfg.patch_val,
+                norm_scaling_factor=cfg.norm_scaling_factor,
+                pgd_conf=cfg.pgd_conf,
+                mask_conf=cfg.mask_conf
         )
     
 def iba_client_fn(node_id,cfg):
@@ -39,7 +45,9 @@ def iba_client_fn(node_id,cfg):
                 lira_output_size=cfg.dataset.size,
                 lira_train_epoch=2,
                 lira_eps=0.2,
-                lira_train_lr=0.008,   
+                lira_train_lr=0.008,
+                pgd_conf=cfg.pgd_conf,
+                mask_conf=cfg.mask_conf
         )
     
 

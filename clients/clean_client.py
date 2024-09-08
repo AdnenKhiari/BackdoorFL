@@ -18,7 +18,6 @@ class FlowerClient(fl.client.NumPyClient):
         self.node_id = node_id
         self.global_run = None
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        print("Device Used", self.device)
         
     def with_loaders(self,trainloader, vallodaer):
         self.trainloader = trainloader
@@ -52,7 +51,7 @@ class FlowerClient(fl.client.NumPyClient):
         current_round = config["current_round"]
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
-        train(self.model, lambda : self.trainloader, optim, epochs, self.device)
+        train(self.model, lambda : self.trainloader, optim, epochs, self.device,{"active":False},{"active":False})
 
         return self.get_parameters({}), len(self.trainloader), {"current_round": current_round,"Poisoned": 0}
 

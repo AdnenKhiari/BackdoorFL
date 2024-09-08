@@ -13,12 +13,14 @@ from poisoning_transforms.model.model_poisoner import ModelPoisoner, ModelPoison
 from poisoning_transforms.model.model_replacement import ModelReplacement
 
 class PoisonedFlowerClient(FlowerClient):
-    def __init__(self,node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size) -> None:
+    def __init__(self,node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,mask_conf) -> None:
         super(PoisonedFlowerClient,self).__init__(node_id,model_cfg,optimizer)
         self.train_data_poisoner : DataPoisoner = BatchPoisoner(data_poisoner,batch_poison_num,target_poisoned)
         self.test_data_poisoner : DataPoisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,target_poisoned),target_poisoned,batch_size)
         self.model_poisoner : ModelPoisoner = None
         self.target_poisoned = target_poisoned
+        self.pgd_conf = pgd_conf
+        self.mask_conf = mask_conf
         
     def report_data(self):
         if self.global_run:

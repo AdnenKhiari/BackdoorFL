@@ -18,37 +18,26 @@ class KrumFilter(StrategyWrapper):
         self.num_malicious = num_malicious
         self.to_keep = to_keep
 
-    def process_weights(self, weights: List[Tuple[NDArrays, int]]) -> List[Tuple[NDArrays, int]]:
-        """
-        Apply Multi-Krum filtering to select the most reliable weights.
-
-        Args:
-            weights (List[Tuple[NDArrays, int]]): The list of tuples where each tuple contains numpy arrays (model weights) and the number of examples.
-
-        Returns:
-            List[Tuple[NDArrays, int]]: The list of tuples with the selected weights and the number of examples.
-        """
+    def process_weights(self, weights: List[Tuple[NDArrays, int,int]]) -> List[Tuple[NDArrays, int,int]]:
+        """Process the weights received from the clients."""
+        
         # Apply Krum filtering to select reliable weights
         good_weights = self.aggregate_krum(
             results=weights,
             num_malicious=self.num_malicious,
             to_keep=self.to_keep
         )
-        
-        # Create a list of tuples with the selected weights and the number of examples
-        filtered_weights = [(good_weights, sum(num_examples for _, num_examples in weights))]
-        
-        return filtered_weights
+        return good_weights
 
     def aggregate_krum(
         self,
-        results: List[Tuple[NDArrays, int]],
+        results: List[Tuple[NDArrays, int,int]],
         num_malicious: int,
         to_keep: int
     ) -> NDArrays:
         """Select weights using the Krum algorithm."""
         # Create a list of weights and ignore the number of examples
-        weights = [weights for weights, _ in results]
+        weights = [weights for weights, _,_ in results]
 
         # Compute distances between vectors
         distance_matrix = self._compute_distances(weights)
@@ -72,10 +61,10 @@ class KrumFilter(StrategyWrapper):
             # Choose to_keep clients and return their weights
             best_indices = np.argsort(scores)[::-1][len(scores) - to_keep:] 
             best_results = [results[i] for i in best_indices]
-            return [weights for weights, _ in best_results]
+            return best_results
 
         # Return the weights that minimize the score (Krum)
-        return weights[np.argmin(scores)]
+        return results[np.argmin(scores)]
 
     def _compute_distances(self, weights: List[NDArrays]) -> np.ndarray:
         """Compute distances between vectors.
