@@ -12,4 +12,4 @@ cfg:
   dataset:
     size: ${dataset.size}
   mask_grad: ${mask_grad}
-  pgd: ${pgd}
+  pgd_conf: ${pgd}
