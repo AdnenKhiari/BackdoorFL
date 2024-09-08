@@ -86,6 +86,9 @@ def get_aggregation_metrics(global_run):
         weighted_sums = {}
         total_weights = {}
         
+        worst_asr = 0
+        bast_asr = 0
+        
         # Aggregate metrics
         for weight, metrics in client_metrics:
             for key, value in metrics.items():
@@ -94,6 +97,12 @@ def get_aggregation_metrics(global_run):
                 if key not in weighted_sums:
                     weighted_sums[key] = 0
                     total_weights[key] = 0
+                if key == "ASR":
+                    if worst_asr == 0 or value < worst_asr:
+                        worst_asr = value
+                    if bast_asr == 0 or value > bast_asr:
+                        bast_asr = value
+                    
                 weighted_sums[key] += value * weight
                 total_weights[key] += weight
 
@@ -108,7 +117,11 @@ def get_aggregation_metrics(global_run):
             "metrics": aggregated_metrics
         }
         if global_run is not None:
-            wandb.run.log(result)
+            wandb.run.log({
+                "poisoning_stats": poisoning_stats,
+                "best_local_asr": None,
+                "worst_local_asr": None,
+            })
 
         print("Evaluation Result :",result)
         return result
