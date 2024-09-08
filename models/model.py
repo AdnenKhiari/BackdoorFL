@@ -7,7 +7,6 @@ from models.modelbase import ModelBase
 
 def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad):
     """Train the network on the training set using torchmetrics."""
-    print("PGD",pgd)
     criterion = torch.nn.CrossEntropyLoss().to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
     net.train()
@@ -28,8 +27,18 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
             loss.backward()
             
             if pgd.active:
-                torch.nn.utils.clip_grad_norm_(net.parameters(), pgd.eps,pgd.norm_type,error_if_nonfinite =True)
+                with torch.no_grad():
+                    # Compute and print old norm of gradients before PGD
+                    old_grad_norm = torch.norm(torch.stack([p.grad.norm() for p in net.parameters() if p.grad is not None]), pgd.norm_type)
+                    print(f"Old gradient norm before PGD: {old_grad_norm}")
 
+                    # Apply PGD by clipping gradient norms
+                    torch.nn.utils.clip_grad_norm_(net.parameters(), pgd.eps, pgd.norm_type, error_if_nonfinite=True)
+
+                    # Compute and print new norm of gradients after PGD
+                    new_grad_norm = torch.norm(torch.stack([p.grad.norm() for p in net.parameters() if p.grad is not None]), pgd.norm_type)
+                    print(f"New gradient norm after PGD: {new_grad_norm}")
+                    
             if mask_grad.active:
                 mask_grad.apply(net)
             
