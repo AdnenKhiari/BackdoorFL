@@ -5,6 +5,7 @@ from clients.clean_client import FlowerClient
 from models.model import train, test
 from flwr.common import NDArrays, Scalar,Context
 from wandb.sdk.wandb_run import Run
+from hydra.utils import instantiate, call
 
 from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline, IgnoreLabel
 from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
@@ -20,7 +21,7 @@ class PoisonedFlowerClient(FlowerClient):
         self.model_poisoner : ModelPoisoner = None
         self.target_poisoned = target_poisoned
         self.pgd_conf = pgd_conf
-        self.grad_filter = grad_filter
+        self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
         self.data_poisoner = data_poisoner
         
     def report_data(self):
@@ -49,7 +50,7 @@ class PoisonedFlowerClient(FlowerClient):
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         
         self.train_data_poisoner.train()
-        train(self.model,backdoored_train, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
+        train(self.model,backdoored_train, optim, epochs, self.device,self.pgd_conf,)
         
         # Poison Weights
         params = self.get_parameters({})

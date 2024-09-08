@@ -54,6 +54,7 @@ def main(cfg: DictConfig):
 
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
+
     
     client_ids,clients_dict = get_clients(cfg,global_run)
     global_data_poisoner = instantiate(cfg.global_merger)
