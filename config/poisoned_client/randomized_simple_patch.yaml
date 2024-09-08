@@ -17,4 +17,3 @@ cfg:
   grad_filter: ${grad_filter}
   pgd_conf: ${pgd_conf}
   global_seed: ${global_seed}
-  poison_between: ${poison_between}

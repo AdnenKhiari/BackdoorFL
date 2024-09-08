@@ -13,4 +13,3 @@ cfg:
     size: ${dataset.size}
   grad_filter: ${grad_filter}
   pgd_conf: ${pgd_conf}
-  poison_between: ${poison_between}
