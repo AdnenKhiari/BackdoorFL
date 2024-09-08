@@ -1,4 +1,5 @@
 import numpy as np
+from clients.attackers.randomized_simple_poisoned_client import RandomizedSimplePoisonedClient
 from clients.clean_client import FlowerClient
 from clients.attackers.iba_client import IbaClient
 from clients.attackers.simple_poisoned_client import SimplePoisonedClient
@@ -33,6 +34,22 @@ def simple_poisoned_client_fn(node_id,cfg):
                 norm_scaling_factor=cfg.norm_scaling_factor,
                 grad_filter=cfg.grad_filter,
                 pgd_conf=cfg.pgd_conf
+        )
+    
+def randomized_simple_poisoned_client_fn(node_id,cfg):
+    return  RandomizedSimplePoisonedClient(
+                node_id,
+                model_cfg=cfg.model,
+                optimizer=cfg.optimizers,
+                batch_poison_num=cfg.poisoned_batch_size,
+                target_poisoned=cfg.poisoned_target,
+                batch_size=cfg.batch_size,
+                norm_scaling_factor=cfg.norm_scaling_factor,
+                grad_filter=cfg.grad_filter,
+                pgd_conf=cfg.pgd_conf,
+                patch_location_range=cfg.patch_location_range,
+                patch_size_range=cfg.patch_size_range,
+                patch_value=cfg.patch_value
         )
     
 def iba_client_fn(node_id,cfg):

@@ -42,24 +42,3 @@ class SimplePatchPoisoner(DataPoisoner):
         # Update the data dictionary with the poisoned images
         data['image'] = images
         return data
-
-
-# Example usage
-if __name__ == "__main__":
-    # Create a simple batch of images (batch_size, channels, height, width)
-    batch_size, channels, height, width = 8, 3, 32, 32
-    images = (torch.randn(batch_size, channels, height, width) + 4) / 8
-    
-    # Initialize the poisoner
-    patch_location = (10, 10)
-    patch_dimension = (5, 5)
-    patch_value = 1.0  # Set the patch to a bright value
-    
-    poisoner = SimplePatchPoisoner(patch_location, patch_dimension, patch_value)
-    
-    # Apply the patch to the batch of images
-    poisoned_images = poisoner.transform(images)
-    
-    img = plt.imshow(poisoned_images[0].permute(1, 2, 0).numpy())
-    # save image to disk
-    plt.savefig('poisoned_image.png')
