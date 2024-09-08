@@ -53,7 +53,7 @@ class PoisonedFlowerClient(FlowerClient):
         current_round = config["current_round"]
         
         if not self.can_poison(self.poison_between, current_round):
-            super().fit(parameters,config)
+            return super().fit(parameters,config)
         
         self.report_data()
 
@@ -86,7 +86,7 @@ class PoisonedFlowerClient(FlowerClient):
         current_round = config["current_round"]
 
         if not self.can_poison(self.poison_between, current_round):
-            super().fit(parameters,config) 
+            return super().fit(parameters,config) 
             
             
         self.report_data()
