@@ -19,8 +19,8 @@ class FlowerClient(fl.client.NumPyClient):
         self.global_run = None
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.pgd_conf = pgd_conf
-        # self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
-        self.grad_filter =None
+        self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
+        
     def with_loaders(self,trainloader, vallodaer):
         self.trainloader = trainloader
         self.valloader = vallodaer
@@ -53,9 +53,9 @@ class FlowerClient(fl.client.NumPyClient):
         current_round = config["current_round"]
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
-        if self.grad_filter != None:
-            self.grad_filter.fit(self.model,self.trainloader)
-        train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
+        # if self.grad_filter != None:
+        #     self.grad_filter.fit(self.model,self.trainloader)
+        train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf)
 
         return self.get_parameters({}), len(self.trainloader), {"current_round": current_round,"Poisoned": 0}
 
