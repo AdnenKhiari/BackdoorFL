@@ -17,7 +17,6 @@ import wandb
 def resolve_tuple(*args):
     return tuple(args)
 
-
 OmegaConf.register_new_resolver("as_tuple", resolve_tuple)
 
 @hydra.main(config_path="config", config_name="base", version_base=None)
