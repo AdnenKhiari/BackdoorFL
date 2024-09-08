@@ -156,7 +156,10 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
                 clean_images.extend([images[j].to(device) for j in range(min(len(images), 4))])
 
             # Create poisoned versions
-            poisoned_images = [data_poisoner.poison(img.unsqueeze(0)).squeeze(0).to(device) for img in clean_images]
+            poisoned_images =data_poisoner.transform({
+                "image": torch.stack(images).to(device),
+                "label": torch.tensor([159] * len(images)).to(device)
+            })["image"]
 
             # Compute the differences and amplify
             diffs = [torch.clamp((poisoned - clean) * 10, 0, 1) for clean, poisoned in zip(clean_images, poisoned_images)]
