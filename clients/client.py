@@ -31,6 +31,7 @@ def simple_poisoned_client_fn(node_id,cfg):
                 patch_size=cfg.patch_size,
                 patch_loc=cfg.patch_loc,
                 patch_val=cfg.patch_val,
+                seed=cfg.global_seed,
                 norm_scaling_factor=cfg.norm_scaling_factor,
                 grad_filter=cfg.grad_filter,
                 pgd_conf=cfg.pgd_conf

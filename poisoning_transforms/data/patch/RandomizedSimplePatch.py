@@ -1,24 +1,30 @@
 from matplotlib import pyplot as plt
 import torch
 import numpy as np
-import torch.utils
-from poisoning_transforms.data.datapoisoner import DataPoisoner
 import random
+from poisoning_transforms.data.datapoisoner import DataPoisoner
 
 class RandomizedSimplePatchPoisoner(DataPoisoner):
-    def __init__(self, patch_location_range: tuple, patch_size_range: tuple, patch_value: float):
+    def __init__(self, patch_location_range: tuple, patch_size_range: tuple, patch_value: float, seed: int = None):
         """
-        Initializes the RandomizedSimplePatchPoisoner with ranges for the location and size of the patch, and the patch value.
+        Initializes the RandomizedSimplePatchPoisoner with ranges for the location and size of the patch, the patch value, and a seed.
 
         Args:
             patch_location_range (tuple): ((x_min, x_max), (y_min, y_max)) for the range of patch locations.
             patch_size_range (tuple): ((width_min, width_max), (height_min, height_max)) for the range of patch sizes.
             patch_value (float): The value to fill the patch with.
+            seed (int, optional): Seed for random number generation. Defaults to None.
         """
         super().__init__()
         self.patch_location_range = patch_location_range
         self.patch_size_range = patch_size_range
         self.patch_value = patch_value
+        self.seed = seed
+        
+        if self.seed is not None:
+            random.seed(self.seed)
+            np.random.seed(self.seed)
+            torch.manual_seed(self.seed)
 
     def _randomize_patch(self, image_height, image_width):
         """ Randomly determine patch location and size within the given ranges. """
