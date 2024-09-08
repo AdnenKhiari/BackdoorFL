@@ -56,7 +56,6 @@ def main(cfg: DictConfig):
     save_path = HydraConfig.get().runtime.output_dir
     
     client_ids,clients_dict = get_clients(cfg,global_run)
-    print("CCC",clients_dict)
     global_data_poisoner = instantiate(cfg.global_merger,clients=clients_dict)
     client_fn = generate_client_fn(cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,clients_dict)
 
