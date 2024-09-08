@@ -43,9 +43,6 @@ class RandomizedSimplePatchPoisoner(DataPoisoner):
         
         return x_start, y_start, patch_width, patch_height
 
-    def train(self) -> None:
-        pass
-
     def transform(self, data: dict) -> dict:
         """
         Applies a randomly-sized and randomly-located patch to each image in the batch.

@@ -137,6 +137,7 @@ class BatchPoisoner(DataPoisoner):
             Dict[str, torch.Tensor]: Updated dictionary with poisoned items and optionally updated labels.
         """
         # Extract labels and images
+        print("DATATA",data)
         labels = data['label']
         images = data['image']
         
