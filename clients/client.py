@@ -21,7 +21,7 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     return res
 
 
-def simple_poisoned_client_fn(node_id,cfg):
+def simple_poisoned_client_fn(node_id,cfg,poison_between):
     return  SimplePoisonedClient(
                 node_id,
                 model_cfg=cfg.model,
@@ -34,10 +34,11 @@ def simple_poisoned_client_fn(node_id,cfg):
                 patch_val=cfg.patch_val,
                 norm_scaling_factor=cfg.norm_scaling_factor,
                 grad_filter=cfg.grad_filter,
-                pgd_conf=cfg.pgd_conf
+                pgd_conf=cfg.pgd_conf,
+                poison_between=poison_between
         )
     
-def randomized_simple_poisoned_client_fn(node_id,cfg):
+def randomized_simple_poisoned_client_fn(node_id,cfg,poison_between):
     return  RandomizedSimplePoisonedClient(
                 node_id,
                 model_cfg=cfg.model,
@@ -51,11 +52,12 @@ def randomized_simple_poisoned_client_fn(node_id,cfg):
                 patch_location_range=cfg.patch_location_range,
                 patch_size_range=cfg.patch_size_range,
                 patch_val=cfg.patch_val,
-                seed=cfg.global_seed
+                seed=cfg.global_seed,
+                poison_between=poison_between
 
         )
     
-def iba_client_fn(node_id,cfg):
+def iba_client_fn(node_id,cfg,poison_between):
     return  IbaClient(
                 node_id,
                 model_cfg=cfg.model,
@@ -70,7 +72,8 @@ def iba_client_fn(node_id,cfg):
                 lira_train_lr=0.008,
                 pgd_conf=cfg.pgd_conf,
                 grad_filter=cfg.grad_filter,
-                norm_scaling_factor=cfg.norm_scaling_factor
+                norm_scaling_factor=cfg.norm_scaling_factor,
+                poison_between=poison_between
         )
     
 
