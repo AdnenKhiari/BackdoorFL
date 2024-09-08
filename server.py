@@ -163,10 +163,9 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
             clean_images = []
             poisoned_images = []
             for i, batch in enumerate(testloader):
-                if len(clean_images) >= 4:
-                    break
                 images = batch["image"]
-                clean_images.extend([images[j].to(device) for j in range(min(len(images), 4))])
+                for j in range(4):
+                    clean_images.append(images[j].to(device))
 
             # Create poisoned versions
             poisoned_images =data_poisoner.transform({  
