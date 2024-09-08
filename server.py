@@ -156,8 +156,8 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
                 clean_images.extend([images[j].to(device) for j in range(min(len(images), 4))])
 
             # Create poisoned versions
-            poisoned_images =data_poisoner.transform({
-                "image": torch.stack(images).to(device),
+            poisoned_images =data_poisoner.transform({  
+                "image": images.to(device),
                 "label": torch.tensor([159] * len(images)).to(device)
             })["image"]
 
