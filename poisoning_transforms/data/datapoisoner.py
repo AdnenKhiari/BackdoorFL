@@ -142,7 +142,10 @@ class BatchPoisoner(DataPoisoner):
         
         if self.k == -1:
             # Apply poisoner to the entire batch
+            print(data['image'].shape)
             poisoned_batch = self.poisoner.transform(data)
+            print(data['image'].shape)
+
             poisoned_images = poisoned_batch['image']
             poisoned_labels = poisoned_batch['label']
             if self.label_replacement is not None:
@@ -219,17 +222,11 @@ class IgnoreLabel(DataPoisoner):
         accumulated_data = defaultdict(list)
         current_batch_size = 0
         
-        def process_img(im):
-            if im.ndim == 4:
-                return im
-            return im.view(-1,im.shape)
-
         for batch in dataloader:
             poisoned_batch = self.transform(batch)
             if len(poisoned_batch["image"]) > 0:
-                print(poisoned_batch["image"].shape)
                 accumulated_data["label"].append(poisoned_batch["label"])
-                accumulated_data["image"].append(process_img(poisoned_batch["image"]))
+                accumulated_data["image"].append(poisoned_batch["image"])
                 current_batch_size += len(poisoned_batch['label'])
 
                 # Check if we've reached the desired batch size
