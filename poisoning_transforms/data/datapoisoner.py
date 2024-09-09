@@ -196,12 +196,12 @@ class IgnoreLabel(DataPoisoner):
         
         # Select data where the label is not the target label
         mask = labels != self.target
+        print("MSK",mask.shape,images.shape)
         selected_images = images[mask]
         selected_labels = labels[mask]
         
-        # If no data is selected, return the original data unchanged
         if selected_images.size(0) == 0:
-            return {}
+            return {'label':[], 'image':[]}
         else:
             return self.poisoner.transform({'label': selected_labels, 'image': selected_images})
 
@@ -221,7 +221,7 @@ class IgnoreLabel(DataPoisoner):
 
         for batch in dataloader:
             poisoned_batch = self.transform(batch)
-            if len(poisoned_batch) > 0:
+            if len(poisoned_batch["image"]) > 0:
                 for key, value in poisoned_batch.items():
                     accumulated_data[key].append(value)
                 current_batch_size += len(poisoned_batch['label'])
