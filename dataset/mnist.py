@@ -19,12 +19,9 @@ class Mnist(Dataset):
             images = []
             labels = []
             for item in batch:
-                if item["image"].shape != (1,28,28):
-                    print("IDEZNTIFIED",item["image"].shape)
-                    item["image"] = item["image"].repeat(3,1,1)
-                    print("CHANGED IDEZNTIFIED",item["image"].shape)
                 images.append(torch.cat([item["image"],item["image"],item["image"]]))
                 labels.append(torch.tensor(item["label"]))
+            print(torch.stack(images).shape)
             return {
                 "image": self.resizer(torch.stack(images)),
                 "label": torch.stack(labels)
