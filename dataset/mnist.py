@@ -21,7 +21,6 @@ class Mnist(Dataset):
             for item in batch:
                 images.append(torch.cat([item["image"],item["image"],item["image"]]))
                 labels.append(torch.tensor(item["label"]))
-            print(torch.stack(images).shape)
             return {
                 "image": self.resizer(torch.stack(images)),
                 "label": torch.stack(labels)

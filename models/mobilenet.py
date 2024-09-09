@@ -15,8 +15,3 @@ class MobileNet(ModelBase):
         )
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
-a=MobileNet(10)
-
-dc = [(_,val.numpy()) for _, val in a.state_dict().items()]
-state_dict = dict({k: torch.from_numpy(v) for k, v in dict(dc).items()})
-a.load_state_dict(state_dict, strict=True)
