@@ -241,6 +241,7 @@ class IgnoreLabel(DataPoisoner):
             return im.view(-1,im.shape)
         # Yield any remaining data if there's no more data left in the iterator
         if current_batch_size > 0:
+            print("Ena howa",accumulated_data["image"].shape)
             yield {
                 "label": torch.cat(accumulated_data["label"]).view(-1),
                 "image": torch.cat(process_img(accumulated_data["image"]))
