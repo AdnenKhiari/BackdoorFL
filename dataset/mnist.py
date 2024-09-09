@@ -19,6 +19,7 @@ class Mnist(Dataset):
             images = []
             labels = []
             for item in batch:
+                print("IDEZNTIFIED",item["image"].shape)
                 images.append(torch.cat([item["image"],item["image"],item["image"]]))
                 labels.append(torch.tensor(item["label"]))
             return {
