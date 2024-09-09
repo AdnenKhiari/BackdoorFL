@@ -33,6 +33,7 @@ class SimplePatchPoisoner(DataPoisoner):
             dict: The dictionary with the batch of images with the patch applied.
         """
         images = data['image']
+        print("PPATCH",images.shape)
         x_start, y_start = self.patch_location
         width, height = self.patch_dimension
 
