@@ -7,7 +7,7 @@ from flwr.common import NDArrays, Scalar,Context
 from wandb.sdk.wandb_run import Run
 from hydra.utils import instantiate, call
 
-from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline, IgnoreLabel
+from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline, IdentityDataPoisoner, IgnoreLabel
 from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
 from poisoning_transforms.model import model_poisoner
 from poisoning_transforms.model.model_poisoner import ModelPoisoner, ModelPoisoningPipeline
@@ -109,7 +109,7 @@ def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]
             data_poisoner = [client.data_poisoner]
         break
     if len(data_poisoner) == 0:
-        return None
+        return IdentityDataPoisoner()
     data_poisoner = DataPoisoningPipeline(data_poisoner)
     data_poisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,poisoned_target),poisoned_target,batch_size)
 
@@ -123,7 +123,7 @@ def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerCl
         else:
             data_poisoner.append(client.data_poisoner)
     if len(data_poisoner) == 0:
-        return None
+        return IdentityDataPoisoner()
     data_poisoner = DataPoisoningPipeline(data_poisoner)
     data_poisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,poisoned_target),poisoned_target,batch_size)
     return data_poisoner
