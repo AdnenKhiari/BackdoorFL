@@ -42,6 +42,9 @@ class RandomizedSimplePatchPoisoner(DataPoisoner):
         y_start = random.randint(y_min, min(y_max, image_height - patch_height))
         
         return x_start, y_start, patch_width, patch_height
+    
+    def train(self) -> None:
+        pass
 
     def transform(self, data: dict) -> dict:
         """
