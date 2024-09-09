@@ -196,7 +196,7 @@ class IgnoreLabel(DataPoisoner):
         
         # Select data where the label is not the target label
         mask = labels != self.target
-        print("MSK",mask.shape,images.shape)
+        # print("MSK",mask.shape,images.shape)
         selected_images = images[mask]
         selected_labels = labels[mask]
         
@@ -235,6 +235,13 @@ class IgnoreLabel(DataPoisoner):
                     accumulated_data = defaultdict(list)
                     current_batch_size = 0
 
+        def process_img(im):
+            if im.ndim == 4:
+                return im
+            return im.view(-1,im.shape)
         # Yield any remaining data if there's no more data left in the iterator
         if current_batch_size > 0:
-            yield {key: torch.cat(value) for key, value in accumulated_data.items()}
+            yield {
+                "label": torch.cat(accumulated_data["label"]).view(-1),
+                "image": torch.cat(process_img(accumulated_data["image"]))
+            }

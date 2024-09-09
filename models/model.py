@@ -111,5 +111,5 @@ def model_to_parameters(model):
     """
     ndarrays = [val.cpu().numpy() for _, val in model.state_dict().items()]
     parameters = ndarrays_to_parameters(ndarrays)
-    print("Extracted model parameters!")
+    # print("Extracted model parameters!")
     return parameters

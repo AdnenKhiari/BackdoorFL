@@ -47,7 +47,7 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
     total_items = 0.0
     poisoned_items = 0.0
     
-    print("METRICSSS",client_metrics)
+    # print("METRICSSS",client_metrics)
     
     # Count poisoned items
     for _, metrics in client_metrics:
