@@ -173,7 +173,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
 
             # Create poisoned versions
             poisoned_images =data_poisoner.transform({  
-                "image": clean_images.to(device),
+                "image": torch.cat(clean_images).to(device),
                 "label": torch.tensor([159] * len(clean_images)).to(device)
             })["image"]
 
