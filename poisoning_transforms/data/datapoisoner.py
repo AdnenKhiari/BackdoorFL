@@ -227,6 +227,7 @@ class IgnoreLabel(DataPoisoner):
         for batch in dataloader:
             poisoned_batch = self.transform(batch)
             if len(poisoned_batch["image"]) > 0:
+                print(poisoned_batch["image"].shape)
                 accumulated_data["label"].append(poisoned_batch["label"])
                 accumulated_data["image"].append(process_img(poisoned_batch["image"]))
                 current_batch_size += len(poisoned_batch['label'])
