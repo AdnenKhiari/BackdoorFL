@@ -160,7 +160,6 @@ class BatchPoisoner(DataPoisoner):
             poisoned_labels = labels.clone()
             if self.label_replacement is not None:
                 poisoned_labels[:k] = self.label_replacement
-        print("ROD BELEK",poisoned_batch["image"].shape,data["image"].shape)
         # Return the updated data
         return {'label': poisoned_labels, 'image': poisoned_images}
     
@@ -196,7 +195,9 @@ class IgnoreLabel(DataPoisoner):
         # Extract labels and images
         labels = data['label']
         images = data['image']
-        print(images.shape)
+        print(images.shape,labels.shape)
+        if(len(labels)<15):
+            print(labels)
         # Select data where the label is not the target label
         mask = labels != self.target
         selected_images = images[mask]
