@@ -139,10 +139,10 @@ class BatchPoisoner(DataPoisoner):
         # Extract labels and images
         labels = data['label']
         images = data['image']
-        
+        print(data['image'].shape)
+
         if self.k == -1:
             # Apply poisoner to the entire batch
-            print(data['image'].shape)
             poisoned_batch = self.poisoner.transform(data)
             print(data['image'].shape)
 
@@ -223,6 +223,7 @@ class IgnoreLabel(DataPoisoner):
         current_batch_size = 0
         
         for batch in dataloader:
+            print(batch['image'].shape)
             poisoned_batch = self.transform(batch)
             if len(poisoned_batch["image"]) > 0:
                 accumulated_data["label"].append(poisoned_batch["label"])
