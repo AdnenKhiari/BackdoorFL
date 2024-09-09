@@ -4,6 +4,6 @@ num_partitions: ${num_partitions}
 seed: ${global_seed}
 shuffle: true
 partition_by: label
-alpha: 0.3
+alpha: 0.7
 min_partition_size: 20
 self_balancing : true

@@ -64,6 +64,10 @@ def main(cfg: DictConfig):
 
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
     dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner)
+    if cfg.wandb.active:
+        dataset.viz_partition_distribution()
+    
+    
     evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),global_data_poisoner(clients=clients_dict),global_run)
 
     strategy : fl.server.strategy.Strategy= instantiate(

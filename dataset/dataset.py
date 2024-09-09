@@ -6,6 +6,10 @@ import torch
 from torchvision.transforms import Compose, ToTensor,Normalize
 from torch.utils.data import  DataLoader
 from flwr_datasets.partitioner import Partitioner
+from flwr_datasets.visualization import plot_label_distributions
+import wandb
+
+
 class Dataset():
     def __init__(self,partitioner):
         self.partitioner : Partitioner = partitioner
@@ -43,9 +47,38 @@ class Dataset():
         data_with_transforms = data.with_transform(self.apply_transforms())
         return DataLoader(data_with_transforms,batch_size=batch_size,collate_fn=self.collate())
     
+    def viz_partition_distribution(self):
+        fds = self.get_federated_dataset({"train": self.partitioner})
+        partitioner = fds.partitioners["train"]
+        fig, ax, df = plot_label_distributions(
+            partitioner,
+            label_name="label",
+            plot_type="bar",
+            size_unit="percent",
+            partition_id_axis="x",
+            legend=True,
+            verbose_labels=True,
+            title="Per Partition Labels Distribution",
+        )
+        wandb.log({"Per Partition Labels Distribution": wandb.Image(fig)})
+        fig, ax, df = plot_label_distributions(
+            partitioner,
+            label_name="label",
+            plot_type="heatmap",
+            size_unit="absolute",
+            partition_id_axis="x",
+            legend=True,
+            verbose_labels=True,
+            title="Per Partition Labels Distribution",
+            plot_kwargs={"annot": True},
+        )
+        wandb.log({"Per Partition Labels HeatMap": wandb.Image(fig)})
+ 
+    
     def load_datasets(self,partition_id: int, batch_size: int = 16, val_ratio: float = 0.15,seed=42):
         fds = self.get_federated_dataset({"train": self.partitioner})
         partition = fds.load_partition(partition_id)
+        
         # Divide data on each node: 80% train, 20% test
         partition_train_test = partition.train_test_split(test_size=val_ratio, seed=seed)
 
