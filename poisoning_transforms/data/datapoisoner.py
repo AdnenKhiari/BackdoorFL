@@ -95,6 +95,9 @@ class IdentityDataPoisoner(DataPoisoner):
         """
         super().__init__()
         
+    def train(self) -> None:
+        pass
+        
     def transform(self, data: Any) -> Any:
         """
         Transforms the data by injecting poison.
