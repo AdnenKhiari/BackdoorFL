@@ -195,9 +195,7 @@ class IgnoreLabel(DataPoisoner):
         # Extract labels and images
         labels = data['label']
         images = data['image']
-        print(images.shape,labels.shape)
-        if(len(labels)<15):
-            print(labels)
+
         # Select data where the label is not the target label
         mask = labels != self.target
         selected_images = images[mask]
