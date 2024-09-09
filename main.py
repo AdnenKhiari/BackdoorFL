@@ -10,6 +10,7 @@ import flwr as fl
 from datetime import datetime
 
 from clients.client import generate_client_fn, get_clients, get_partitioner
+from custom_simulation.client_manager import ClientM
 from custom_simulation.simulation import start_simulation
 from dataset.dataset import Dataset
 from server import fit_stats, get_aggregation_metrics, get_evalulate_fn
@@ -80,6 +81,7 @@ def main(cfg: DictConfig):
         config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
         strategy=strategy,
         client_resources={"num_cpus": cfg.num_cpus_per_client, "num_gpus": cfg.num_gpus_per_client},
+        client_manager=ClientM(cfg.global_seed),
     )
 
     ## 6. Save your results
