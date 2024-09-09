@@ -106,7 +106,7 @@ def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]
     data_poisoner = []
     for client in clients["malicious"].values():
         if len(data_poisoner) == 0:
-            data_poisoner = [client.test_data_poisoner]
+            data_poisoner = [client.data_poisoner]
         break
     if len(data_poisoner) == 0:
         return None
@@ -119,9 +119,9 @@ def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerCl
     data_poisoner = []
     for client in clients["malicious"].values():
         if len(data_poisoner) == 0:
-            data_poisoner = [client.test_data_poisoner]
+            data_poisoner = [client.data_poisoner]
         else:
-            data_poisoner.append(client.test_data_poisoner)
+            data_poisoner.append(client.data_poisoner)
     if len(data_poisoner) == 0:
         return None
     data_poisoner = DataPoisoningPipeline(data_poisoner)
