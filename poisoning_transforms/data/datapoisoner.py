@@ -140,6 +140,7 @@ class BatchPoisoner(DataPoisoner):
         labels = data['label']
         images = data['image']
         # print(data['image'].shape)
+        print("INIT",labels.shape,images.shape)
 
         if self.k == -1:
             # Apply poisoner to the entire batch
@@ -161,7 +162,7 @@ class BatchPoisoner(DataPoisoner):
             if self.label_replacement is not None:
                 poisoned_labels[:k] = self.label_replacement
         
-        print("BATCHED",poisoned_labels.shape,images.shape)
+        print("LATER",poisoned_labels.shape,images.shape)
         # Return the updated data
         return {'label': poisoned_labels, 'image': poisoned_images}
     
