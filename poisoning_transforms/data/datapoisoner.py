@@ -218,12 +218,17 @@ class IgnoreLabel(DataPoisoner):
         """
         accumulated_data = defaultdict(list)
         current_batch_size = 0
+        
+        def process_img(im):
+            if im.ndim == 4:
+                return im
+            return im.view(-1,im.shape)
 
         for batch in dataloader:
             poisoned_batch = self.transform(batch)
             if len(poisoned_batch["image"]) > 0:
-                for key, value in poisoned_batch.items():
-                    accumulated_data[key].append(value)
+                accumulated_data["label"].append(poisoned_batch["label"])
+                accumulated_data["image"].append(process_img(poisoned_batch["image"]))
                 current_batch_size += len(poisoned_batch['label'])
 
                 # Check if we've reached the desired batch size
@@ -235,14 +240,7 @@ class IgnoreLabel(DataPoisoner):
                     accumulated_data = defaultdict(list)
                     current_batch_size = 0
 
-        def process_img(im):
-            if im.ndim == 4:
-                return im
-            return im.view(-1,im.shape)
+
         # Yield any remaining data if there's no more data left in the iterator
         if current_batch_size > 0:
-            print("Ena howa",accumulated_data["image"].shape)
-            yield {
-                "label": torch.cat(accumulated_data["label"]).view(-1),
-                "image": torch.cat(process_img(accumulated_data["image"]))
-            }
+            yield {key: torch.cat(value) for key, value in accumulated_data.items()}
