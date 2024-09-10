@@ -42,7 +42,7 @@ class ClientM(SimpleClientManager):
             )
             return []
 
-        sampled_cids = np.random.choice(available_cids, num_clients)
+        sampled_cids = np.random.choice(available_cids, num_clients, replace=False)
         result = [self.clients[cid] for cid in sampled_cids]
         print("Sampled",list(map(lambda d: d.node_id,result)))
         return result

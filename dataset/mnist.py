@@ -8,12 +8,13 @@ from dataset.dataset import Dataset
 from torchvision import transforms
 
 class Mnist(Dataset):
-    def __init__(self,partitioner):
+    def __init__(self,partitioner,seed):
         super(Mnist,self).__init__(partitioner)
         self.resizer = transforms.Resize((32,32))
+        self.seed = seed
 
     def get_federated_dataset(self,partitioners):
-        return FederatedDataset(dataset="mnist",partitioners=partitioners)
+        return FederatedDataset(dataset="mnist",partitioners=partitioners,seed =self.seed)
     def collate(self):
         def col(batch):
             images = []

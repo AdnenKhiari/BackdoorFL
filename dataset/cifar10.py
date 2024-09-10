@@ -5,11 +5,12 @@ import  torch
 from dataset.dataset import Dataset
 
 class Cifar10(Dataset):
-    def __init__(self,partitioner):
+    def __init__(self,partitioner,seed):
         super(Cifar10,self).__init__(partitioner)
+        self.seed = seed
 
     def get_federated_dataset(self,partitioners):
-        return FederatedDataset(dataset="cifar10",partitioners=partitioners)
+        return FederatedDataset(dataset="cifar10",partitioners=partitioners,seed=self.seed)
     
     def apply_transforms(self):
         def tr(batch):

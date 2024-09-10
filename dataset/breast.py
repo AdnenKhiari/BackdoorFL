@@ -7,12 +7,13 @@ from torchvision import transforms
 from dataset.dataset import Dataset
 
 class Breast(Dataset):
-    def __init__(self,partitioner):
+    def __init__(self,partitioner,seed):
         super(Breast,self).__init__(partitioner)
         self.resizer = transforms.Resize((64,64))
+        self.seed = seed
         
     def get_federated_dataset(self,partitioners):
-        return FederatedDataset(dataset="dbzadnen/breast-histopathology-images",partitioners=partitioners)
+        return FederatedDataset(dataset="dbzadnen/breast-histopathology-images",partitioners=partitioners,seed=self.seed)
     def collate(self):
         def col(batch):
             images = []
