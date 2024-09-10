@@ -62,7 +62,6 @@ def main(cfg: DictConfig):
     random.seed(cfg.global_seed)
     np.random.seed(cfg.global_seed)
     torch.manual_seed(cfg.global_seed)
-    print("State",random.getstate())
 
     client_ids,clients_dict = get_clients(cfg,global_run)
     global_data_poisoner = instantiate(cfg.global_merger)

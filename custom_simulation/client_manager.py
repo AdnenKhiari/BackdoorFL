@@ -17,7 +17,7 @@ class ClientM(SimpleClientManager):
     def sample(
         self,
         num_clients: int,
-        min_num_clients = None,
+        min_num_clients= None,
         criterion = None,
     ) -> List[ClientProxy]:
         """Sample a number of Flower ClientProxy instances."""
@@ -42,7 +42,7 @@ class ClientM(SimpleClientManager):
             )
             return []
 
-        sampled_cids = np.random.sample(available_cids, num_clients)
+        sampled_cids = np.random.choice(available_cids, num_clients)
         result = [self.clients[cid] for cid in sampled_cids]
         print("Sampled",list(map(lambda d: d.node_id,result)))
         return result
