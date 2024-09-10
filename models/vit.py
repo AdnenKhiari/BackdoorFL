@@ -5,9 +5,9 @@ from torchvision.models.vision_transformer import vit_b_16
 from models.modelbase import ModelBase
 from vit_pytorch.vit_for_small_dataset import ViT
 
-class Vit(ModelBase):
+class VisualTR(ModelBase):
     def __init__(self, num_classes: int) -> None:
-        super(Vit, self).__init__(num_classes)
+        super(VisualTR, self).__init__(num_classes)
         self.model = ViT(
             image_size = 128,
             patch_size = 16,
