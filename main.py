@@ -76,7 +76,7 @@ def main(cfg: DictConfig):
     
     if cfg.wandb.active:
         train_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=cfg.num_clients)
-        viz_dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=train_partitioner)
+        viz_dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=train_partitioner,seed=cfg.global_seed)
         viz_dataset.viz_partition_distribution()
     
     
