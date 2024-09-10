@@ -13,6 +13,6 @@ cfg:
     size: ${dataset.size}
   grad_filter: ${grad_filter}
   pgd_conf: ${pgd_conf}
-  lira_train_epoch: ${lira_train_epoch}
-  lira_eps: ${lira_eps}
-  lira_train_lr: ${lira_train_lr}
+  lira_train_epoch: 3
+  lira_eps: 0.2
+  lira_train_lr: 0.01
