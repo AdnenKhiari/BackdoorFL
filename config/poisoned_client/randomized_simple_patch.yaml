@@ -7,11 +7,11 @@ cfg:
   poisoned_target: ${poisoned_target}
   batch_size: ${batch_size}
   patch_size_range: 
-    - ${as_tuple:2, 7}  
-    - ${as_tuple:2, 7}
+    - ${as_tuple:3, 6}  
+    - ${as_tuple:3, 6}
   patch_location_range:
-    - ${as_tuple:0, 10}
-    - ${as_tuple:0, 10}
+    - ${as_tuple:0, 7}
+    - ${as_tuple:0, 7}
   patch_val: 1 
   norm_scaling_factor: 1.2
   grad_filter: ${grad_filter}

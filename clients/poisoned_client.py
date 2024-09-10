@@ -109,7 +109,7 @@ def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]
             data_poisoner = [client.data_poisoner]
         break
     if len(data_poisoner) == 0:
-        return IdentityDataPoisoner()
+        data_poisoner = [IdentityDataPoisoner()]
     data_poisoner = DataPoisoningPipeline(data_poisoner)
     data_poisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,poisoned_target),poisoned_target,batch_size)
 
@@ -123,7 +123,7 @@ def get_distributed_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerCl
         else:
             data_poisoner.append(client.data_poisoner)
     if len(data_poisoner) == 0:
-        return IdentityDataPoisoner()
+        data_poisoner = [IdentityDataPoisoner()]
     data_poisoner = DataPoisoningPipeline(data_poisoner)
     data_poisoner = IgnoreLabel(BatchPoisoner(data_poisoner,-1,poisoned_target),poisoned_target,batch_size)
     return data_poisoner

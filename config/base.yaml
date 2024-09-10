@@ -23,8 +23,7 @@ pgd_conf:
   norm_type: "inf"
 
 poison_between:
-  - ${as_tuple:5,35}
-  - ${as_tuple:55,80}
+  - ${as_tuple:5,50}
 
 grad_filter:
   active: true
