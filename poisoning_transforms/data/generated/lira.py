@@ -49,6 +49,7 @@ class LiraGenerator(DataPoisoner):
         
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.client_model.eval()
+        self.client_model.to(device)
         
         # prepare the hypothical model for the attacker to learn better
         tmp_model = copy.deepcopy(self.client_model)
