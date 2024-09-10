@@ -26,8 +26,8 @@ class IbaClient(PoisonedFlowerClient):
                  lira_eps,
                  norm_scaling_factor,
                  pgd_conf,
-                 mask_conf,
-                 poison_between
+                 poison_between,
+                 grad_filter
                  ) -> None:
         
         model = instantiate(model_cfg)
@@ -46,7 +46,7 @@ class IbaClient(PoisonedFlowerClient):
                 self.lira
             ]
         )
-        super(IbaClient,self).__init__(node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,mask_conf,poison_between)
+        super(IbaClient,self).__init__(node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,grad_filter,poison_between)
         self.model = model
         self.norm_scaling_factor = norm_scaling_factor
 
