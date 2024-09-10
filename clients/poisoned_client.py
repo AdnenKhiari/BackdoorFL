@@ -64,11 +64,12 @@ class PoisonedFlowerClient(FlowerClient):
         # Inject Backdoor
         if self.train_data_poisoner is None:
             raise Exception("Implement a data poisoner")
-        backdoored_train = lambda : self.train_data_poisoner.wrap_transform_iterator(self.trainloader)
 
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         
         self.train_data_poisoner.train()
+        backdoored_train = lambda : self.train_data_poisoner.wrap_transform_iterator(self.trainloader)
+
         if self.grad_filter != None:
             self.grad_filter.fit(self.model,self.trainloader)        
         train(self.model,backdoored_train, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
