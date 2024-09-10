@@ -18,7 +18,7 @@ class UNet(nn.Module):
     def __init__(self, shape):
         super().__init__()
 
-        self.dconv_down1 = double_conv(3, 32)
+        self.dconv_down1 = double_conv(3, 64)
         self.dconv_down2 = double_conv(32, 64)
         self.dconv_down3 = double_conv(64, 128)
         self.dconv_down4 = double_conv(128, 256)
@@ -28,8 +28,8 @@ class UNet(nn.Module):
                                     align_corners=True)
 
         self.dconv_up3 = double_conv(128 + 256, 128)
-        self.dconv_up2 = double_conv(128 + 64, 128)
-        self.dconv_up1 = double_conv(32 + 64, 64)
+        self.dconv_up2 = double_conv(128 + 64, 64)
+        self.dconv_up1 = double_conv(32 + 64, 32)
 
         self.conv_last = nn.Sequential(
             nn.Conv2d(64, shape[0], 1),
