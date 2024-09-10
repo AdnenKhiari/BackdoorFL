@@ -79,7 +79,7 @@ class LiraGenerator(DataPoisoner):
                 defense_loss = self.train_temp_model(data,device,tmp_model,tempmodel_optimizer)
                 with torch.no_grad():
                     total_tempmodel_loss += defense_loss
-            print(f"Epoch {epoch} : Attack Loss : {total_attack_loss} Defense Loss : {total_tempmodel_loss}")
+            print(f"Lira Epoch {epoch} : Attack Loss : {total_attack_loss} Defense Loss : {total_tempmodel_loss}")
             
     def train_temp_model(self,data,device,tmp_model,tmp_optimizer):
         images,labels = data["image"],data["label"]
