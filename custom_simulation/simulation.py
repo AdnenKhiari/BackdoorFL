@@ -7,6 +7,7 @@ import warnings
 from logging import ERROR, INFO
 from typing import Any, Dict, List, Optional, Type, Union
 
+import numpy as np
 import ray
 from ray.util.scheduling_strategies import NodeAffinitySchedulingStrategy
 
@@ -52,7 +53,7 @@ def get_client_ids(num_clients: int) -> List[str]:
     """Generate a list of client IDs."""
     client_ids = []
     for i in range(num_clients):
-        client_id = generate_rand_int_from_bytes(NODE_ID_NUM_BYTES)
+        client_id = int.from_bytes(np.random.bytes(NODE_ID_NUM_BYTES), "little", signed=True)
         client_ids.append(client_id)
     return client_ids
 
