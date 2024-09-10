@@ -91,6 +91,7 @@ class LiraGenerator(DataPoisoner):
         loss = self.criterion(attacked_labels,labels)
         loss.backward()
         tmp_optimizer.step()
+        return loss.detach().cpu().item()
         
     def train_lira_batch(self,data,device,tmp_model,lira_optimizer):
         images,labels = data["image"],data["label"]
