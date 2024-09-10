@@ -102,7 +102,7 @@ class LiraGenerator(DataPoisoner):
         newly_attacked_labels = tmp_model(poisoned_images)
         standard_attacked_labels = self.client_model(poisoned_images)
         poisoned_labels = torch.tensor([self.label_replacement]*len(newly_attacked_labels)).to(device)
-        attack_loss = self.alpha*self.criterion(standard_attacked_labels,poisoned_labels) + (1-self.alpha)*self.criterion(newly_attacked_labels,)
+        attack_loss = self.alpha*self.criterion(standard_attacked_labels,poisoned_labels) + (1-self.alpha)*self.criterion(newly_attacked_labels,poisoned_labels)
         attack_loss.backward()
         lira_optimizer.step()
     
