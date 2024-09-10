@@ -116,7 +116,7 @@ def generate_client_fn(dataset_cfg,partitioner_cfg,bachsize_cfg,valratio_cfg,see
         num_partitions = int(context.node_config["num-partitions"])
         node_id = context.node_id
         partitioner : Partitioner = get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions)
-        dataset : Dataset= instantiate(dataset_cfg["class"],partitioner=partitioner,seed=cfg.global_seed)
+        dataset : Dataset= instantiate(dataset_cfg["class"],partitioner=partitioner,seed=seed_cfg)
         trainloader, valloader, _ = dataset.load_datasets(partition_id,bachsize_cfg,valratio_cfg,seed_cfg)
         return clients_dict["malicious"][node_id].with_loaders(trainloader,valloader).to_client()
     
