@@ -17,8 +17,8 @@ class ClientM(SimpleClientManager):
     def sample(
         self,
         num_clients: int,
-        min_num_clients: Optional[int] = None,
-        criterion: Optional[Criterion] = None,
+        min_num_clients = None,
+        criterion = None,
     ) -> List[ClientProxy]:
         """Sample a number of Flower ClientProxy instances."""
         # Block until at least num_clients are connected.
