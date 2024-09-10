@@ -16,4 +16,5 @@ class ClientM(SimpleClientManager):
     def sample(self, num_clients: int, min_num_clients: int | None = None, criterion: Criterion | None = None) -> List[ClientProxy]:
         result = super().sample(num_clients, min_num_clients, criterion)
         print("Sampled",list(map(lambda d: d.node_id,result)))
+        return result
         
