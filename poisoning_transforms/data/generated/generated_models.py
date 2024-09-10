@@ -32,7 +32,7 @@ class UNet(nn.Module):
         self.dconv_up1 = double_conv(32 + 64, 32)
 
         self.conv_last = nn.Sequential(
-            nn.Conv2d(64, shape[0], 1),
+            nn.Conv2d(32, shape[0], 1),
             nn.BatchNorm2d(shape[0]),
         )
 
