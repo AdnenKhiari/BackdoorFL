@@ -49,6 +49,8 @@ class IbaClient(PoisonedFlowerClient):
         super(IbaClient,self).__init__(node_id,model_cfg,optimizer,data_poisoner,batch_poison_num,target_poisoned,batch_size,pgd_conf,mask_conf,poison_between)
         self.model = model
         self.norm_scaling_factor = norm_scaling_factor
+        self.train_data_poisoner : DataPoisoner = data_poisoner
+
         
     def with_loaders(self, trainloader, vallodaer):
         self.lira.train_loader = trainloader

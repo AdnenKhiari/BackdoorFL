@@ -7,7 +7,6 @@ class LiraGenerator(DataPoisoner):
         self.eps = eps
         self.attacker_train_epoch = attacker_train_epoch
         self.attack_model = gen_model
-        self.assistant_attack_model = copy.deepcopy(gen_model)
         self.client_model = client_model
         self.criterion = torch.nn.CrossEntropyLoss()
         self.alpha =alpha
@@ -56,50 +55,54 @@ class LiraGenerator(DataPoisoner):
         tmp_model.train()
         tmp_model.to(device)
         tempmodel_optimizer = torch.optim.SGD(tmp_model.parameters(),lr=self.client_model_optimizer_lr)
-
-        self.assistant_attack_model.load_state_dict(self.attack_model.state_dict())
         
-        lira_optimizer = torch.optim.SGD(self.assistant_attack_model.parameters(),lr=self.attacker_train_optimizer_lr)
+        lira_optimizer = torch.optim.SGD(self.attack_model.parameters(),lr=self.attacker_train_optimizer_lr)
         
-        self.assistant_attack_model.to(device)
-        self.assistant_attack_model.train()
-
+        self.attack_model.to(device)
+        self.attack_model.train()
+        k_lira = 2
         for epoch in range(self.attacker_train_epoch):
-            total_mixed_loss = 0
             total_attack_loss = 0
+            total_tempmodel_loss = 0
             self.attack_model.to(device)
             self.attack_model.eval()
 
-            for data in self.train_loader:
-                mixed_loss, attack_loss = self.train_lira_batch(data,device,tmp_model,tempmodel_optimizer,lira_optimizer)
-                with torch.no_grad():
-                    total_mixed_loss += mixed_loss
-                    total_attack_loss += attack_loss
+            for i in range(k_lira):
+                for data in self.train_loader:
+                    attack_loss = self.train_lira_batch(data,device,tmp_model,lira_optimizer)
+                    with torch.no_grad():
+                        total_attack_loss += attack_loss
+            total_attack_loss/= k_lira
             
-            print(f"LIRA Training : Epoch {epoch} Mixed Loss: {total_mixed_loss} Attack Loss: {total_attack_loss}")
-            self.attack_model.load_state_dict(self.assistant_attack_model.state_dict())
-                       
-    def train_lira_batch(self,data,device,tmp_model,tmp_optimizer,lira_optimizer):
+            for data in self.train_loader:
+                defense_loss = self.train_temp_model(data,device,tmp_model,tempmodel_optimizer)
+                with torch.no_grad():
+                    total_tempmodel_loss += defense_loss
+            print(f"Epoch {epoch} : Attack Loss : {total_attack_loss} Defense Loss : {total_tempmodel_loss}")
+            
+    def train_temp_model(self,data,device,tmp_model,tmp_optimizer):
         images,labels = data["image"],data["label"]
         images,labels = images.to(device),labels.to(device)
         
+        tmp_optimizer.zero_grad()
         poisoned_images = self.get_poisoned_batch(self.attack_model,images)
         attacked_labels = tmp_model(poisoned_images)
-        predicted_labels = tmp_model(images)
-        
-        poisoned_target = torch.full(attacked_labels.shape,self.label_replacement,dtype=torch.float16).to(device)
-        
-        tmp_optimizer.zero_grad()
-        mixed_loss = self.alpha * self.criterion(attacked_labels,poisoned_target) + (1- self.alpha)*self.criterion(predicted_labels,labels)
-        mixed_loss.backward()
+        loss = self.criterion(attacked_labels,labels)
+        loss.backward()
         tmp_optimizer.step()
         
+    def train_lira_batch(self,data,device,tmp_model,lira_optimizer):
+        images,labels = data["image"],data["label"]
+        images,labels = images.to(device),labels.to(device)
+
         # train target to backdoor the tmpmodel ( who is trained to be injected with the backdoor )
         lira_optimizer.zero_grad()
-        poisoned_images = self.get_poisoned_batch(self.assistant_attack_model,images)
-        attacked_labels = tmp_model(poisoned_images)
-        attack_loss = self.criterion(attacked_labels,poisoned_target)
+        poisoned_images = self.get_poisoned_batch(self.attack_model,images)
+        newly_attacked_labels = tmp_model(poisoned_images)
+        standard_attacked_labels = self.client_model(poisoned_images)
+        poisoned_labels = torch.tensor([self.label_replacement]*len(newly_attacked_labels)).to(device)
+        attack_loss = self.alpha*self.criterion(standard_attacked_labels,poisoned_labels) + (1-self.alpha)*self.criterion(newly_attacked_labels,)
         attack_loss.backward()
         lira_optimizer.step()
     
-        return mixed_loss.detach().cpu().item(),attack_loss.detach().cpu().item()
+        return attack_loss.detach().cpu().item()
