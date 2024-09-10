@@ -71,7 +71,7 @@ def main(cfg: DictConfig):
     print("clients_dict",clients_dict)
 
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
-    dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner)
+    dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner,seed=cfg.global_seed)
     
     
     if cfg.wandb.active:
