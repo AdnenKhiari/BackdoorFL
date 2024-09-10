@@ -16,7 +16,6 @@ def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     #    params.update({"seed":seed_cfg})
     # if partitioner_cfg.get("partition_by",None) is not None:
     #    params.update({"partition_by":dataset_cfg.label})
-    print("NUM PARTITIONS",num_partitions)
     res = instantiate(partitioner_cfg,num_partitions=num_partitions,**params)
     return res
 

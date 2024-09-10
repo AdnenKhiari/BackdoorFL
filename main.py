@@ -5,9 +5,12 @@ import random
 import hydra
 from hydra.utils import instantiate, call
 from hydra.core.hydra_config import HydraConfig
+import numpy as np
 from omegaconf import DictConfig, OmegaConf
 import flwr as fl
 from datetime import datetime
+
+import torch
 
 from clients.client import generate_client_fn, get_clients, get_partitioner
 from custom_simulation.client_manager import ClientM
@@ -57,6 +60,8 @@ def main(cfg: DictConfig):
     save_path = HydraConfig.get().runtime.output_dir
 
     random.seed(cfg.global_seed)
+    np.random.seed(cfg.global_seed)
+    torch.manual_seed(cfg.global_seed)
     
     client_ids,clients_dict = get_clients(cfg,global_run)
     global_data_poisoner = instantiate(cfg.global_merger)
@@ -66,10 +71,10 @@ def main(cfg: DictConfig):
     dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner)
     
     
-    # if cfg.wandb.active:
-    #     train_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=cfg.num_clients)
-    #     viz_dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=train_partitioner)
-    #     viz_dataset.viz_partition_distribution()
+    if cfg.wandb.active:
+        train_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=cfg.num_clients)
+        viz_dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=train_partitioner)
+        viz_dataset.viz_partition_distribution()
     
     
     evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),global_data_poisoner(clients=clients_dict),global_run)

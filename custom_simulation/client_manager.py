@@ -7,8 +7,7 @@ import random
 class ClientM(SimpleClientManager):
     
     def __init__(self,seed):
-        random.seed(seed)
+        # random.seed(seed)
         super().__init__()
-        self.seed = seed
         
         

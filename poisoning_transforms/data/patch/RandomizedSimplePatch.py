@@ -21,10 +21,10 @@ class RandomizedSimplePatchPoisoner(DataPoisoner):
         self.patch_value = patch_value
         self.seed = seed
         
-        if self.seed is not None:
-            random.seed(self.seed)
-            np.random.seed(self.seed)
-            torch.manual_seed(self.seed)
+        # if self.seed is not None:
+        #     random.seed(self.seed)
+        #     np.random.seed(self.seed)
+        #     torch.manual_seed(self.seed)
 
     def _randomize_patch(self, image_height, image_width):
         """ Randomly determine patch location and size within the given ranges. """
