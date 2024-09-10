@@ -67,6 +67,9 @@ def main(cfg: DictConfig):
     global_data_poisoner = instantiate(cfg.global_merger)
     client_fn = generate_client_fn(cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,clients_dict)
 
+    print("Client Ids",client_ids)
+    print("clients_dict",clients_dict)
+
     test_partitioner = get_partitioner(cfg.dataset,cfg.partitioners,cfg.global_seed,num_partitions=1)
     dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=test_partitioner)
     
