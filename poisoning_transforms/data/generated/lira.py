@@ -22,11 +22,9 @@ class LiraGenerator(DataPoisoner):
     def get_poisoned_batch(self,model,images):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         noise = model(images.to(device))
-        wandb.log({"noise": wandb.Image(noise[0].detach().cpu().numpy())})
         noise = (noise - noise.mean(dim=(1,2,3),keepdim=True) / noise.std(dim=(1,2,3),keepdim=True))
-        noise *= self.eps
-        images = LiraGenerator.clamp(images + noise,0,1)
-        return images
+        images = LiraGenerator.clamp(images + noise * self.eps,0,1)
+        return images,noise
     
     def clear_grad(self, model):
         """
@@ -44,7 +42,7 @@ class LiraGenerator(DataPoisoner):
         img = data["image"].to(device)
         with torch.no_grad():
             return {
-                "image": self.get_poisoned_batch(self.attack_model,img),
+                "image": self.get_poisoned_batch(self.attack_model,img)[0],
                 "label": data["label"]
             }
             
@@ -60,14 +58,20 @@ class LiraGenerator(DataPoisoner):
         for epoch in range(self.attacker_train_epoch):
             total_attack_loss = 0
             total_tempmodel_loss = 0
-
+            for data in self.train_loader:
+                images,labels = data["image"],data["label"]
+                images,labels = images.to(device),labels.to(device)
+                poisoned_images,noise = self.get_poisoned_batch(self.attack_model,images)
+                wandb.log({"lira_noise": [wandb.Image(noise[0].detach().cpu().numpy())]})
+                break
+                
             for data in self.train_loader:
                 images,labels = data["image"],data["label"]
                 images,labels = images.to(device),labels.to(device)
 
                 # train target to backdoor the tmpmodel ( who is trained to be injected with the backdoor )
                 lira_optimizer.zero_grad()
-                poisoned_images = self.get_poisoned_batch(self.attack_model,images)
+                poisoned_images,_ = self.get_poisoned_batch(self.attack_model,images)
                 standard_attacked_labels = self.client_model(poisoned_images)
                 poisoned_labels = torch.tensor([self.label_replacement]*len(labels)).to(device)
                 attack_loss = self.criterion(standard_attacked_labels,poisoned_labels)
@@ -117,7 +121,7 @@ class LiraGenerator(DataPoisoner):
         images,labels = images.to(device),labels.to(device)
         
         tmp_optimizer.zero_grad()
-        poisoned_images = self.get_poisoned_batch(self.attack_model,images)
+        poisoned_images,_ = self.get_poisoned_batch(self.attack_model,images)
         attacked_labels = tmp_model(poisoned_images)
         loss = self.criterion(attacked_labels,labels)
         loss.backward()
@@ -130,7 +134,7 @@ class LiraGenerator(DataPoisoner):
 
         # train target to backdoor the tmpmodel ( who is trained to be injected with the backdoor )
         lira_optimizer.zero_grad()
-        poisoned_images = self.get_poisoned_batch(self.attack_model,images)
+        poisoned_images,_ = self.get_poisoned_batch(self.attack_model,images)
         newly_attacked_labels = tmp_model(poisoned_images)
         standard_attacked_labels = self.client_model(poisoned_images)
         poisoned_labels = torch.tensor([self.label_replacement]*len(newly_attacked_labels)).to(device)
