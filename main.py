@@ -92,7 +92,7 @@ def main(cfg: DictConfig):
     strategy_with_defense = instantiate(
         cfg.defense_strategy,
         strategy=strategy,
-    ) if cfg.defense_strategy else strategy
+    ) if cfg.get("defense_strategy") is not None else strategy
    
     ## 5. Start Simulation
     # As you'll notice, we can start the simulation in exactly the same way as we did in the previous project.
