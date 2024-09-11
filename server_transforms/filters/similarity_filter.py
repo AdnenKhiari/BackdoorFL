@@ -42,7 +42,7 @@ class SimilarityFilter(StrategyWrapper):
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
         filtered_weights = []
         global_weights = self._global_model
-
+        print("TYPES",type(weights),type(global_weights))
         for client_weights, num_examples, client_id in weights:
             if self.similarity_metric == "cosine":
                 similarity = self._cosine_similarity(global_weights, client_weights)
