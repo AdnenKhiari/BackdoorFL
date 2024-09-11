@@ -96,7 +96,7 @@ class SimilarityFilter(StrategyWrapper):
         client_ids = [client_id for _, _, client_id in weights]
 
         # Log histogram of similarity values
-        wandb.log({f"{metric_name} Distribution": plt.bar(client_ids,self.similarity_values)[0],
+        wandb.log({f"{metric_name} Distribution": wandb.Image(plt.bar(client_ids,self.similarity_values)[0]),
                     "metrics.current_round": self.server_round
 
                    })
