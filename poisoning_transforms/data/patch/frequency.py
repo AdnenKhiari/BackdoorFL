@@ -61,6 +61,9 @@ class FrequencyDomainPoisoner(DataPoisoner):
                         x_idct[i][ch][w:w+self.window_size, h:h+self.window_size] = sub_idct
         x_idct = np.transpose(x_idct, (0, 2, 3, 1))
         return x_idct
+    
+    def train(self):
+        pass
 
     def transform(self, data: dict) -> dict:
         """
