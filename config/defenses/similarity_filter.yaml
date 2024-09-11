@@ -1,0 +1,6 @@
+---
+_target_: server_transforms.filters.similarity_filter.SimilarityFilter
+_partial_: true
+similarity_threshold: "cosine"
+threshold: 0.6
+p: 2

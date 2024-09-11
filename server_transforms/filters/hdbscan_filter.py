@@ -6,6 +6,8 @@ from typing import List, Tuple, Union
 from flwr.common import NDArrays
 from flwr.server.strategy import Strategy
 
+from server_transforms.wrapper import StrategyWrapper
+
 class HDBSCANFilter(StrategyWrapper):
     def __init__(self, strategy: Strategy, distance_metric: str = 'cosine', min_cluster_size: int = 2, min_samples: int = 1):
         """

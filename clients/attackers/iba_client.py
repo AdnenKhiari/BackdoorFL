@@ -2,7 +2,7 @@ import numpy as np
 import wandb
 from clients.poisoned_client import PoisonedFlowerClient
 from poisoning_transforms.data.datapoisoner import BatchPoisoner, DataPoisoner, DataPoisoningPipeline
-from poisoning_transforms.data.generated.generated_models import UNet
+from poisoning_transforms.data.generated.generated_models import UNet,Autoencoder
 from poisoning_transforms.data.generated.lira import LiraGenerator
 from poisoning_transforms.data.patch.SimplePatch import SimplePatchPoisoner
 from poisoning_transforms.model import model_poisoner
@@ -31,7 +31,8 @@ class IbaClient(PoisonedFlowerClient):
                  ) -> None:
         
         model = instantiate(model_cfg)
-        lira_model = UNet(lira_output_size)
+        # lira_model = UNet(lira_output_size)
+        lira_model = Autoencoder()
         self.lira = LiraGenerator(
                 lira_train_epoch,
                 lira_train_lr,

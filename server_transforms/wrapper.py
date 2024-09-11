@@ -13,7 +13,7 @@ from flwr.server.client_proxy import ClientProxy
 import numpy as np
 
 class StrategyWrapper(Strategy, ABC):
-    def __init__(self, strategy: Strategy):
+    def __init__(self, strategy: Strategy,wandb_active = False):
         """
         Initialize the StrategyWrapper.
 
@@ -22,6 +22,7 @@ class StrategyWrapper(Strategy, ABC):
         """
         self._strategy = strategy
         self._global_model = None
+        self.wandb_active = wandb_active
     def initialize_parameters(self, client_manager) -> Optional[Parameters]:
         params=self._strategy.initialize_parameters(client_manager)
         self._global_model = parameters_to_ndarrays(params)
@@ -76,7 +77,6 @@ class StrategyWrapper(Strategy, ABC):
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
         params,metrics= self._strategy.aggregate_fit(server_round, processed_results, failures)
-        params = self._strategy.post_process_weights(params)
         self._global_model = ndarrays_to_parameters(self.post_process_weights(parameters_to_ndarrays(params)))
         return self._global_model,metrics
 

@@ -2,7 +2,9 @@ from typing import List, Tuple, Optional
 import numpy as np
 from flwr.common import NDArrays, Parameters
 from flwr.server.client_proxy import ClientProxy
-from flwr.server.strategy import Strategy, StrategyWrapper
+from flwr.server.strategy import Strategy
+
+from server_transforms.wrapper import StrategyWrapper
 
 class SimilarityFilter(StrategyWrapper):
     def __init__(self, strategy: Strategy, similarity_metric: str, threshold: float, p: Optional[int] = None):
