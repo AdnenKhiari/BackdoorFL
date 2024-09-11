@@ -65,8 +65,6 @@ class LiraGenerator(DataPoisoner):
         for epoch in range(self.attacker_train_epoch):
             total_attack_loss = 0
             total_tempmodel_loss = 0
-            self.attack_model.to(device)
-            self.attack_model.eval()
 
             for i in range(k_lira):
                 for data in self.train_loader:

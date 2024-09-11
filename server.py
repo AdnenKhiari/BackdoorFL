@@ -1,4 +1,5 @@
 from collections import OrderedDict
+import gc
 from typing import Dict, List, Tuple
 from omegaconf import DictConfig
 from hydra.utils import instantiate
@@ -189,6 +190,7 @@ def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,glob
             # Log other metrics
             global_run.log(result)
 
+        gc.collect()
         return mt_loss, result
 
     return evaluate_fn

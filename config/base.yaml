@@ -25,6 +25,8 @@ pgd_conf:
 poison_between:
   - ${as_tuple:5,50}
 
+ray_auto: false
+
 grad_filter:
   active: true
   filter:
