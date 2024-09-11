@@ -19,7 +19,7 @@ class SimilarityFilter(StrategyWrapper):
             p (Optional[int]): The p value for Lp distance (e.g., p=2 for Euclidean distance). Ignored if similarity_metric is "cosine".
             wandb_active (bool): Whether to log metrics and plots to Weights and Biases.
         """
-        super(SimilarityFilter, self).__init__(strategy, [], wandb_active)
+        super(SimilarityFilter, self).__init__(strategy, wandb_active)
         self.similarity_metric = similarity_metric
         self.threshold = threshold
         self.p = p

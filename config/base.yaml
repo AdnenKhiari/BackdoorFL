@@ -56,3 +56,4 @@ defaults:
   - optimizers: sgd  
   - poisoned_client: iba
   - global_merger: single
+  - defense_strategy: no_defense
