@@ -22,7 +22,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
 
     def RGB2YUV(self, x_rgb):
         # Conversion from RGB to YUV using OpenCV
-        x_yuv = np.zeros(x_rgb.shape, dtype=np.float)
+        x_yuv = np.zeros(x_rgb.shape, dtype=np.float16)
         for i in range(x_rgb.shape[0]):
             img = cv2.cvtColor(x_rgb[i].astype(np.uint8), cv2.COLOR_RGB2YCrCb)
             x_yuv[i] = img
@@ -30,7 +30,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
 
     def YUV2RGB(self, x_yuv):
         # Conversion from YUV back to RGB
-        x_rgb = np.zeros(x_yuv.shape, dtype=np.float)
+        x_rgb = np.zeros(x_yuv.shape, dtype=np.float16)
         for i in range(x_yuv.shape[0]):
             img = cv2.cvtColor(x_yuv[i].astype(np.uint8), cv2.COLOR_YCrCb2RGB)
             x_rgb[i] = img
@@ -38,26 +38,26 @@ class FrequencyDomainPoisoner(DataPoisoner):
 
     def DCT(self, x_train):
         # Apply DCT to the image batch in windows
-        x_dct = np.zeros((x_train.shape[0], x_train.shape[3], x_train.shape[1], x_train.shape[2]), dtype=np.float)
+        x_dct = np.zeros((x_train.shape[0], x_train.shape[3], x_train.shape[1], x_train.shape[2]), dtype=np.float16)
         x_train = np.transpose(x_train, (0, 3, 1, 2))  # Reorder dimensions for easier processing
 
         for i in range(x_train.shape[0]):
             for ch in range(x_train.shape[1]):
                 for w in range(0, x_train.shape[2], self.window_size):
                     for h in range(0, x_train.shape[3], self.window_size):
-                        sub_dct = cv2.dct(x_train[i][ch][w:w+self.window_size, h:h+self.window_size].astype(np.float))
+                        sub_dct = cv2.dct(x_train[i][ch][w:w+self.window_size, h:h+self.window_size].astype(np.float16))
                         x_dct[i][ch][w:w+self.window_size, h:h+self.window_size] = sub_dct
         return x_dct
 
     def IDCT(self, x_train):
         # Apply inverse DCT to the image batch
-        x_idct = np.zeros(x_train.shape, dtype=np.float)
+        x_idct = np.zeros(x_train.shape, dtype=np.float16)
 
         for i in range(x_train.shape[0]):
             for ch in range(x_train.shape[1]):
                 for w in range(0, x_train.shape[2], self.window_size):
                     for h in range(0, x_train.shape[3], self.window_size):
-                        sub_idct = cv2.idct(x_train[i][ch][w:w+self.window_size, h:h+self.window_size].astype(np.float))
+                        sub_idct = cv2.idct(x_train[i][ch][w:w+self.window_size, h:h+self.window_size].astype(np.float16))
                         x_idct[i][ch][w:w+self.window_size, h:h+self.window_size] = sub_idct
         x_idct = np.transpose(x_idct, (0, 2, 3, 1))
         return x_idct
