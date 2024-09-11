@@ -20,7 +20,9 @@ class LiraGenerator(DataPoisoner):
         
     def get_poisoned_batch(self,model,images):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        noise = model(images.to(device)) * self.eps
+        noise = model(images.to(device))
+        noise = (noise - noise.mean(dim=(1,2,3),keepdim=True) / noise.std(dim=(1,2,3),keepdim=True))
+        noise *= self.eps
         images = LiraGenerator.clamp(images + noise,0,1)
         return images
     
