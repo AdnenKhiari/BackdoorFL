@@ -24,7 +24,7 @@ class StrategyWrapper(Strategy, ABC):
         self._global_model = None
         self.wandb_active = wandb_active
     def initialize_parameters(self, client_manager) -> Optional[Parameters]:
-        params=self._strategy.initial_parameters
+        params=self._strategy.initialize_parameters(client_manager)
         self._global_model = parameters_to_ndarrays(params)
 
     def configure_fit(
