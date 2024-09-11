@@ -57,8 +57,8 @@ class SimilarityFilter(StrategyWrapper):
                 raise ValueError(f"Unknown similarity metric: {self.similarity_metric}")
 
         # Log information about accepted and rejected clients
-        self.logger.info(f"Accepted clients: {self.accepted_clients}")
-        self.logger.info(f"Rejected clients: {self.rejected_clients}")
+        print(f"Accepted clients: {self.accepted_clients}")
+        print(f"Rejected clients: {self.rejected_clients}")
         
         # Log to wandb if active
         if self.wandb_active:
