@@ -1,5 +1,5 @@
 from server_transforms.wrapper import StrategyWrapper
-
+from flwr.server.strategy.fedavg import FedAvg
 
 class NoDefense(StrategyWrapper):
     def __init__(self,strategy):

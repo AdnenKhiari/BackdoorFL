@@ -90,10 +90,14 @@ class StrategyWrapper(Strategy, ABC):
         # Process the list of tuples using the `process_weights` method
         processed_weights = self.process_weights(weights_list)
         
+        filtered_ids = [node_id for (weights, num_examples,node_id) in processed_weights]
+        
+        filtered_results = [(cp,fit_res) for cp, fit_res in results if cp.node_id in filtered_ids ]
+        
         # Convert processed weights back to Parameters
         processed_results = [
-            (node_id_to_cp[node_id], FitRes(ndarrays_to_parameters(weights), num_examples))
-            for (weights, num_examples,node_id) in  processed_weights
+            (node_id_to_cp[node_id], FitRes(fitres.status,ndarrays_to_parameters(weights), num_examples,fitres.metrics))
+            for (weights, num_examples,node_id),(cp,fitres) in  zip(processed_weights,filtered_results)
         ]
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
