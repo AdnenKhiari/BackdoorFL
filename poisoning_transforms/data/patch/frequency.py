@@ -23,7 +23,6 @@ class FrequencyDomainPoisoner(DataPoisoner):
     def RGB2YUV(self, x_rgb):
         # Conversion from RGB to YUV using OpenCV
         x_yuv = np.zeros(x_rgb.shape, dtype=np.float16)
-        print(x_rgb.shape)
         for i in range(x_rgb.shape[0]):
             img = cv2.cvtColor(x_rgb[i].astype(np.uint8), cv2.COLOR_RGB2YCrCb)
             x_yuv[i] = img
@@ -79,6 +78,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
         """
         images = data['image'].numpy()  # Convert from PyTorch tensor to NumPy array
         images *= 255.  # Scale to [0, 255]
+        images = images.premute(0, 2, 3, 1)  # Reorder dimensions for easier processing
 
         # Convert to YUV color space
         images = self.RGB2YUV(images)
@@ -105,5 +105,5 @@ class FrequencyDomainPoisoner(DataPoisoner):
         images = np.clip(images, 0, 1)
 
         # Convert back to PyTorch tensor
-        data['image'] = torch.tensor(images, dtype=torch.float32)
+        data['image'] = torch.tensor(images, dtype=torch.float32).premute(0, 3, 1, 2) 
         return data
