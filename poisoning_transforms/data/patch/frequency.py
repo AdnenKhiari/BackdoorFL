@@ -23,6 +23,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
     def RGB2YUV(self, x_rgb):
         # Conversion from RGB to YUV using OpenCV
         x_yuv = np.zeros(x_rgb.shape, dtype=np.float16)
+        print(x_rgb.shape)
         for i in range(x_rgb.shape[0]):
             img = cv2.cvtColor(x_rgb[i].astype(np.uint8), cv2.COLOR_RGB2YCrCb)
             x_yuv[i] = img
