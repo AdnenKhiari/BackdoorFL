@@ -105,5 +105,5 @@ class FrequencyDomainPoisoner(DataPoisoner):
         images = np.clip(images, 0, 1)
 
         # Convert back to PyTorch tensor
-        data['image'] = torch.tensor(images, dtype=torch.float32).premute(0, 3, 1, 2) 
+        data['image'] = torch.tensor(images, dtype=torch.float32).permute(0, 3, 1, 2) 
         return data
