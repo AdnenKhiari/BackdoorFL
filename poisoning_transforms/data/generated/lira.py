@@ -1,5 +1,6 @@
 import copy
 import torch
+import wandb
 from poisoning_transforms.data.datapoisoner import DataPoisoner
 
 class LiraGenerator(DataPoisoner):
@@ -21,6 +22,7 @@ class LiraGenerator(DataPoisoner):
     def get_poisoned_batch(self,model,images):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         noise = model(images.to(device))
+        wandb.log({"noise": wandb.Image(noise[0].detach().cpu().numpy())})
         noise = (noise - noise.mean(dim=(1,2,3),keepdim=True) / noise.std(dim=(1,2,3),keepdim=True))
         noise *= self.eps
         images = LiraGenerator.clamp(images + noise,0,1)
