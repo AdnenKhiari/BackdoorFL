@@ -93,7 +93,10 @@ class SimilarityFilter(StrategyWrapper):
             metric_name = "Unknown Metric"
 
         # Log histogram of similarity values
-        wandb.log({f"{metric_name} Distribution": wandb.Histogram(self.similarity_values)})
+        wandb.log({f"{metric_name} Distribution": wandb.Histogram(self.similarity_values),
+                    "metrics.current_round": self.server_round
+
+                   })
 
         # Log the number of accepted/rejected clients
         wandb.log({
