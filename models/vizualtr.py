@@ -19,7 +19,6 @@ class VisualTR(ModelBase):
             dropout = 0.1,
             emb_dropout = 0.1
         )
-        self.model.heads.head = nn.Linear(self.model.heads.head.in_features, num_classes)
         self.pytorch_transforms = torch.nn.UpsamplingBilinear2d(size=(128, 128))
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.model(x)
