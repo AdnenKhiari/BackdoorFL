@@ -102,8 +102,8 @@ class StrategyWrapper(Strategy, ABC):
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
         params,metrics= self._strategy.aggregate_fit(server_round, processed_results, failures)
-        self._global_model = ndarrays_to_parameters(self.post_process_weights(parameters_to_ndarrays(params)))
-        return self._global_model,metrics
+        self._global_model = self.post_process_weights(parameters_to_ndarrays(params))
+        return ndarrays_to_parameters(self._global_model),metrics
 
     def configure_evaluate(
         self, server_round: int, parameters: Parameters, client_manager
