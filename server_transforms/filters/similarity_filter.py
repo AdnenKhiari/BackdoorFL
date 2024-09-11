@@ -1,5 +1,6 @@
 import logging
 from typing import List, Tuple, Optional
+from matplotlib import pyplot as plt
 import numpy as np
 from flwr.common import NDArrays, Parameters
 from flwr.server.client_proxy import ClientProxy
@@ -62,7 +63,7 @@ class SimilarityFilter(StrategyWrapper):
         
         # Log to wandb if active
         if self.wandb_active:
-            self._log_wandb_metrics()
+            self._log_wandb_metrics(weights)
 
         return filtered_weights
 
@@ -83,7 +84,7 @@ class SimilarityFilter(StrategyWrapper):
             distance += np.sum(np.abs(layer_diff) ** p)
         return np.power(distance, 1 / p)
     
-    def _log_wandb_metrics(self):
+    def _log_wandb_metrics(self,weights):
         """Log similarity/distribution information to wandb."""
         if self.similarity_metric == "cosine":
             metric_name = "Cosine Similarity"
@@ -91,9 +92,11 @@ class SimilarityFilter(StrategyWrapper):
             metric_name = f"L{self.p} Distance"
         else:
             metric_name = "Unknown Metric"
+            
+        client_ids = [client_id for _, _, client_id in weights]
 
         # Log histogram of similarity values
-        wandb.log({f"{metric_name} Distribution": wandb.Histogram(self.similarity_values),
+        wandb.log({f"{metric_name} Distribution": plt.bar(client_ids,self.similarity_values)[0],
                     "metrics.current_round": self.server_round
 
                    })
