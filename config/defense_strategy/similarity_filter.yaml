@@ -1,6 +1,6 @@
 ---
 _target_: server_transforms.filters.similarity_filter.SimilarityFilter
-similarity_threshold: "cosine"
+similarity_metric: "cosine"
 threshold: 0.6
 p: 2
 wandb_active: ${wandb.active}
