@@ -11,3 +11,6 @@ on_fit_config_fn: # this is a function
 on_evaluate_config_fn: # this is a function
   _target_: server.get_on_eval_config
   config: ${config_eval}
+initial_parameters:
+  _target_: models.model.model_to_parameters
+  model: ${model} # note you don't need to do `${defaults.model}`, just `${model}`
