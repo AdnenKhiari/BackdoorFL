@@ -76,7 +76,8 @@ class FrequencyDomainPoisoner(DataPoisoner):
         Returns:
             dict: The dictionary with the batch of images with the poison applied.
         """
-        images = data['image'].permute(0, 2, 3, 1).numpy()  # Convert from PyTorch tensor to NumPy array
+        device = data['image'][0].get_device() if len(data['image']) > 0 else torch.device('cpu')
+        images = data['image'].cpu().permute(0, 2, 3, 1).numpy()  # Convert from PyTorch tensor to NumPy array
         images *= 255.  # Scale to [0, 255]
 
         # Convert to YUV color space
@@ -104,5 +105,5 @@ class FrequencyDomainPoisoner(DataPoisoner):
         images = np.clip(images, 0, 1)
 
         # Convert back to PyTorch tensor
-        data['image'] = torch.tensor(images, dtype=torch.float32).permute(0, 3, 1, 2) 
+        data['image'] = torch.tensor(images, dtype=torch.float32).permute(0, 3, 1, 2).to(device)
         return data
