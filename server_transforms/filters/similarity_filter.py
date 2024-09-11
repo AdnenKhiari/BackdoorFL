@@ -24,20 +24,11 @@ class SimilarityFilter(StrategyWrapper):
         self.threshold = threshold
         self.p = p
         self.wandb_active = wandb_active
-        self.similarity_values = []  # To store similarity or distance values
+        self.similarity_values = [] 
         self.accepted_clients = []
         self.rejected_clients = []
-        
-        # Configure logger
-        self.logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
 
-        if self.wandb_active:
-            wandb.init(project="fl_similarity_filter", config={
-                "similarity_metric": similarity_metric,
-                "threshold": threshold,
-                "distance_p": p
-            })
+
 
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
         filtered_weights = []
@@ -107,7 +98,8 @@ class SimilarityFilter(StrategyWrapper):
         # Log the number of accepted/rejected clients
         wandb.log({
             "Accepted Clients": len(self.accepted_clients),
-            "Rejected Clients": len(self.rejected_clients)
+            "Rejected Clients": len(self.rejected_clients),
+            "metrics.current_round": self.server_round
         })
 
         # Reset for next round of filtering

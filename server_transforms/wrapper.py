@@ -25,6 +25,7 @@ class StrategyWrapper(Strategy, ABC):
         self._strategy = strategy
         self._global_model = None
         self.wandb_active = wandb_active
+        self.server_round = 0
         
     def get_random_params_from_one_client(self,client_manager):
                 # Get initial parameters from one of the clients
@@ -82,6 +83,9 @@ class StrategyWrapper(Strategy, ABC):
         self, server_round: int, results: List[Tuple[ClientProxy, FitRes]], 
         failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]]
     ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
+        
+        self.server_round = server_round
+        
         # Convert FitRes parameters to list of tuples (weights, num_examples)
         weights_list = [(parameters_to_ndarrays(fit_res.parameters), fit_res.num_examples,cp.node_id) for cp, fit_res in results]
         
