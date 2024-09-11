@@ -26,6 +26,7 @@ class StrategyWrapper(Strategy, ABC):
         self._global_model = None
         self.wandb_active = wandb_active
         self.server_round = 0
+        self._metrics = None
         
     def get_random_params_from_one_client(self,client_manager):
                 # Get initial parameters from one of the clients
@@ -105,9 +106,12 @@ class StrategyWrapper(Strategy, ABC):
         ]
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
-        params,metrics= self._strategy.aggregate_fit(server_round, processed_results, failures)
-        self._global_model = self.post_process_weights(parameters_to_ndarrays(params))
-        return ndarrays_to_parameters(self._global_model),metrics
+        new_result = self._strategy.aggregate_fit(server_round, processed_results, failures)
+        if new_result is not None:
+            params,metrics= new_result
+            self._global_model = self.post_process_weights(parameters_to_ndarrays(params))
+            self._metrics = metrics
+        return ndarrays_to_parameters(self._global_model),self._metrics
 
     def configure_evaluate(
         self, server_round: int, parameters: Parameters, client_manager

@@ -1,0 +1,19 @@
+_target_: clients.client.frequency_client_fn
+_recursive_ : false
+cfg:
+  model: ${model}
+  optimizers: ${optimizers}
+  poisoned_batch_size: ${poisoned_batch_size}
+  poisoned_target: ${poisoned_target}
+  batch_size: ${batch_size}
+  window_size: 32
+  channel_list: 
+    - 1
+    - 2
+  pos_list: 
+    - ${as_tuple:15,15}
+    - ${as_tuple:31,31}
+  magnitude: 30
+  norm_scaling_factor: 1.2
+  grad_filter: ${grad_filter}
+  pgd_conf: ${pgd_conf}

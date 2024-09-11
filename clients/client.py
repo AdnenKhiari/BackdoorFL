@@ -1,5 +1,6 @@
 import numpy as np
 from omegaconf import OmegaConf
+from clients.attackers.frequency_poisoned_client import FrequencyPoisonedClient
 from clients.attackers.randomized_simple_poisoned_client import RandomizedSimplePoisonedClient
 from clients.clean_client import FlowerClient
 from clients.attackers.iba_client import IbaClient
@@ -9,6 +10,8 @@ from dataset.dataset import Dataset
 from flwr_datasets.partitioner import Partitioner
 from flwr.common import Context
 from hydra.utils import instantiate
+
+from poisoning_transforms.data.patch.frequency import FrequencyDomainPoisoner
 
 def get_partitioner(dataset_cfg,partitioner_cfg,seed_cfg,num_partitions):
     params = {}
@@ -75,7 +78,25 @@ def iba_client_fn(node_id,cfg,poison_between):
                 poison_between=poison_between
         )
     
-
+def frequency_client_fn(node_id,cfg,poison_between):
+    return  FrequencyPoisonedClient(
+                node_id,
+                model_cfg=cfg.model,
+                optimizer=cfg.optimizers,
+                batch_poison_num=cfg.poisoned_batch_size,
+                target_poisoned=cfg.poisoned_target,
+                batch_size=cfg.batch_size,
+                window_size=cfg.window_size,
+                channel_list=cfg.channel_list,
+                pos_list=cfg.pos_list,
+                magnitude=cfg.magnitude,
+                norm_scaling_factor=cfg.norm_scaling_factor,
+                grad_filter=cfg.grad_filter,
+                pgd_conf=cfg.pgd_conf,
+                poison_between=poison_between
+        )
+    
+    
 def get_clients(cfg,global_run):
     client_ids = get_client_ids(cfg.num_clients)
     honest_clients_ids = np.random.choice(client_ids, int(cfg.num_clients * (1-cfg.poisoned_clients_ratio)), replace=False)
