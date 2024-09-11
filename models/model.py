@@ -104,14 +104,12 @@ def test(net, get_testloader, device):
 
 
 def model_to_parameters(model):
-    def get_params(clientManager):
-        """Note that the model is already instantiated when passing it here.
+    """Note that the model is already instantiated when passing it here.
 
-        This happens because we call this utility function when instantiating the parent
-        object (i.e. the FedAdam strategy in this example).
-        """
-        ndarrays = [val.cpu().numpy() for _, val in model.state_dict().items()]
-        parameters = ndarrays_to_parameters(ndarrays)
-        # print("Extracted model parameters!")
-        return parameters
-    return get_params
+    This happens because we call this utility function when instantiating the parent
+    object (i.e. the FedAdam strategy in this example).
+    """
+    ndarrays = [val.cpu().numpy() for _, val in model.state_dict().items()]
+    parameters = ndarrays_to_parameters(ndarrays)
+    # print("Extracted model parameters!")
+    return parameters
