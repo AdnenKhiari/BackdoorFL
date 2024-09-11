@@ -112,5 +112,5 @@ class StrategyWrapper(Strategy, ABC):
     ) -> Tuple[Optional[float], Dict[str, Scalar]]:
         return self._strategy.aggregate_evaluate(server_round, results, failures)
 
-    def evaluate(self, parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:
-        return self._strategy.evaluate(parameters)
+    def evaluate(self, server_round: int,parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:
+        return self._strategy.evaluate(server_round,parameters)
