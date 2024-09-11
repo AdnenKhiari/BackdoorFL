@@ -1,6 +1,8 @@
 from typing import List, Tuple, Optional, Dict, Union
 from abc import ABC, abstractmethod
 from flwr.server.strategy import Strategy
+from flwr.common.typing import GetParametersIns
+from flwr.common import Code
 from flwr.common import (
     FitRes,
     Parameters,
@@ -23,9 +25,28 @@ class StrategyWrapper(Strategy, ABC):
         self._strategy = strategy
         self._global_model = None
         self.wandb_active = wandb_active
+        
+    def get_random_params_from_one_client(self,client_manager):
+                # Get initial parameters from one of the clients
+        print("Requesting initial parameters from one random client")
+        random_client = client_manager.sample(1)[0]
+
+        ins = GetParametersIns(config={})
+        get_parameters_res = random_client.get_parameters(
+            ins=ins, timeout=5000, group_id=0
+        )
+        if get_parameters_res.status.code == Code.OK:
+            print("Received initial parameters from one random client")
+        else:
+            raise Exception("Could not get init weights")
+        return parameters_to_ndarrays(get_parameters_res.parameters)
+        
     def initialize_parameters(self, client_manager) -> Optional[Parameters]:
         params=self._strategy.initialize_parameters(client_manager)
-        self._global_model = parameters_to_ndarrays(params)
+        if params is not None:
+            self._global_model = parameters_to_ndarrays(params)
+        else:
+            self._global_model = self.get_random_params_from_one_client(client_manager)
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager
