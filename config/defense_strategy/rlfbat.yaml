@@ -1,3 +1,4 @@
 ---
 _target_: server_transforms.filters.rflbat.RFLBATWrapper
 wandb_active: ${wandb.active}
+model_cfg: ${model}

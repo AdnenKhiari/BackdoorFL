@@ -4,3 +4,4 @@ similarity_metric: "cosine"
 threshold: 0.6
 p: 2
 wandb_active: ${wandb.active}
+model_cfg: ${model}

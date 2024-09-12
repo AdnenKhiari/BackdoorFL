@@ -94,7 +94,6 @@ def main(cfg: DictConfig):
         cfg.defense_strategy,
         strategy=strategy,
         poisoned_clients=poisoned_client_ids,
-        model_cfg=cfg.model
     ) if cfg.get("defense_strategy") is not None else strategy
    
     ## 5. Start Simulation
