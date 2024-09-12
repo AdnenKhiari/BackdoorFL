@@ -17,6 +17,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.model_cfg = model_cfg
         self.optimizer = instantiate(optimizer)
         self.node_id = node_id
+        self.model = None
         self.global_run = None
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.pgd_conf = pgd_conf
