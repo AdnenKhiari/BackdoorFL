@@ -3,7 +3,7 @@ import numpy as np
 from flwr.common import NDArrays, Parameters
 from flwr.server.strategy import Strategy, StrategyWrapper
 
-class LpFilter(StrategyWrapper):
+class NormClipping(StrategyWrapper):
     def __init__(self, strategy: Strategy, p: Optional[int] = None, norm_type: str = "lp", threshold: float = 1.0):
         """
         Initialize the LpFilter.

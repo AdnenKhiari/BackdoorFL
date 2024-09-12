@@ -5,6 +5,7 @@ from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 from typing import List, Tuple
 from flwr.common import FitRes, Parameters, Scalar, ndarrays_to_parameters, parameters_to_ndarrays, NDArrays
+import wandb
 from server_transforms.wrapper import StrategyWrapper
 from flwr.server.server import Strategy
 import sklearn.metrics.pairwise as smp
@@ -60,6 +61,10 @@ class RFLBATWrapper(StrategyWrapper):
         plt.xlabel('Principal Component 1')
         plt.ylabel('Principal Component 2')
         plt.legend()
+        
+        if(self.wandb_active):
+            wandb.log({"Initial PCA of Clients (Poisoned vs Benign)": wandb.Image(plt)})
+        
         return fig
 
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
