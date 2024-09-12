@@ -9,8 +9,8 @@ from flwr.server.server import Strategy
 import sklearn.metrics.pairwise as smp
 
 class RFLBATWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy, epsilon1: float = 10, epsilon2: float = 4, num_sampling: int = 5, K_max: int = 10):
-        super().__init__(strategy)
+    def __init__(self, strategy: Strategy,poisoned_clients, epsilon1: float = 10, epsilon2: float = 4, num_sampling: int = 5, K_max: int = 10,wandb_active = False):
+        super().__init__(strategy,poisoned_clients,wandb_active)
         self.epsilon1 = epsilon1
         self.epsilon2 = epsilon2
         self.num_sampling = num_sampling
@@ -50,7 +50,7 @@ class RFLBATWrapper(StrategyWrapper):
 
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
         dataAll = []
-        for weight_set, _, _ in weights:
+        for weight_set, _, node_id in weights:
             flat_weights = np.concatenate([w.flatten() for w in weight_set])
             dataAll.append(flat_weights)
         dataAll = np.array(dataAll)

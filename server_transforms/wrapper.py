@@ -15,7 +15,7 @@ from flwr.server.client_proxy import ClientProxy
 import numpy as np
 
 class StrategyWrapper(Strategy, ABC):
-    def __init__(self, strategy: Strategy,wandb_active = False):
+    def __init__(self, strategy: Strategy,poisoned_clients,wandb_active = False):
         """
         Initialize the StrategyWrapper.
 
@@ -27,6 +27,7 @@ class StrategyWrapper(Strategy, ABC):
         self.wandb_active = wandb_active
         self.server_round = 0
         self._metrics = None
+        self._poisoned_clients =poisoned_clients
         
     def get_random_params_from_one_client(self,client_manager):
                 # Get initial parameters from one of the clients
