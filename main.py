@@ -102,7 +102,7 @@ def main(cfg: DictConfig):
         client_fn=client_fn,
         clients_ids=client_ids,
         config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
-        strategy=strategy_with_defense,
+        strategy=strategy,
         client_resources={"num_cpus": cfg.num_cpus_per_client, "num_gpus": cfg.num_gpus_per_client},
         client_manager=ClientM(cfg.global_seed),
         ray_init_args={"address": "auto"} if cfg.ray_auto else None
