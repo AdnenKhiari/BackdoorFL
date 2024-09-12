@@ -33,6 +33,18 @@ def get_on_eval_config(config: DictConfig):
 
     return eval_config_fn
 
+def get_fit_stats_fn(global_run):
+    def fit_stats_wrapper(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
+        res =  fit_stats(client_metrics)
+        if global_run is not None:
+            wandb.run.log({
+                "poisoning_stats": res,
+                "metrics":{
+                    "current_round": client_metrics[0][1]["current_round"],
+                }
+            })
+    return fit_stats_wrapper
+
 def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
     """
     Calculate the proportion of poisoned items in the round.

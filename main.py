@@ -16,7 +16,7 @@ from clients.client import generate_client_fn, get_clients, get_partitioner
 from custom_simulation.client_manager import ClientM
 from custom_simulation.simulation import start_simulation
 from dataset.dataset import Dataset
-from server import fit_stats, get_aggregation_metrics, get_evalulate_fn
+from server import fit_stats, get_aggregation_metrics, get_evalulate_fn, get_fit_stats_fn
 import wandb
 
 def resolve_tuple(*args):
@@ -90,7 +90,7 @@ def main(cfg: DictConfig):
     strategy : fl.server.strategy.Strategy= instantiate(
         cfg.strategy,
         evaluate_fn=evaluate_fn,
-        fit_metrics_aggregation_fn=fit_stats,
+        fit_metrics_aggregation_fn=get_fit_stats_fn(global_run),
         evaluate_metrics_aggregation_fn=get_aggregation_metrics(global_run) if cfg.evaluate_metrics_aggregation_fn else None,
     )
     

@@ -67,7 +67,6 @@ class FlowerClient(fl.client.NumPyClient):
         # if self.grad_filter != None:
         #     self.grad_filter.fit(self.model,self.trainloader)
         train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf,None)
-        
 
         gc.collect()
 
