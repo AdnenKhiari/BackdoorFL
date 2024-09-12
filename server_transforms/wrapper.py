@@ -14,6 +14,7 @@ from flwr.common import (
 from flwr.server.client_proxy import ClientProxy
 import numpy as np
 from hydra.utils import instantiate, call
+import torch
 
 class StrategyWrapper(Strategy, ABC):
     def __init__(self, strategy: Strategy,model_cfg,poisoned_clients,wandb_active = False):
@@ -53,7 +54,8 @@ class StrategyWrapper(Strategy, ABC):
         if params is not None:
             self._global_model = parameters_to_ndarrays(params)
         else:
-            self._global_model = [val.cpu().numpy() for _, val in instantiate(self._model_cfg).state_dict().items()]
+            model : torch.nn = instantiate(self._model_cfg)
+            self._global_model = [val.cpu().numpy() for _, val in model.state_dict().items()]
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager

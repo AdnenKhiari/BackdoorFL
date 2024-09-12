@@ -130,7 +130,7 @@ def get_aggregation_metrics(global_run):
         print("Evaluation Result :",result)
         return result
     return aggregation_metrics
-def get_evalulate_fn(model_cfg: int, testloader,data_poisoner: DataPoisoner,global_run):
+def get_evalulate_fn(model_cfg, testloader,data_poisoner: DataPoisoner,global_run):
     """Return a function to evaluate the global model."""
 
     def evaluate_fn(server_round: int, parameters, config):
