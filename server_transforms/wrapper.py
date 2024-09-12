@@ -47,8 +47,8 @@ class StrategyWrapper(Strategy, ABC):
         params=self._strategy.initialize_parameters(client_manager)
         if params is not None:
             self._global_model = parameters_to_ndarrays(params)
-        # else:
-        #     self._global_model = self.get_random_params_from_one_client(client_manager)
+        else:
+            self._global_model = self.get_random_params_from_one_client(client_manager)
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager
@@ -90,7 +90,7 @@ class StrategyWrapper(Strategy, ABC):
         # Convert FitRes parameters to list of tuples (weights, num_examples)
         weights_list = [(parameters_to_ndarrays(fit_res.parameters), fit_res.num_examples,cp.node_id) for cp, fit_res in results]
         
-        node_id_to_cp = dict([(cp.node_id, cp) for cp, _ in results])
+        node_id_to_cp = dict([(cp.node_id, (cp,fitres)) for cp, fitres in results])
         
         # Process the list of tuples using the `process_weights` method
         processed_weights = self.process_weights(weights_list)
@@ -101,8 +101,8 @@ class StrategyWrapper(Strategy, ABC):
         
         # Convert processed weights back to Parameters
         processed_results = [
-            (node_id_to_cp[node_id], FitRes(fitres.status,ndarrays_to_parameters(weights), num_examples,fitres.metrics))
-            for (weights, num_examples,node_id),(cp,fitres) in  zip(processed_weights,filtered_results)
+            (node_id_to_cp[node_id][0], FitRes(node_id_to_cp[node_id][1].status,ndarrays_to_parameters(weights), num_examples,node_id_to_cp[node_id][1].metrics))
+            for weights, num_examples,node_id in  zip(processed_weights)
         ]
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
