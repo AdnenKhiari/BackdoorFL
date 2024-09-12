@@ -9,6 +9,7 @@ from models.model import test
 from poisoning_transforms.data.datapoisoner import DataPoisoner
 import numpy as np
 from torchvision.utils import make_grid
+import uuid  # Import the uuid module to generate random file names
 
 def get_on_fit_config(config: DictConfig):
     """Return a function to configure the client's fit."""
@@ -43,6 +44,7 @@ def get_fit_stats_fn(global_run):
                     "current_round": client_metrics[0][1]["current_round"],
                 }
             })
+        return res
     return fit_stats_wrapper
 
 def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
@@ -132,8 +134,6 @@ def get_aggregation_metrics(global_run):
         if global_run is not None:
             wandb.run.log({
                 "poisoning_stats": poisoning_stats,
-                "best_local_asr": None,
-                "worst_local_asr": None,
                 "metrics":{
                     "current_round": client_metrics[0][1]["current_round"],
                 }
@@ -142,38 +142,40 @@ def get_aggregation_metrics(global_run):
         print("Evaluation Result :",result)
         return result
     return aggregation_metrics
-def get_evalulate_fn(model_cfg, testloader,data_poisoner: DataPoisoner,global_run):
-    """Return a function to evaluate the global model."""
 
+def get_evalulate_fn(model_cfg, testloader, data_poisoner: DataPoisoner, global_run):
+    """Return a function to evaluate the global model."""
+    # Generate a random file name for the model
+    random_filename = f"model_{uuid.uuid4().hex}.pth"
     def evaluate_fn(server_round: int, parameters, config):
-        model : torch.nn.Module = instantiate(model_cfg)
+        model: torch.nn.Module = instantiate(model_cfg)
 
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         params_dict = zip(model.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
         model.load_state_dict(state_dict, strict=True)
 
-        mt_loss, mt_metrics = test(model, lambda : testloader, device)
-        
-        
+        mt_loss, mt_metrics = test(model, lambda: testloader, device)
+
         global_asr = 0
         global_attack_loss = 0
-        
+
         if data_poisoner is not None:
-            backdoored_set = lambda : data_poisoner.wrap_transform_iterator(testloader)
+            backdoored_set = lambda: data_poisoner.wrap_transform_iterator(testloader)
             attack_loss, attack_metrics = test(model, backdoored_set, device)
             global_asr = attack_metrics["accuracy"]
-            global_attack_loss= attack_loss
-    
+            global_attack_loss = attack_loss
+
         result = {
-            "metrics":{
+            "metrics": {
                 "global_loss": mt_loss,
                 "global_MTA": mt_metrics["accuracy"],
-                "global_ASR": global_asr ,
+                "global_ASR": global_asr,
                 "global_AttackLoss": global_attack_loss,
-                "current_round": server_round
+                "current_round": server_round,
             }
         }
+
         if global_run is not None:
             # Randomly sample 4 clean images
             clean_images = []
@@ -185,7 +187,7 @@ def get_evalulate_fn(model_cfg, testloader,data_poisoner: DataPoisoner,global_ru
                 break
 
             # Create poisoned versions
-            poisoned_images =data_poisoner.transform({  
+            poisoned_images = data_poisoner.transform({
                 "image": torch.stack(clean_images).to(device),
                 "label": torch.tensor([159] * len(clean_images)).to(device)
             })["image"]
@@ -194,10 +196,22 @@ def get_evalulate_fn(model_cfg, testloader,data_poisoner: DataPoisoner,global_ru
             diffs = [torch.clamp((poisoned - clean) * 10, 0, 1) for clean, poisoned in zip(clean_images, poisoned_images)]
 
             # Stack them into a single grid
-            grid = make_grid(torch.cat([torch.stack(clean_images),poisoned_images,torch.stack(diffs)]) , nrow=4, normalize=True)
+            grid = make_grid(torch.cat([torch.stack(clean_images), poisoned_images, torch.stack(diffs)]), nrow=4, normalize=True)
 
             # Log to wandb
             global_run.log({"evaluation_images": wandb.Image(grid)})
+
+            # Log the model as an artifact if the server round is even
+            if server_round % 2 == 0:
+
+
+                # Save model weights with the random file name
+                model_artifact = wandb.Artifact(random_filename, type="model")
+                torch.save(model.state_dict(), random_filename)
+                model_artifact.add_file(random_filename)
+                
+                # Log the artifact to W&B
+                global_run.log_artifact(model_artifact)
 
             # Log other metrics
             global_run.log(result)
