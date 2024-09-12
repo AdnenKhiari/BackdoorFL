@@ -76,10 +76,10 @@ class RFLBATWrapper(StrategyWrapper):
         client_ids = []
 
         print("Starting to process weights...")
-
+        flattented_global_model = np.concatenate([w.flatten() for w in self._global_model])
         for index, (weight_set, _, node_id) in enumerate(weights):
             flat_weights = np.concatenate([w.flatten() for w in weight_set])
-            dataAll.append(flat_weights)
+            dataAll.append(flat_weights - flattented_global_model)
             client_ids.append(node_id)
             if node_id in self._poisoned_clients:
                 poisoned_clients_indicies.append(index)
