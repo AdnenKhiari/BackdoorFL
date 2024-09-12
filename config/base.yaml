@@ -47,6 +47,7 @@ wandb:
   report_clients: false
   group_name: null
   main_run_name: null
+  project_name: "federated-2"
   
 defaults:
   - partitioners: iid
