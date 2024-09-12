@@ -63,7 +63,10 @@ class RFLBATWrapper(StrategyWrapper):
         plt.legend()
         
         if(self.wandb_active):
-            wandb.log({"Initial PCA of Clients (Poisoned vs Benign)": wandb.Image(plt)})
+            wandb.log({
+                "Initial PCA of Clients (Poisoned vs Benign)": wandb.Image(plt),
+                "metrics.current_round": self.server_round
+            })
         
         return fig
 
@@ -135,6 +138,13 @@ class RFLBATWrapper(StrategyWrapper):
         print(f"Final accepted clients (IDs): {final_accepted_client_ids}")
         rejected_clients_2 = [client_ids[i] for i in accept if i not in final_accept]
         print(f"Clients rejected after final filtering (IDs): {rejected_clients_2}")
+        
+        if self.wandb_active:
+            wandb.log({
+                "Accepted Clients": len(final_accepted_client_ids),
+                "Rejected Clients": len(rejected_clients_2),
+                "metrics.current_round": self.server_round
+            })
 
         # Return the filtered weights
         filtered_weights = [weights[i] for i in final_accept]
