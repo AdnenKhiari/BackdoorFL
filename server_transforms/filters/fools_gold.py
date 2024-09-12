@@ -13,7 +13,8 @@ from flwr.server.client_proxy import ClientProxy
 import numpy as np
 import scipy.spatial.distance as ssd
 
-from server_defenses.wrapper import StrategyWrapper
+from server_transforms.wrapper import StrategyWrapper
+
 # TODO : Make it a matrix from the begin , use Module for removing and adding according to memory budget
 class FoolsGoldWrapper(StrategyWrapper):
     def __init__(self, strategy: Strategy, num_client_round: int, client_ids: List[int], num_features: int, num_classes: int, memory_budget: int, clip: int = 0, importance: bool = True, importance_hard: bool = False, topk_prop: float = 0.5):

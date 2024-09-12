@@ -14,7 +14,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def __init__(self,node_id,model_cfg,optimizer,pgd_conf,grad_filter) -> None:
         super(FlowerClient,self).__init__()
-        self.model = instantiate(model_cfg)
+        self.model_cfg = model_cfg
         self.optimizer = instantiate(optimizer)
         self.node_id = node_id
         self.global_run = None
@@ -36,13 +36,20 @@ class FlowerClient(fl.client.NumPyClient):
             })
     def register_report_data(self,global_run: Run):
         self.global_run = global_run
+        
     def set_parameters(self, parameters):
+        gc.collect()
+
+        self.model = instantiate(self.model_cfg)
         params_dict = zip(self.model.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.from_numpy(v) for k, v in params_dict})
         self.model.load_state_dict(state_dict, strict=True)
 
     def get_parameters(self, config: Dict[str, Scalar]):
-        return [val.cpu().numpy() for _, val in self.model.state_dict().items()]
+        params = [val.cpu().numpy() for _, val in self.model.state_dict().items()]
+        # Removed From Memory
+        self.model = None
+        return params
 
     def fit(self, parameters, config):
         # copy parameters sent by the server into client's local model
