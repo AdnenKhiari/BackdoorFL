@@ -202,9 +202,7 @@ def get_evalulate_fn(model_cfg, testloader, data_poisoner: DataPoisoner, global_
             global_run.log({"evaluation_images": wandb.Image(grid)})
 
             # Log the model as an artifact if the server round is even
-            if server_round % 2 == 0:
-
-
+            if server_round % 50 == 0:
                 # Save model weights with the random file name
                 model_artifact = wandb.Artifact(random_filename, type="model")
                 torch.save(model.state_dict(), random_filename)
