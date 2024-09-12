@@ -7,7 +7,8 @@ from flwr.server.client_proxy import ClientProxy
 from flwr.server.strategy import Strategy
 from server_transforms.wrapper import StrategyWrapper
 import wandb
-
+from PIL import Image
+import seaborn as sns
 class SimilarityFilter(StrategyWrapper):
     def __init__(self, strategy: Strategy, similarity_metric: str, threshold: float, p: Optional[int] = None, wandb_active: bool = False):
         """
@@ -94,10 +95,9 @@ class SimilarityFilter(StrategyWrapper):
             metric_name = "Unknown Metric"
             
         client_ids = [client_id for _, _, client_id in weights]
-        fig,axs= plt.bar(x=client_ids,height=self.similarity_values)
         # Log histogram of similarity values
         wandb.log({
-            "Metric Distribution": wandb.Image(np.random.rand(128,128),caption=f'{metric_name} Distribution'),
+            "Metric Distribution": wandb.Image(sns.barplot(x=client_ids,height=self.similarity_values),caption=f'{metric_name} Distribution'),
             "metrics.current_round": self.server_round
         })
 
