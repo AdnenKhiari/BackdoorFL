@@ -10,7 +10,7 @@ import wandb
 from PIL import Image
 import seaborn as sns
 class SimilarityFilter(StrategyWrapper):
-    def __init__(self, strategy: Strategy,poisoned_clients, similarity_metric: str, threshold: float, p: Optional[int] = None, wandb_active: bool = False):
+    def __init__(self, strategy: Strategy,model_cfg,poisoned_clients, similarity_metric: str, threshold: float, p: Optional[int] = None, wandb_active: bool = False):
         """
         Initialize the SimilarityFilter.
 
@@ -21,7 +21,7 @@ class SimilarityFilter(StrategyWrapper):
             p (Optional[int]): The p value for Lp distance (e.g., p=2 for Euclidean distance). Ignored if similarity_metric is "cosine".
             wandb_active (bool): Whether to log metrics and plots to Weights and Biases.
         """
-        super(SimilarityFilter, self).__init__(strategy, poisoned_clients,wandb_active)
+        super(SimilarityFilter, self).__init__(strategy,model_cfg, poisoned_clients,wandb_active)
         self.similarity_metric = similarity_metric
         self.threshold = threshold
         self.p = p

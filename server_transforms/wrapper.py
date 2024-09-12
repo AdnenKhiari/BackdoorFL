@@ -13,9 +13,10 @@ from flwr.common import (
 )
 from flwr.server.client_proxy import ClientProxy
 import numpy as np
+from hydra.utils import instantiate, call
 
 class StrategyWrapper(Strategy, ABC):
-    def __init__(self, strategy: Strategy,poisoned_clients,wandb_active = False):
+    def __init__(self, strategy: Strategy,model_cfg,poisoned_clients,wandb_active = False):
         """
         Initialize the StrategyWrapper.
 
@@ -23,35 +24,36 @@ class StrategyWrapper(Strategy, ABC):
             strategy (Strategy): The strategy to wrap.
         """
         self._strategy = strategy
+        self._model_cfg = model_cfg
         self._global_model = None
         self.wandb_active = wandb_active
         self.server_round = 0
         self._metrics = None
         self._poisoned_clients =poisoned_clients
         
-    def get_random_params_from_one_client(self,client_manager):
-                # Get initial parameters from one of the clients
-        print("Requesting initial parameters from a client")
-        all_clients = client_manager.all()
-        cid = list(all_clients.keys())[0]
-        random_client = all_clients[cid]
+    # def get_random_params_from_one_client(self,client_manager):
+    #             # Get initial parameters from one of the clients
+    #     print("Requesting initial parameters from a client")
+    #     all_clients = client_manager.all()
+    #     cid = list(all_clients.keys())[0]
+    #     random_client = all_clients[cid]
 
-        ins = GetParametersIns(config={})
-        get_parameters_res = random_client.get_parameters(
-            ins=ins, timeout=5000, group_id=0
-        )
-        if get_parameters_res.status.code == Code.OK:
-            print("Received initial parameters from one random client")
-        else:
-            raise Exception("Could not get init weights")
-        return parameters_to_ndarrays(get_parameters_res.parameters)
+    #     ins = GetParametersIns(config={})
+    #     get_parameters_res = random_client.get_parameters(
+    #         ins=ins, timeout=5000, group_id=0
+    #     )
+    #     if get_parameters_res.status.code == Code.OK:
+    #         print("Received initial parameters from one random client")
+    #     else:
+    #         raise Exception("Could not get init weights")
+    #     return parameters_to_ndarrays(get_parameters_res.parameters)
         
     def initialize_parameters(self, client_manager) -> Optional[Parameters]:
         params=self._strategy.initialize_parameters(client_manager)
         if params is not None:
             self._global_model = parameters_to_ndarrays(params)
         else:
-            self._global_model = self.get_random_params_from_one_client(client_manager)
+            self._global_model = [val.cpu().numpy() for _, val in instantiate(self._model_cfg).state_dict().items()]
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager
