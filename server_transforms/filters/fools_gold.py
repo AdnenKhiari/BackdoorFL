@@ -184,6 +184,12 @@ class FoolsGoldWrapper(StrategyWrapper):
             for params, _, client_id in weights
         ]
         
+        # Normalize deltas if their norm is higher than 1 ( Norm Clipping )
+        for i in range(len(deltas)):
+            norm = np.linalg.norm(deltas[i])
+            if norm > 1:
+                deltas[i] /= norm
+            
         # Update history
         for i, (_, _, client_id) in enumerate(weights):
             self.update_history(client_id, deltas[i])
