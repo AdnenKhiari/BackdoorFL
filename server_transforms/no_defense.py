@@ -5,8 +5,8 @@ from server_transforms.wrapper import StrategyWrapper
 from flwr.server.strategy.fedavg import FedAvg
 
 class NoDefense(StrategyWrapper):
-    def __init__(self,strategy):
-        super().__init__(strategy)
+    def __init__(self,strategy,poisoned_clients):
+        super().__init__(strategy,poisoned_clients)
     
     def process_weights(self, weights):
         return weights
