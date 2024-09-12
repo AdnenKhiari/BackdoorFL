@@ -46,6 +46,9 @@ def main(cfg: DictConfig):
             "partitioners": cfg.partitioners,
             "strategy": cfg.strategy,
             "num_classes": cfg.num_classes,
+            "poison_between": cfg.poison_between,
+            "defense_strategy": cfg.defense_strategy,
+            "global_merger": cfg.global_merger,
         }
         group_name = cfg.wandb.group_name
         run_name = cfg.wandb.main_run_name
