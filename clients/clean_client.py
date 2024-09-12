@@ -46,6 +46,8 @@ class FlowerClient(fl.client.NumPyClient):
         self.model.load_state_dict(state_dict, strict=True)
 
     def get_parameters(self, config: Dict[str, Scalar]):
+        if self.model is None:
+            self.model = instantiate(self.model_cfg)
         params = [val.cpu().numpy() for _, val in self.model.state_dict().items()]
         # Removed From Memory
         self.model = None

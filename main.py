@@ -93,8 +93,7 @@ def main(cfg: DictConfig):
     strategy_with_defense = instantiate(
         cfg.defense_strategy,
         strategy=strategy,
-        poisoned_clients=poisoned_client_ids,
-        init_model = instantiate(cfg.model),
+        poisoned_clients=poisoned_client_ids
     ) if cfg.get("defense_strategy") is not None else strategy
    
     ## 5. Start Simulation
