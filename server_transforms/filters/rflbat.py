@@ -10,15 +10,15 @@ from flwr.server.server import Strategy
 import sklearn.metrics.pairwise as smp
 
 class RFLBATWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy,poisoned_clients, epsilon1: float = 10, epsilon2: float = 4, num_sampling: int = 5, K_max: int = 10,wandb_active = False):
-        super().__init__(strategy,poisoned_clients,wandb_active)
+    def __init__(self, strategy: Strategy, poisoned_clients, epsilon1: float = 10, epsilon2: float = 4, num_sampling: int = 5, K_max: int = 10, wandb_active=False):
+        super().__init__(strategy, poisoned_clients, wandb_active)
         self.epsilon1 = epsilon1
         self.epsilon2 = epsilon2
         self.num_sampling = num_sampling
         self.K_max = K_max
 
     def gap_statistics(self, data, num_sampling, K_max, n):
-        # Implementation of gap statistics function as provided
+        print("Calculating gap statistics...")
         data = np.reshape(data, (data.shape[0], -1))
         data_c = np.zeros(shape=data.shape)
         for i in range(data.shape[1]):
@@ -27,6 +27,7 @@ class RFLBATWrapper(StrategyWrapper):
         gap = []
         s = []
         for k in range(1, K_max + 1):
+            print(f"Evaluating k={k} for gap statistics...")
             k_means = KMeans(n_clusters=k, init='k-means++').fit(data_c)
             predicts = k_means.labels_
             centers = k_means.cluster_centers_
@@ -47,66 +48,65 @@ class RFLBATWrapper(StrategyWrapper):
 
         for k in range(1, K_max + 1):
             if k == K_max or gap[k - 1] - gap[k] + s[k - 1] > 0:
+                print(f"Optimal number of clusters determined: {k}")
                 return k
 
-    def viz_pca_with_colors(self,dataAll,poisoned_clients_indicies,X_dr):
-        # Create a mask for benign clients
+    def viz_pca_with_colors(self, dataAll, poisoned_clients_indicies, X_dr):
         benign_clients_indicies = np.setdiff1d(np.arange(dataAll.shape[0]), poisoned_clients_indicies)
-
-        # Visualize the data
         fig = plt.figure(figsize=(10, 6))
-
-        # Plot poisoned clients in red
-        plt.scatter(X_dr[poisoned_clients_indicies, 0], X_dr[poisoned_clients_indicies, 1],
-                    color='red', label='Poisoned Clients', alpha=0.7)
-
-        # Plot benign clients in blue
-        plt.scatter(X_dr[benign_clients_indicies, 0], X_dr[benign_clients_indicies, 1],
-                    color='blue', label='Benign Clients', alpha=0.7)
-
-        # Add labels, title, and legend
+        plt.scatter(X_dr[poisoned_clients_indicies, 0], X_dr[poisoned_clients_indicies, 1], color='red', label='Poisoned Clients', alpha=0.7)
+        plt.scatter(X_dr[benign_clients_indicies, 0], X_dr[benign_clients_indicies, 1], color='blue', label='Benign Clients', alpha=0.7)
         plt.title('PCA of Clients (Poisoned vs Benign)')
         plt.xlabel('Principal Component 1')
         plt.ylabel('Principal Component 2')
         plt.legend()
-       
         return fig
 
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
         dataAll = []
-
-        # poisoned_clients_indicies : For Viz
         poisoned_clients_indicies = []
-        
-        for index,(weight_set, _, node_id) in enumerate(weights):
+        client_ids = []
+
+        print("Starting to process weights...")
+
+        for index, (weight_set, _, node_id) in enumerate(weights):
             flat_weights = np.concatenate([w.flatten() for w in weight_set])
             dataAll.append(flat_weights)
-            
-            #For Viz 
+            client_ids.append(node_id)
             if node_id in self._poisoned_clients:
                 poisoned_clients_indicies.append(index)
-                
+        
         dataAll = np.array(dataAll)
+
+        print(f"Total number of clients: {len(weights)}")
+        print(f"Poisoned clients (IDs): {[weights[i][2] for i in poisoned_clients_indicies]}")
 
         # PCA reduction to 2 components
         pca = PCA(n_components=2)
         X_dr = pca.fit_transform(dataAll)
         
-        # For Viz
-        self.viz_pca_with_colors(dataAll,poisoned_clients_indicies,X_dr)
+        # Visualize PCA (optional)
+        self.viz_pca_with_colors(dataAll, poisoned_clients_indicies, X_dr)
 
-        # Compute sum of Euclidean distances and initial filtering
+        # Step 1: Initial filtering based on Euclidean distances
+        print("Filtering based on Euclidean distances...")
         eu_list = [np.sum([np.linalg.norm(X_dr[i] - X_dr[j]) for j in range(len(X_dr)) if i != j]) for i in range(len(X_dr))]
         accept = [i for i in range(len(eu_list)) if eu_list[i] < self.epsilon1 * np.median(eu_list)]
+        accepted_client_ids_1 = [client_ids[i] for i in accept]
+        print(f"Clients accepted after first filtering (IDs): {accepted_client_ids_1}")
+        rejected_clients_1 = [client_ids[i] for i in range(len(X_dr)) if i not in accept]
+        print(f"Clients rejected after first filtering (IDs): {rejected_clients_1}")
 
         X_filtered = X_dr[accept]
 
-        # Clustering using gap statistics to determine the optimal number of clusters
+        # Step 2: Clustering with gap statistics
+        print("Performing clustering using gap statistics...")
         num_clusters = self.gap_statistics(X_filtered, self.num_sampling, self.K_max, len(X_filtered))
         k_means = KMeans(n_clusters=num_clusters, init='k-means++').fit(X_filtered)
         predicts = k_means.labels_
 
-        # Select the most suitable cluster based on cosine similarity
+        # Step 3: Select the best cluster based on cosine similarity
+        print("Selecting the best cluster based on cosine similarity...")
         v_med = []
         for i in range(num_clusters):
             cluster_indices = [idx for idx, pred in enumerate(predicts) if pred == i]
@@ -118,12 +118,19 @@ class RFLBATWrapper(StrategyWrapper):
 
         best_cluster = v_med.index(min(v_med))
         accept = [accept[i] for i in range(len(predicts)) if predicts[i] == best_cluster]
+        accepted_client_ids_2 = [client_ids[i] for i in accept]
+        print(f"Clients accepted after clustering (IDs): {accepted_client_ids_2}")
 
-        # Recalculate Euclidean distances and further filtering
+        # Step 4: Final filtering based on Euclidean distances
+        print("Final filtering based on Euclidean distances...")
         X_final = X_filtered[[i in accept for i in range(len(X_filtered))]]
         eu_list_final = [np.sum([np.linalg.norm(X_final[i] - X_final[j]) for j in range(len(X_final)) if i != j]) for i in range(len(X_final))]
         final_accept = [accept[i] for i in range(len(eu_list_final)) if eu_list_final[i] < self.epsilon2 * np.median(eu_list_final)]
+        final_accepted_client_ids = [client_ids[i] for i in final_accept]
+        print(f"Final accepted clients (IDs): {final_accepted_client_ids}")
+        rejected_clients_2 = [client_ids[i] for i in accept if i not in final_accept]
+        print(f"Clients rejected after final filtering (IDs): {rejected_clients_2}")
 
         # Return the filtered weights
         filtered_weights = [weights[i] for i in final_accept]
-        return filtered_weights 
+        return filtered_weights
