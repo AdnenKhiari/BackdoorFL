@@ -38,7 +38,7 @@ class StrategyWrapper(Strategy, ABC):
 
         ins = GetParametersIns(config={})
         get_parameters_res = random_client.get_parameters(
-            ins=ins, timeout=5000, group_id=0
+            ins=ins, timeout=5000000, group_id=0
         )
         if get_parameters_res.status.code == Code.OK:
             print("Received initial parameters from one random client")

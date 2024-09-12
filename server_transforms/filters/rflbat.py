@@ -86,8 +86,9 @@ class RFLBATWrapper(StrategyWrapper):
         
         dataAll = np.array(dataAll)
 
+        poisoned_ids = [weights[i][2] for i in poisoned_clients_indicies]
         print(f"Total number of clients: {len(weights)}")
-        print(f"Poisoned clients (IDs): {[weights[i][2] for i in poisoned_clients_indicies]}")
+        print(f"Poisoned clients (IDs): {poisoned_ids}")
 
         # PCA reduction to 2 components
         pca = PCA(n_components=2)
@@ -110,7 +111,7 @@ class RFLBATWrapper(StrategyWrapper):
         # Step 2: Clustering with gap statistics
         print("Performing clustering using gap statistics...")
         num_clusters = self.gap_statistics(X_filtered, self.num_sampling, self.K_max, len(X_filtered))
-        k_means = KMeans(n_clusters=num_clusters, init='k-means++',n_init="auto").fit(X_filtered)
+        k_means = KMeans(n_clusters=num_clusters, init='k-means++', n_init="auto").fit(X_filtered)
         predicts = k_means.labels_
 
         # Step 3: Select the best cluster based on cosine similarity
@@ -135,15 +136,29 @@ class RFLBATWrapper(StrategyWrapper):
         eu_list_final = [np.sum([np.linalg.norm(X_final[i] - X_final[j]) for j in range(len(X_final)) if i != j]) for i in range(len(X_final))]
         final_accept = [accept[i] for i in range(len(eu_list_final)) if eu_list_final[i] < self.epsilon2 * np.median(eu_list_final)]
         final_accepted_client_ids = [client_ids[i] for i in final_accept]
+        final_rejected_clients = [_id for _id in client_ids if _id not in final_accepted_client_ids]
         print(f"Final accepted clients (IDs): {final_accepted_client_ids}")
-        rejected_clients_2 = [client_ids[i] for i in accept if i not in final_accept]
-        print(f"Clients rejected after final filtering (IDs): {rejected_clients_2}")
-        
+        print(f"Final Clients rejected (IDs): {final_rejected_clients}")
+
+        # Benign recall
+        benign_clients = [cid for cid in client_ids if cid not in self._poisoned_clients]
+        benign_recall = len([cid for cid in final_accepted_client_ids if cid in benign_clients]) / len(benign_clients) if benign_clients else 0
+        print(f"Benign Recall (accuracy in accepting benign clients): {benign_recall:.2f}")
+
+        # Weakness percentage
+        poisoned_accepted = len([cid for cid in final_accepted_client_ids if cid in self._poisoned_clients])
+        weakness_percentage = poisoned_accepted / len(self._poisoned_clients) if self._poisoned_clients else 0
+        print(f"Weakness Percentage (poisoned clients mistakenly accepted): {weakness_percentage:.2f}")
+
+
+        # Log metrics to wandb if active
         if self.wandb_active:
             wandb.log({
                 "Accepted Clients": len(final_accepted_client_ids),
-                "Rejected Clients": len(rejected_clients_2),
-                "metrics.current_round": self.server_round
+                "Rejected Clients": len(final_rejected_clients),
+                "metrics.current_round": self.server_round,
+                "benign_recall": benign_recall,
+                "weakness_percentage": weakness_percentage,
             })
 
         # Return the filtered weights
