@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
@@ -48,16 +49,51 @@ class RFLBATWrapper(StrategyWrapper):
             if k == K_max or gap[k - 1] - gap[k] + s[k - 1] > 0:
                 return k
 
+    def viz_pca_with_colors(self,dataAll,poisoned_clients_indicies,X_dr):
+        # Create a mask for benign clients
+        benign_clients_indicies = np.setdiff1d(np.arange(dataAll.shape[0]), poisoned_clients_indicies)
+
+        # Visualize the data
+        fig = plt.figure(figsize=(10, 6))
+
+        # Plot poisoned clients in red
+        plt.scatter(X_dr[poisoned_clients_indicies, 0], X_dr[poisoned_clients_indicies, 1],
+                    color='red', label='Poisoned Clients', alpha=0.7)
+
+        # Plot benign clients in blue
+        plt.scatter(X_dr[benign_clients_indicies, 0], X_dr[benign_clients_indicies, 1],
+                    color='blue', label='Benign Clients', alpha=0.7)
+
+        # Add labels, title, and legend
+        plt.title('PCA of Clients (Poisoned vs Benign)')
+        plt.xlabel('Principal Component 1')
+        plt.ylabel('Principal Component 2')
+        plt.legend()
+       
+        return fig
+
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
         dataAll = []
-        for weight_set, _, node_id in weights:
+
+        # poisoned_clients_indicies : For Viz
+        poisoned_clients_indicies = []
+        
+        for index,(weight_set, _, node_id) in enumerate(weights):
             flat_weights = np.concatenate([w.flatten() for w in weight_set])
             dataAll.append(flat_weights)
+            
+            #For Viz 
+            if node_id in self._poisoned_clients:
+                poisoned_clients_indicies.append(index)
+                
         dataAll = np.array(dataAll)
 
         # PCA reduction to 2 components
         pca = PCA(n_components=2)
         X_dr = pca.fit_transform(dataAll)
+        
+        # For Viz
+        self.viz_pca_with_colors(dataAll,poisoned_clients_indicies,X_dr)
 
         # Compute sum of Euclidean distances and initial filtering
         eu_list = [np.sum([np.linalg.norm(X_dr[i] - X_dr[j]) for j in range(len(X_dr)) if i != j]) for i in range(len(X_dr))]
@@ -90,4 +126,4 @@ class RFLBATWrapper(StrategyWrapper):
 
         # Return the filtered weights
         filtered_weights = [weights[i] for i in final_accept]
-        return filtered_weights
+        return filtered_weights 

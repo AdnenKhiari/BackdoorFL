@@ -64,6 +64,7 @@ def main(cfg: DictConfig):
     torch.manual_seed(cfg.global_seed)
 
     client_ids,clients_dict = get_clients(cfg,global_run)
+    poisoned_client_ids = list(clients_dict["malicious"].keys())
     global_data_poisoner = instantiate(cfg.global_merger)
     client_fn = generate_client_fn(cfg.dataset,cfg.partitioners,cfg.batch_size,cfg.valratio,cfg.global_seed,clients_dict)
 
@@ -92,6 +93,7 @@ def main(cfg: DictConfig):
     strategy_with_defense = instantiate(
         cfg.defense_strategy,
         strategy=strategy,
+        poisoned_clients=poisoned_client_ids,
     ) if cfg.get("defense_strategy") is not None else strategy
    
     ## 5. Start Simulation
