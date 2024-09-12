@@ -11,8 +11,8 @@ from flwr.server.server import Strategy
 import sklearn.metrics.pairwise as smp
 
 class RFLBATWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy, init_model,poisoned_clients, epsilon1: float = 10, epsilon2: float = 4, num_sampling: int = 5, K_max: int = 10, wandb_active=False):
-        super().__init__(strategy, init_model,poisoned_clients, wandb_active)
+    def __init__(self, strategy: Strategy, poisoned_clients, epsilon1: float = 10, epsilon2: float = 4, num_sampling: int = 5, K_max: int = 10, wandb_active=False):
+        super().__init__(strategy, poisoned_clients, wandb_active)
         self.epsilon1 = epsilon1
         self.epsilon2 = epsilon2
         self.num_sampling = num_sampling
