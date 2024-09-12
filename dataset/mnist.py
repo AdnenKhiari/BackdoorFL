@@ -10,7 +10,7 @@ from torchvision import transforms
 class Mnist(Dataset):
     def __init__(self,partitioner,seed):
         super(Mnist,self).__init__(partitioner)
-        self.resizer = transforms.Resize((32,32))
+        self.resizer = transforms.Resize((32,32),antialias=True)
         self.seed = seed
 
     def get_federated_dataset(self,partitioners):
