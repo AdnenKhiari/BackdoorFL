@@ -17,7 +17,7 @@ from hydra.utils import instantiate, call
 import torch
 
 class StrategyWrapper(Strategy, ABC):
-    def __init__(self, strategy: Strategy,model_cfg,poisoned_clients,wandb_active = False):
+    def __init__(self, strategy: Strategy,init_model,poisoned_clients,wandb_active = False):
         """
         Initialize the StrategyWrapper.
 
@@ -25,7 +25,7 @@ class StrategyWrapper(Strategy, ABC):
             strategy (Strategy): The strategy to wrap.
         """
         self._strategy = strategy
-        self._model_cfg = model_cfg
+        self.init_model = init_model
         self._global_model = None
         self.wandb_active = wandb_active
         self.server_round = 0
@@ -54,7 +54,7 @@ class StrategyWrapper(Strategy, ABC):
         if params is not None:
             self._global_model = parameters_to_ndarrays(params)
         else:
-            model : torch.nn = instantiate(self._model_cfg)
+            model : torch.nn = self.init_model
             self._global_model = [val.cpu().numpy() for _, val in model.state_dict().items()]
 
     def configure_fit(
