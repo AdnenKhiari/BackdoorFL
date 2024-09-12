@@ -77,7 +77,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
             dict: The dictionary with the batch of images with the poison applied.
         """
         device = data['image'][0].get_device() if len(data['image']) > 0 else torch.device('cpu')
-        print(device)
+        print("DDD",device)
         images = data['image'].cpu().permute(0, 2, 3, 1).numpy()  # Convert from PyTorch tensor to NumPy array
         images *= 255.  # Scale to [0, 255]
 
