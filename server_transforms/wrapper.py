@@ -32,7 +32,7 @@ class StrategyWrapper(Strategy, ABC):
     def get_random_params_from_one_client(self,client_manager):
                 # Get initial parameters from one of the clients
         print("Requesting initial parameters from one random client")
-        random_client = client_manager.sample(1)[0]
+        random_client = client_manager.all()[0]
 
         ins = GetParametersIns(config={})
         get_parameters_res = random_client.get_parameters(
