@@ -29,7 +29,7 @@ class RFLBATWrapper(StrategyWrapper):
         s = []
         for k in range(1, K_max + 1):
             print(f"Evaluating k={k} for gap statistics...")
-            k_means = KMeans(n_clusters=k, init='k-means++').fit(data_c)
+            k_means = KMeans(n_clusters=k, init='k-means++',n_init="auto").fit(data_c)
             predicts = k_means.labels_
             centers = k_means.cluster_centers_
             v_k = sum(np.linalg.norm(centers[i] - data_c[predicts == i], axis=1).sum() for i in range(k))
@@ -37,7 +37,7 @@ class RFLBATWrapper(StrategyWrapper):
             v_kb = []
             for _ in range(num_sampling):
                 data_fake = np.random.uniform(0, 1, (n, data.shape[1]))
-                k_means_b = KMeans(n_clusters=k, init='k-means++').fit(data_fake)
+                k_means_b = KMeans(n_clusters=k, init='k-means++',n_init="auto").fit(data_fake)
                 predicts_b = k_means_b.labels_
                 centers_b = k_means_b.cluster_centers_
                 v_kb_i = sum(np.linalg.norm(centers_b[i] - data_fake[predicts_b == i], axis=1).sum() for i in range(k))
@@ -110,7 +110,7 @@ class RFLBATWrapper(StrategyWrapper):
         # Step 2: Clustering with gap statistics
         print("Performing clustering using gap statistics...")
         num_clusters = self.gap_statistics(X_filtered, self.num_sampling, self.K_max, len(X_filtered))
-        k_means = KMeans(n_clusters=num_clusters, init='k-means++').fit(X_filtered)
+        k_means = KMeans(n_clusters=num_clusters, init='k-means++',n_init="auto").fit(X_filtered)
         predicts = k_means.labels_
 
         # Step 3: Select the best cluster based on cosine similarity
