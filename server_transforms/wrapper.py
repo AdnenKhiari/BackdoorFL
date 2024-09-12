@@ -109,10 +109,10 @@ class StrategyWrapper(Strategy, ABC):
         ]
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
-        new_result = self._strategy.aggregate_fit(server_round, processed_results, failures)
-        if new_result is not None:
-            params,metrics= new_result
+        params,metrics = self._strategy.aggregate_fit(server_round, processed_results, failures)
+        if params is not None:
             self._global_model = self.post_process_weights(parameters_to_ndarrays(params))
+        if metrics is not None:
             self._metrics = metrics
         return ndarrays_to_parameters(self._global_model),self._metrics
 
