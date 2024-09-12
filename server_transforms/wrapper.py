@@ -47,8 +47,8 @@ class StrategyWrapper(Strategy, ABC):
         params=self._strategy.initialize_parameters(client_manager)
         if params is not None:
             self._global_model = parameters_to_ndarrays(params)
-        else:
-            self._global_model = self.get_random_params_from_one_client(client_manager)
+        # else:
+        #     self._global_model = self.get_random_params_from_one_client(client_manager)
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager
