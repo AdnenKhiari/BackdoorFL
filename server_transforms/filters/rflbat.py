@@ -16,7 +16,7 @@ class RFLBATWrapper(StrategyWrapper):
         self.epsilon1 = epsilon1
         self.epsilon2 = epsilon2
         self.num_sampling = num_sampling
-        self.K_max = K_max
+        self.K_max = min(K_max,len(poisoned_clients))
 
     def gap_statistics(self, data, num_sampling, K_max, n):
         print("Calculating gap statistics...")
