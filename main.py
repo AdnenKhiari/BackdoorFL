@@ -90,11 +90,11 @@ def main(cfg: DictConfig):
         evaluate_metrics_aggregation_fn=get_aggregation_metrics(global_run) if cfg.evaluate_metrics_aggregation_fn else None,
     )
     
-    # strategy_with_defense = instantiate(
-    #     cfg.defense_strategy,
-    #     strategy=strategy,
-    #     poisoned_clients=poisoned_client_ids,
-    # ) if cfg.get("defense_strategy") is not None else strategy
+    strategy_with_defense = instantiate(
+        cfg.defense_strategy,
+        strategy=strategy,
+        poisoned_clients=poisoned_client_ids,
+    ) if cfg.get("defense_strategy") is not None else strategy
    
     ## 5. Start Simulation
     # As you'll notice, we can start the simulation in exactly the same way as we did in the previous project.
@@ -102,7 +102,7 @@ def main(cfg: DictConfig):
         client_fn=client_fn,
         clients_ids=client_ids,
         config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
-        strategy=strategy,
+        strategy=strategy_with_defense,
         client_resources={"num_cpus": cfg.num_cpus_per_client, "num_gpus": cfg.num_gpus_per_client},
         client_manager=ClientM(cfg.global_seed),
         ray_init_args={"address": "auto"} if cfg.ray_auto else None
