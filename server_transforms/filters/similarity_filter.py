@@ -95,6 +95,7 @@ class SimilarityFilter(StrategyWrapper):
             metric_name = "Unknown Metric"
             
         client_ids = [client_id for _, _, client_id in weights]
+        plt.subplots(figsize=(10, 5))   
         # Log histogram of similarity values
         wandb.log({
             "Metric Distribution": wandb.Image(sns.barplot(x=client_ids,y=self.similarity_values),caption=f'{metric_name} Distribution'),
