@@ -35,7 +35,7 @@ class StrategyWrapper(Strategy, ABC):
 
         ins = GetParametersIns(config={})
         get_parameters_res = random_client.get_parameters(
-            ins=ins, timeout=5000, group_id=-1
+            ins=ins, timeout=5000, group_id=0
         )
         if get_parameters_res.status.code == Code.OK:
             print("Received initial parameters from one random client")
@@ -102,7 +102,7 @@ class StrategyWrapper(Strategy, ABC):
         # Convert processed weights back to Parameters
         processed_results = [
             (node_id_to_cp[node_id][0], FitRes(node_id_to_cp[node_id][1].status,ndarrays_to_parameters(weights), num_examples,node_id_to_cp[node_id][1].metrics))
-            for weights, num_examples,node_id in  zip(processed_weights)
+            for weights, num_examples,node_id in  processed_weights
         ]
         
         # Aggregate the processed results using the wrapped strategy's aggregate_fit
