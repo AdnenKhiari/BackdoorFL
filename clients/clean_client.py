@@ -21,8 +21,9 @@ class FlowerClient(fl.client.NumPyClient):
         self.global_run = None
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.pgd_conf = pgd_conf
-        self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
         self.weights = None
+        self.grad_filter = grad_filter
+        self.grad_filter_conf = grad_filter
         
     def get_weights(self,trainloader):
         # Step 1: Calculate class distribution from the training data
@@ -50,6 +51,9 @@ class FlowerClient(fl.client.NumPyClient):
         self.trainloader = trainloader
         self.valloader = vallodaer
         self.weights = self.get_weights(trainloader)
+        print("Weights Used For Balancing: ",self.weights)
+        self.grad_filter = instantiate(self.grad_filter.filter) if self.grad_filter.active else None
+
         return self
     
     def report_data(self):
