@@ -3,12 +3,13 @@ import numpy as np
 from poisoning_transforms.model.masks.grad_masker import GradMask
 
 class NeuroToxinPoisoner(GradMask):
-    def __init__(self,ratio=0.5):
+    def __init__(self,ratio=0.5,weights=None):
         super().__init__()
         self.ratio = ratio
+        self.weights = weights
 
     def fit(self, model: torch.nn.Module,dataset_clean):
-        criterion = torch.nn.CrossEntropyLoss()
+        criterion = torch.nn.CrossEntropyLoss(self.weights)
         model.train()
         model.zero_grad()
 

@@ -1,4 +1,4 @@
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from typing import Dict, Tuple
 from flwr.common import NDArrays, Scalar,Context
 from hydra.utils import instantiate
@@ -22,10 +22,34 @@ class FlowerClient(fl.client.NumPyClient):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.pgd_conf = pgd_conf
         self.grad_filter = instantiate(grad_filter.filter) if grad_filter.active else None
+        self.weights = None
+        
+    def get_weights(self,trainloader):
+        # Step 1: Calculate class distribution from the training data
+        class_counts = Counter()
+        
+        # Assuming trainloader returns batches with (inputs, labels)
+        for _, labels in trainloader:
+            class_counts.update(labels.tolist())
+        
+        # Step 2: Compute class weights as the inverse of the class frequencies
+        total_samples = sum(class_counts.values())
+        num_classes = len(class_counts)
+
+        # Inverse frequency for each class
+        class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items()}
+
+        # Step 3: Convert weights to tensor
+        weights_tensor = torch.tensor([class_weights[cls] for cls in range(num_classes)], dtype=torch.float)
+
+        normalized_weights = weights_tensor / weights_tensor.max()
+
+        return normalized_weights
         
     def with_loaders(self,trainloader, vallodaer):
         self.trainloader = trainloader
         self.valloader = vallodaer
+        self.weights = self.get_weights(trainloader)
         return self
     
     def report_data(self):
@@ -66,7 +90,7 @@ class FlowerClient(fl.client.NumPyClient):
         optim = self.optimizer(self.model.parameters(), lr=lr, momentum=momentum)
         # if self.grad_filter != None:
         #     self.grad_filter.fit(self.model,self.trainloader)
-        train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf,None)
+        train(self.model, lambda : self.trainloader, optim, epochs, self.device,self.pgd_conf,None,self.weights)
 
         gc.collect()
 
@@ -79,7 +103,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.set_parameters(parameters)
         current_round = config["current_round"]
 
-        loss, metrics = test(self.model, lambda : self.valloader, self.device)
+        loss, metrics = test(self.model, lambda : self.valloader, self.device,self.weights)
         if self.global_run:
             wandb.run.log({
                 "current_round": current_round,

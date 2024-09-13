@@ -31,8 +31,8 @@ HYDRA_FULL_ERROR=1 && python "$script_path" \
 
 # Run the Python command with the script path
 HYDRA_FULL_ERROR=1 && python "$script_path" \
-  num_gpus_per_client=0.25 \
-  num_cpus_per_client=1 \
+  num_gpus_per_client=0.5 \
+  num_cpus_per_client=2 \
   num_rounds=200 \
   num_clients=50 \
   num_clients_per_round_fit=10 \

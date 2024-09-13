@@ -72,7 +72,7 @@ class PoisonedFlowerClient(FlowerClient):
 
         if self.grad_filter != None:
             self.grad_filter.fit(self.model,self.trainloader)        
-        train(self.model,backdoored_train, optim, epochs, self.device,self.pgd_conf,self.grad_filter)
+        train(self.model,backdoored_train, optim, epochs, self.device,self.pgd_conf,self.grad_filter,self.weights)
         
         # Poison Weights
         params = self.get_parameters({})
@@ -94,9 +94,9 @@ class PoisonedFlowerClient(FlowerClient):
         
         self.set_parameters(parameters)
 
-        mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device)
+        mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device,self.weights)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)
-        attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device)
+        attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device,self.weights)
         if self.global_run:
             wandb.run.log(
                 {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}

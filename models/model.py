@@ -8,9 +8,9 @@ from models.modelbase import ModelBase
 from poisoning_transforms.model.masks.grad_masker import GradMask
 
 
-def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad: GradMask | None):
+def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad: GradMask | None,weights=None):
     """Train the network on the training set using torchmetrics."""
-    criterion = torch.nn.CrossEntropyLoss().to(device)
+    criterion = torch.nn.CrossEntropyLoss(weight=weights).to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
     net.train()
     net.to(device)
@@ -71,9 +71,9 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
             print(f"Epoch {epoch+1}: train loss {avg_loss}, train accuracy {epoch_acc}")
 
 
-def test(net, get_testloader, device):
+def test(net, get_testloader, device,weights=None):
     """Evaluate the network on the entire test set using torchmetrics."""
-    criterion = torch.nn.CrossEntropyLoss().to(device)
+    criterion = torch.nn.CrossEntropyLoss(weight=weights).to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
     # precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
     net.eval()
