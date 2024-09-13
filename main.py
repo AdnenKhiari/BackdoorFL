@@ -45,7 +45,7 @@ def main(cfg: DictConfig):
             "optimizers": cfg.optimizers,
             "partitioners": cfg.partitioners,
             "strategy": cfg.strategy,
-            "num_classes": cfg.num_classes,
+            "num_classes": cfg.dataset.num_classes,
             "poison_between": cfg.poison_between,
             "defense_strategy": cfg.defense_strategy,
             "global_merger": cfg.global_merger,

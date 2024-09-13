@@ -3,3 +3,4 @@ class:
   _target_: dataset.mnist.Mnist
 label: image
 size: ${as_tuple:3,32,32}
+numç_classes: 10

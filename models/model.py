@@ -73,7 +73,7 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
 
 def test(net, get_testloader, device,weights=None):
     """Evaluate the network on the entire test set using torchmetrics."""
-    criterion = torch.nn.CrossEntropyLoss(weight=weights).to(device)
+    criterion = torch.nn.CrossEntropyLoss(weight=None).to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
     # precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
     net.eval()
