@@ -39,6 +39,7 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
                 
             # PGD projection step
             if pgd.active:
+                print("Using PGD")
                 with torch.no_grad():
                     # Flatten both the current model and reference model parameters
                     current_params = torch.nn.utils.parameters_to_vector(net.parameters())

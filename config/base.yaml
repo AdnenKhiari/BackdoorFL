@@ -18,7 +18,7 @@ poisoned_target: 1
 
 pgd_conf:
   active: true
-  eps: 0.03
+  eps: 1.0
   norm_type: "inf"
 
 poison_between:
@@ -30,7 +30,7 @@ grad_filter:
   active: true
   filter:
     _target_: poisoning_transforms.model.masks.neurotoxin_poisoner.NeuroToxinPoisoner
-    ratio: 0.5
+    ratio: 0.94
 
 config_fit:
   lr: 0.01
