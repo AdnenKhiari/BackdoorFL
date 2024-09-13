@@ -30,7 +30,7 @@ class FlowerClient(fl.client.NumPyClient):
         
         # Assuming trainloader returns batches with (inputs, labels)
         for batch in trainloader:
-            class_counts.update(batch["labels"].tolist())
+            class_counts.update(batch["label"].tolist())
         
         # Step 2: Compute class weights as the inverse of the class frequencies
         total_samples = sum(class_counts.values())
