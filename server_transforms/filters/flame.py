@@ -24,7 +24,7 @@ from flwr.common import NDArrays
 from scipy.spatial.distance import cosine
 
 class FLAMEStrategyWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy, lamda: float = 0.001, min_cluster_size: int = None):
+    def __init__(self, strategy: Strategy,poisoned_clients, lamda: float = 0.001, min_cluster_size: int = None,wandb_active=False):
         """
         Initialize the FLAME StrategyWrapper.
 
@@ -33,7 +33,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
             lamda (float): The noise addition parameter for FLAME.
             min_cluster_size (int): Minimum cluster size for HDBSCAN. If not specified, defaults to half the number of clients + 1.
         """
-        super().__init__(strategy)
+        super().__init__(strategy,poisoned_clients,wandb_active)
         self.lamda = lamda
         self.min_cluster_size = min_cluster_size
     

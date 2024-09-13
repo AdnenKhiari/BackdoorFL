@@ -12,12 +12,13 @@ from flwr.common import (
 from flwr.server.client_proxy import ClientProxy
 import numpy as np
 import scipy.spatial.distance as ssd
+import wandb
 
 from server_transforms.wrapper import StrategyWrapper
 
 # TODO : Make it a matrix from the begin , use Module for removing and adding according to memory budget
 class FoolsGoldWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy, num_client_round: int, client_ids: List[int], num_features: int, num_classes: int, memory_budget: int, clip: int = 0, importance: bool = True, importance_hard: bool = False, topk_prop: float = 0.5):
+    def __init__(self, strategy: Strategy, poisoned_clients,num_client_round: int, client_ids: List[int], num_features: int, num_classes: int, memory_budget: int, clip: int = 0, importance: bool = True, importance_hard: bool = False, topk_prop: float = 0.5,wandb_active=False):
         """
         Initializes the FoolsGoldWrapper class with the given parameters.
 
@@ -46,7 +47,7 @@ class FoolsGoldWrapper(StrategyWrapper):
             history (Dict[int, np.ndarray]): Dictionary to keep track of the latest deltas for each client, with client IDs as keys.
             client_id_to_idx (Dict[int, int]): Dictionary mapping client IDs to their indices in the `client_ids` list.
         """
-        super().__init__(strategy)
+        super().__init__(strategy,poisoned_clients,wandb_active)
         self.num_clients = num_client_round
         self.client_ids = client_ids
         self.num_features = num_features
@@ -114,12 +115,12 @@ class FoolsGoldWrapper(StrategyWrapper):
             krum_scores[i] = np.sum(np.sort(distances[i])[1:(groupsize - 1)])
         return krum_scores
     
-    def get_summed_deltas(self, history: Dict[int, np.ndarray]) -> np.ndarray:
+    def get_summed_deltas(self, history: Dict[int, np.ndarray],ids) -> np.ndarray:
         # Initialize an array to hold summed deltas for each client
         summed_deltas = np.zeros((self.num_clients, self.num_features))
         
         # Iterate over each client and sum the latest deltas from the history
-        for i, client_id in enumerate(self.client_ids):
+        for i, client_id in enumerate(ids):
             if history[client_id].size > 0:
                 summed_deltas[i] = np.sum(history[client_id], axis=0)
         
@@ -184,6 +185,8 @@ class FoolsGoldWrapper(StrategyWrapper):
             for params, _, client_id in weights
         ]
         
+        client_ids = [client_id for _, _, client_id in weights]
+        
         # Normalize deltas if their norm is higher than 1 ( Norm Clipping )
         for i in range(len(deltas)):
             norm = np.linalg.norm(deltas[i])
@@ -195,7 +198,7 @@ class FoolsGoldWrapper(StrategyWrapper):
             self.update_history(client_id, deltas[i])
         
         # Sum of deltas
-        summed_deltas = self.get_summed_deltas(self.history)
+        summed_deltas = self.get_summed_deltas(self.history,client_ids)
         sig_features_idx = np.arange(self.num_features)
         
         wv = self.foolsgold(
@@ -224,5 +227,39 @@ class FoolsGoldWrapper(StrategyWrapper):
             ]
             
             reweighted_weights.append((reweighted_params, num_examples, client_id))
+            
+            
+
+        # Identify locally poisoned clients for the current round
+        locally_poisoned_clients = [cid for cid in client_ids if cid in self._poisoned_clients]
+        benign_clients = [cid for cid in client_ids if cid not in self._poisoned_clients]
+
+        # Separate weights for locally benign and locally poisoned clients
+        benign_weights = [client_id_to_wv[cid] for cid in benign_clients]
+        poisoned_weights = [client_id_to_wv[cid] for cid in locally_poisoned_clients]
+
+        # Evaluate metrics
+        benign_mean_weight = np.mean(benign_weights) if benign_weights else 0
+        poisoned_mean_weight = np.mean(poisoned_weights) if poisoned_weights else 0
+        poisoned_weight_rankings = np.argsort(poisoned_weights)  # Rank poisoned clients by their weights
+
+        # Check if locally poisoned clients got the lowest weights
+        poisoned_low_weight_percentage = np.sum(np.array(poisoned_weights) <= np.percentile(benign_weights, 25)) / len(locally_poisoned_clients) if locally_poisoned_clients else 0
+
+        # Log the result
+        print(f"Poisoned clients with lowest weights (percentage): {poisoned_low_weight_percentage:.2f}")
+        print(f"Mean weight for benign clients: {benign_mean_weight:.2f}")
+        print(f"Mean weight for poisoned clients: {poisoned_mean_weight:.2f}")
+
+        # Log metrics to wandb if active
+        if self.wandb_active:
+            wandb.log({
+                "metrics.current_round": self.server_round,
+                "benign_mean_weight": benign_mean_weight,
+                "poisoned_mean_weight": poisoned_mean_weight,
+                "poisoned_low_weight_percentage": poisoned_low_weight_percentage,
+                "locally_poisoned_clients": len(locally_poisoned_clients),
+                "benign_clients": len(benign_clients),
+            })
         
         return reweighted_weights

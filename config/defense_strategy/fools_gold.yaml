@@ -1,0 +1,3 @@
+---
+_target_: server_transforms.filters.fools_gold.FoolsGoldWrapper
+wandb_active: ${wandb.active}

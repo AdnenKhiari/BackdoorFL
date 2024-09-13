@@ -74,6 +74,7 @@ class RFLBATWrapper(StrategyWrapper):
         dataAll = []
         poisoned_clients_indicies = []
         client_ids = []
+        poisoned_clients = []
 
         print("Starting to process weights...")
         flattented_global_model = np.concatenate([w.flatten() for w in self._global_model])
@@ -83,6 +84,7 @@ class RFLBATWrapper(StrategyWrapper):
             client_ids.append(node_id)
             if node_id in self._poisoned_clients:
                 poisoned_clients_indicies.append(index)
+                poisoned_clients.append(node_id)
         
         dataAll = np.array(dataAll)
 
@@ -146,8 +148,8 @@ class RFLBATWrapper(StrategyWrapper):
         print(f"Benign Recall (accuracy in accepting benign clients): {benign_recall:.2f}")
 
         # Weakness percentage
-        poisoned_accepted = len([cid for cid in final_accepted_client_ids if cid in self._poisoned_clients])
-        weakness_percentage = poisoned_accepted / len(self._poisoned_clients) if self._poisoned_clients else 0
+        poisoned_accepted = len([cid for cid in final_accepted_client_ids if cid in poisoned_clients])
+        weakness_percentage = poisoned_accepted / len(poisoned_clients) if len(poisoned_clients) > 0 else 0
         print(f"Weakness Percentage (poisoned clients mistakenly accepted): {weakness_percentage:.2f}")
 
 
