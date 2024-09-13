@@ -52,7 +52,7 @@ class FlowerClient(fl.client.NumPyClient):
         self.valloader = vallodaer
         self.weights = self.get_weights(trainloader)
         print("Weights Used For Balancing: ",self.weights)
-        self.grad_filter = instantiate(self.grad_filter.filter) if self.grad_filter.active else None
+        self.grad_filter = instantiate(self.grad_filter.filter,weights=self.weights) if self.grad_filter.active else None
 
         return self
     
