@@ -9,7 +9,7 @@ from dataset.dataset import Dataset
 class Breast(Dataset):
     def __init__(self,partitioner,seed):
         super(Breast,self).__init__(partitioner)
-        self.resizer = transforms.Resize((64,64),antialias=True,antialias=True)
+        self.resizer = transforms.Resize((64,64),antialias=True)
         self.seed = seed
         
     def get_federated_dataset(self,partitioners):
