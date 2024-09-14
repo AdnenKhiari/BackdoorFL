@@ -20,9 +20,7 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
     for epoch in range(epochs):
         total_loss = 0.0
         accuracy_metric.reset()
-        
-        print("Checking Train Loader Is Okay Or Not !",sum([1 for _ in get_trainloader()]),sum([1 for _ in get_trainloader()]))
-        
+                
         for batch in get_trainloader():
             batch = net.transform_input(batch)
             images, labels = batch["image"], batch["label"]
