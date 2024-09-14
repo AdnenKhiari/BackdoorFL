@@ -111,7 +111,10 @@ class FlowerClient(fl.client.NumPyClient):
         if self.global_run:
             wandb.run.log({
                 "current_round": current_round,
-                "MTA": metrics["accuracy"]
+                "MTA": metrics["accuracy"],
+                "MTR": metrics["recall"],
+                "MTF1": metrics["f1"],
+                "MTP": metrics["precision"]
             })
         gc.collect()
-        return float(loss), len(self.valloader), {"current_round": current_round,"MTA": metrics["accuracy"],"Poisoned": 0}
+        return float(loss), len(self.valloader), {"current_round": current_round,"MTA": metrics["accuracy"],"MTR": metrics["recall"],"MTF1": metrics["f1"],"MTP": metrics["precision"],"Poisoned": 0}

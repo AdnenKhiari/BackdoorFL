@@ -76,6 +76,9 @@ def test(net, get_testloader, device,weights=None):
     """Evaluate the network on the entire test set using torchmetrics."""
     criterion = torch.nn.CrossEntropyLoss(weight=None).to(device)
     accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
+    precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
+    recall_metric = torchmetrics.Recall(task="multiclass",num_classes=net.num_classes).to(device)
+    f1_metric = torchmetrics.F1Score(task="multiclass",num_classes=net.num_classes).to(device)
     # precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
     net.eval()
     net.to(device)
@@ -92,15 +95,21 @@ def test(net, get_testloader, device,weights=None):
 
             total_loss += loss.item()
             accuracy_metric.update(outputs, labels)
-            # precision_metric.update(outputs, labels)
+            precision_metric.update(outputs, labels)
+            recall_metric.update(outputs, labels)
+            f1_metric.update(outputs, labels)
 
     avg_loss = total_loss / sum([1 for _ in get_testloader()])
     accuracy = accuracy_metric.compute().cpu().item()
-    # precision = precision_metric.compute().cpu().item()
+    precision = precision_metric.compute().cpu().item()
+    recall = recall_metric.compute().cpu().item()
+    f1= f1_metric.compute().cpu().item()
     
     return avg_loss, {
         "accuracy": accuracy,
-        # "precision": precision
+        "precision": precision,
+        "recall": recall,
+        "f1": f1
     }
 
 

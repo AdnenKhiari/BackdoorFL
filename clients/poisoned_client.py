@@ -99,9 +99,11 @@ class PoisonedFlowerClient(FlowerClient):
         attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device,self.weights)
         if self.global_run:
             wandb.run.log(
-                {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+                {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"],
+                 "MTP": mta_metrics["precision"],"MTR": mta_metrics["recall"],"MTF1": mta_metrics["f1"]}
             )
-        return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"]}
+        return float(mt_loss), len(self.valloader), {"current_round":current_round ,"Poisoned": 1,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"],
+                 "MTP": mta_metrics["precision"],"MTR": mta_metrics["recall"],"MTF1": mta_metrics["f1"]}
     
 def get_single_global_poisoner(clients : dict[str,dict[str,PoisonedFlowerClient]],poisoned_target,batch_size) -> DataPoisoner:
     data_poisoner = []
