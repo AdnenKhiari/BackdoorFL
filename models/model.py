@@ -82,28 +82,26 @@ def test(net, get_testloader, device,weights=None):
     # precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
     net.eval()
     net.to(device)
+    
+    def get_metric(mt):
+        total_loss = 0.0
+        with torch.no_grad():
+            for batch in get_testloader():
+                batch = net.transform_input(batch)
 
-    total_loss = 0.0
-    with torch.no_grad():
-        for batch in get_testloader():
-            batch = net.transform_input(batch)
+                images, labels = batch["image"], batch["label"]
+                images, labels = images.to(device), labels.to(device)
+                outputs = net(images)
+                loss = criterion(outputs, labels)
 
-            images, labels = batch["image"], batch["label"]
-            images, labels = images.to(device), labels.to(device)
-            outputs = net(images)
-            loss = criterion(outputs, labels)
+                total_loss += loss.item()
+                mt.update(outputs, labels)
+            return total_loss / sum([1 for _ in get_testloader()]),mt.compute().cpu().item()
 
-            total_loss += loss.item()
-            accuracy_metric.update(outputs, labels)
-            precision_metric.update(outputs, labels)
-            recall_metric.update(outputs, labels)
-            f1_metric.update(outputs, labels)
-
-    avg_loss = total_loss / sum([1 for _ in get_testloader()])
-    accuracy = accuracy_metric.compute().cpu().item()
-    precision = precision_metric.compute().cpu().item()
-    recall = recall_metric.compute().cpu().item()
-    f1= f1_metric.compute().cpu().item()
+    avg_loss,accuracy = get_metric(accuracy_metric)
+    avg_loss,precision = get_metric(precision_metric)
+    avg_loss,recall = get_metric(recall_metric)
+    avg_loss,f1 = get_metric(f1_metric)
     
     return avg_loss, {
         "accuracy": accuracy,
