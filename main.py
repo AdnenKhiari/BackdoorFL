@@ -29,27 +29,7 @@ def main(cfg: DictConfig):
     
     global_run = None
     if cfg.wandb.active:
-        wandb_config = {
-            "num_clients": cfg.num_clients,
-            "num_rounds": cfg.num_rounds,
-            "num_cpus_per_client": cfg.num_cpus_per_client,
-            "num_gpus_per_client": cfg.num_gpus_per_client,
-            "poisoned_clients_ratio": cfg.poisoned_clients_ratio,
-            "global_seed": cfg.global_seed,
-            "batch_size": cfg.batch_size,
-            "valratio": cfg.valratio,
-            "poisoned_batch_size": cfg.poisoned_batch_size,
-            "poisoned_target": cfg.poisoned_target,
-            "dataset": cfg.dataset,
-            "model": cfg.model,
-            "optimizers": cfg.optimizers,
-            "partitioners": cfg.partitioners,
-            "strategy": cfg.strategy,
-            "num_classes": cfg.dataset.num_classes,
-            "poison_between": cfg.poison_between,
-            "defense_strategy": cfg.defense_strategy,
-            "global_merger": cfg.global_merger,
-        }
+        wandb_config = OmegaConf.to_container(cfg)
         group_name = cfg.wandb.group_name
         run_name = cfg.wandb.main_run_name
         project_name = cfg.wandb.project_name
