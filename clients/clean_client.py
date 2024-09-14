@@ -24,7 +24,8 @@ class FlowerClient(fl.client.NumPyClient):
         self.weights = None
         self.grad_filter = grad_filter
         self.grad_filter_conf = grad_filter
-        
+        self.can_poison_now = False
+
     def get_properties(self, config: Dict[str, bool | bytes | float | int | str]) -> Dict[str, bool | bytes | float | int | str]:
         res= super().get_properties(config)
         res["can_poison"] = 0
