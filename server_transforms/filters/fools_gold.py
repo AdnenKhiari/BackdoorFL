@@ -183,7 +183,7 @@ class FoolsGoldWrapper(StrategyWrapper):
         # Lazy Init
         if self.num_features==0:
             self.num_features = len(np.concatenate([layer.flatten() for layer in weights[0][0]]))
-            self.history = {client_id: np.zeros((self.memory_budget, self.num_features)) for client_id in client_ids}
+            self.history = {client_id: np.zeros((self.memory_budget, self.num_features)) for client_id in self.client_ids}
 
         deltas = [
             np.concatenate([layer.flatten() for layer in params]) - np.concatenate([layer.flatten() for layer in self._global_model])
