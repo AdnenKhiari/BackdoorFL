@@ -45,7 +45,6 @@ class FoolsGoldWrapper(StrategyWrapper):
             importance_hard (bool): Flag to enable or disable hard importance weighting.
             topk_prop (float): Proportion of features to consider significant for importance weighting.
             history (Dict[int, np.ndarray]): Dictionary to keep track of the latest deltas for each client, with client IDs as keys.
-            client_id_to_idx (Dict[int, int]): Dictionary mapping client IDs to their indices in the `client_ids` list.
         """
         super().__init__(strategy,poisoned_clients,client_ids,wandb_active)
         self.num_clients = num_client_round
@@ -58,8 +57,7 @@ class FoolsGoldWrapper(StrategyWrapper):
         self.importance_hard = importance_hard
         self.topk_prop = topk_prop
         
-        # Initialize history with empty matrices
-        self.client_id_to_idx = {client_id: self.client_ids.index(client_id) for client_id in self.client_ids}
+
 
    
     def update_history(self, client_id: int, flattened_delta: NDArrays):
@@ -217,14 +215,11 @@ class FoolsGoldWrapper(StrategyWrapper):
             clip=self.clip
         )
         
-        # Map client_id to their respective weight vector
-        client_id_to_wv = {client_id: wv[self.client_id_to_idx[client_id]] for _, _, client_id in weights}
-
         # Reweight the params based on the computed weights
         reweighted_weights = []
-        for params, num_examples, client_id in weights:
+        for i,(params, num_examples, client_id) in enumerate(weights):
             # Get the corresponding weight vector for the client
-            weight_value = client_id_to_wv[client_id]
+            weight_value = wv[i]
             
             # Apply the weight vector to each layer's weights
             reweighted_params = [
