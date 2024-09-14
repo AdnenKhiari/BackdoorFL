@@ -31,6 +31,7 @@ class PoisonedFlowerClient(FlowerClient):
     def get_properties(self, config: Dict[str, bool | bytes | float | int | str]) -> Dict[str, bool | bytes | float | int | str]:
         res= super().get_properties(config)
         res["can_poison"] = self.can_poison_now
+        return res
 
            
     def can_poison(self,poisoning_rounds, current_round):

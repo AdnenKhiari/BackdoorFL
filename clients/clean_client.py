@@ -28,6 +28,7 @@ class FlowerClient(fl.client.NumPyClient):
     def get_properties(self, config: Dict[str, bool | bytes | float | int | str]) -> Dict[str, bool | bytes | float | int | str]:
         res= super().get_properties(config)
         res["can_poison"] = 0
+        return res
         
     def get_weights(self,trainloader):
         
