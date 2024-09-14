@@ -3,7 +3,7 @@ from flwr.server.client_manager import SimpleClientManager
 from flwr.common.logger import log
 from logging import INFO
 import random
-
+from flwr.common.typing import GetPropertiesIns
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.criterion import Criterion
 import numpy as np
@@ -56,12 +56,12 @@ class ClientM(SimpleClientManager):
 
         poisoned_count = 0
         round_data = {}  # To store the poisoning status and selection of each client for this round
-
+        ins = GetPropertiesIns({})
         if self._wandb_active and num_clients > 0:
             for node in result:
                 # Check if the client is poisoned
                 round_data[node.node_id] = 0.5  # Selected but not poisoned
-                is_poisoned = node.can_poison_now
+                is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties(ins=ins)["can_poison"]
                 if is_poisoned:
                     poisoned_count += 1
                     round_data[node.node_id] = 1  # Poisoned
