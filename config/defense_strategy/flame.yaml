@@ -1,0 +1,3 @@
+---
+_target_: server_transforms.filters.flame.FLAMEStrategyWrapper
+wandb_active: ${wandb.active}
