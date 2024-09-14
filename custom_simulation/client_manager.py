@@ -21,7 +21,7 @@ class ClientM(SimpleClientManager):
         self._wandb_active = wandb_active
         self.history = {}
 
-     def sample(
+    def sample(
         self,
         num_clients: int,
         min_num_clients=None,
