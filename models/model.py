@@ -21,6 +21,8 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
         total_loss = 0.0
         accuracy_metric.reset()
         
+        print("Checking Train Loader Is Okay Or Not !",sum([1 for _ in get_trainloader()]),sum([1 for _ in get_trainloader()]))
+        
         for batch in get_trainloader():
             batch = net.transform_input(batch)
             images, labels = batch["image"], batch["label"]
@@ -67,9 +69,8 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
                 total_loss += loss.item()
                 accuracy_metric.update(outputs, labels)
         with torch.no_grad():
-            avg_loss = total_loss / sum([1 for _ in get_trainloader()])
             epoch_acc = accuracy_metric.compute().item()
-            print(f"Epoch {epoch+1}: train loss {avg_loss}, train accuracy {epoch_acc}")
+            print(f"Epoch {epoch+1}: train loss {total_loss}, train accuracy {epoch_acc}")
 
 
 def test(net, get_testloader, device,weights=None):
