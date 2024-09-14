@@ -13,6 +13,7 @@ from flwr.common import (
     parameters_to_ndarrays,
     NDArrays
 )
+import wandb
 
 from server_transforms.wrapper import StrategyWrapper
 import numpy as np
@@ -41,10 +42,19 @@ class FLAMEStrategyWrapper(StrategyWrapper):
         # Step 1: Collect local parameters
         local_params = []
         norm_distances = []
+        
+        client_ids = []
+        poisoned_clients = []
+        
         for params, _, client_id in weights:
             # Collect parameters into a single flat array
             flat_params = np.concatenate([layer.flatten() for layer in params])
             local_params.append(flat_params)
+            
+            #W&B
+            client_ids.append(client_id)
+            if client_id in self._poisoned_clients:
+                poisoned_clients.append(client_id)
             
             # Calculate the norm distance for norm clipping later
             norm_distances.append(np.linalg.norm(flat_params - np.concatenate([layer.flatten() for layer in self._global_model])))
@@ -65,8 +75,13 @@ class FLAMEStrategyWrapper(StrategyWrapper):
         # Step 3: Norm-clipping
         norm_threshold = np.median(norm_distances)
         reweighted_weights = []
+        
+        rejected_list = []
+        accepted_list = []
+        
         for i, (params, num_examples, client_id) in enumerate(weights):
             if cluster_labels[i] == -1:  # Ignore outliers
+                rejected_list.append(client_id)
                 continue
             
             if norm_threshold / norm_distances[i] < 1:
@@ -85,5 +100,27 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 layer + np.random.normal(0, self.lamda * norm_threshold, layer.shape) for layer in params
             ]
             reweighted_weights[i] = (noisy_params, num_examples, client_id)
+            
+        
+        # Benign recall
+        benign_clients = [cid for cid in client_ids if cid not in poisoned_clients]
+        benign_recall = len([cid for cid in accepted_list if cid in benign_clients]) / len(benign_clients) if benign_clients else 0
+        print(f"Benign Recall (accuracy in accepting benign clients): {benign_recall:.2f}")
+
+        # Weakness percentage
+        poisoned_accepted = len([cid for cid in accepted_list if cid in poisoned_clients])
+        weakness_percentage = poisoned_accepted / len(poisoned_clients) if len(poisoned_clients) > 0 else 0
+        print(f"Weakness Percentage (poisoned clients mistakenly accepted): {weakness_percentage:.2f}")
+    
+        
+        if self.wandb_active:
+            wandb.log({
+                "Accepted Clients": len(accepted_list),
+                "Rejected Clients": len(rejected_list),
+                "metrics.current_round": self.server_round,
+                "benign_recall": benign_recall,
+                "weakness_percentage": weakness_percentage
+            })
+
         
         return reweighted_weights
