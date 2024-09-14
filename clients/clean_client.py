@@ -48,10 +48,13 @@ class FlowerClient(fl.client.NumPyClient):
         # Inverse frequency for each class
         class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items()}
         
-        class_weights.setdefault(1/num_classes)
+        class_weights.setdefault(1.0/num_classes)
+        print("New Weight Arriving Not Normalized",)
+        
+        new_weights = [class_weights.get(i) for i in range(num_classes)]
 
         # Step 3: Convert weights to tensor
-        mixed_weights = torch.tensor([class_weights.get(i) for i in range(num_classes)], dtype=torch.float) 
+        mixed_weights = torch.tensor(new_weights, dtype=torch.float) 
         
         normalized_weights = mixed_weights / mixed_weights.sum()
         self.model = None
