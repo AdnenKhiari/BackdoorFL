@@ -18,7 +18,7 @@ from server_transforms.wrapper import StrategyWrapper
 
 # TODO : Make it a matrix from the begin , use Module for removing and adding according to memory budget
 class FoolsGoldWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy, poisoned_clients,num_client_round: int, client_ids: List[int],num_classes: int, memory_budget: int, clip: int = 0, importance: bool = True, importance_hard: bool = False, topk_prop: float = 0.5,wandb_active=False):
+    def __init__(self, strategy: Strategy, poisoned_clients,num_client_round: int, client_ids: List[int],num_classes: int, memory_budget: int, clip: int = 0, importance: bool = False, importance_hard: bool = False, topk_prop: float = 0.5,wandb_active=False):
         """
         Initializes the FoolsGoldWrapper class with the given parameters.
 
@@ -85,6 +85,7 @@ class FoolsGoldWrapper(StrategyWrapper):
         d = self.num_features
         class_d = int(d / self.num_classes)
         M = np.reshape(model, (self.num_classes, class_d))
+        
         
         for i in range(self.num_classes):
             if (M[i].sum() == 0):
