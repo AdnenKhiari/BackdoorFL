@@ -84,6 +84,7 @@ def test(net, get_testloader, device,weights=None):
     
     def get_metric(mt):
         total_loss = 0.0
+        mt.reset()
         with torch.no_grad():
             for batch in get_testloader():
                 batch = net.transform_input(batch)
