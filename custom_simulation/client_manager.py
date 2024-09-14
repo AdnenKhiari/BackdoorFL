@@ -57,7 +57,7 @@ class ClientM(SimpleClientManager):
         poisoned_count = 0
         round_data = {}  # To store the poisoning status and selection of each client for this round
 
-        if self._wandb_active:
+        if self._wandb_active and num_clients > 0:
             for node in result:
                 # Check if the client is poisoned
                 is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties()["can_poison"]
@@ -81,6 +81,9 @@ class ClientM(SimpleClientManager):
                 "poisoning_stats": {
                     "PoisonedClients": poisoned_count,
                     "RoundPoisoningPercentage": poisoned_count / num_clients
+                },
+                "metrics":{
+                    "current_round": len(self.history)-1
                 }
             })
 
