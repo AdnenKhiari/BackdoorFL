@@ -11,7 +11,7 @@ from poisoning_transforms.model.masks.grad_masker import GradMask
 def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,mask_grad: GradMask | None,weights=None):
     """Train the network on the training set using torchmetrics."""
     criterion = torch.nn.CrossEntropyLoss(weight=weights).to(device)
-    accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
+    accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
     net.train()
     net.to(device)
     
@@ -74,10 +74,10 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
 def test(net, get_testloader, device,weights=None):
     """Evaluate the network on the entire test set using torchmetrics."""
     criterion = torch.nn.CrossEntropyLoss(weight=None).to(device)
-    accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes).to(device)
-    precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
-    recall_metric = torchmetrics.Recall(task="multiclass",num_classes=net.num_classes).to(device)
-    f1_metric = torchmetrics.F1Score(task="multiclass",num_classes=net.num_classes).to(device)
+    accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
+    precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
+    recall_metric = torchmetrics.Recall(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
+    f1_metric = torchmetrics.F1Score(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
     # precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
     net.eval()
     net.to(device)
