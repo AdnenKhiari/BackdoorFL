@@ -170,6 +170,9 @@ def get_evalulate_fn(model_cfg, testloader, data_poisoner: DataPoisoner, global_
             "metrics": {
                 "global_loss": mt_loss,
                 "global_MTA": mt_metrics["accuracy"],
+                "global_MTP": mt_metrics["MTP"],
+                "global_MTR": mt_metrics["MTR"],
+                "global_MTF1": mt_metrics["MTF1"],
                 "global_ASR": global_asr,
                 "global_AttackLoss": global_attack_loss,
                 "current_round": server_round,
