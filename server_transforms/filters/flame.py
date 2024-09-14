@@ -14,6 +14,9 @@ from flwr.common import (
     NDArrays
 )
 import wandb
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 from server_transforms.wrapper import StrategyWrapper
 import numpy as np
@@ -114,6 +117,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
     
         
         if self.wandb_active:
+            self.viz_cluster_result(cosine_distances, cluster_labels, client_ids)
             wandb.log({
                 "Accepted Clients": len(accepted_list),
                 "Rejected Clients": len(rejected_list),
@@ -124,3 +128,39 @@ class FLAMEStrategyWrapper(StrategyWrapper):
 
         
         return reweighted_weights
+
+
+
+    def viz_cluster_result(self, cosine_distances, cluster_labels, client_ids):
+        # Step 1: Prepare the figure
+        plt.figure(figsize=(10, 8))
+        
+        # Create a matrix to store colors, default is white (no special coloring)
+        color_matrix = np.zeros_like(cosine_distances, dtype=object)
+        color_matrix[:, :] = 'white'  # Default color for non-poisoned clients
+
+        # Step 2: Assign red color for cells where both clients are poisoned
+        for i in range(len(client_ids)):
+            for j in range(len(client_ids)):
+                if client_ids[i] in self._poisoned_clients and client_ids[j] in self._poisoned_clients:
+                    color_matrix[i, j] = 'red'
+
+        # Step 3: Plot the cosine similarity matrix as a heatmap
+        sns.heatmap(cosine_distances, cmap="viridis", cbar=True, annot=False, mask=(color_matrix == 'red'),
+                    linewidths=0.5, linecolor='red', square=True)
+        
+        plt.title(f'Cosine Similarity Matrix with Poisoned Clients Highlighted (Round {self.server_round})')
+        plt.xlabel('Clients')
+        plt.ylabel('Clients')
+        
+        # Step 4: Overlay cluster labels on the heatmap
+        for i in range(len(client_ids)):
+            plt.text(i + 0.5, i + 0.5, str(cluster_labels[i]), ha='center', va='center', color='white')
+
+        # Step 5: Send the plot to WandB
+        if self.wandb_active:
+            plt.savefig(f'cluster_cosine_similarity_poisoned_round_{self.server_round}.png')
+            wandb.log({"cosine_similarity_poisoned_plot": wandb.Image(f'cluster_cosine_similarity_poisoned_round_{self.server_round}.png')})
+        
+        # Step 6: Show the plot
+        plt.show()
