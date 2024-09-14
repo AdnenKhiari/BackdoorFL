@@ -105,6 +105,12 @@ def main(cfg: DictConfig):
         pickle.dump(results, h, protocol=pickle.HIGHEST_PROTOCOL)
         
     if cfg.wandb.active:
+        # Create an artifact
+        artifact = wandb.Artifact('results', type='file')  # Adjust the name and type as needed
+        artifact.add_file(str(results_path))
+
+        # Log the artifact
+        wandb.log_artifact(artifact)
         global_run.finish()
 if __name__ == "__main__":
     main()

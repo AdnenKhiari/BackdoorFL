@@ -113,15 +113,17 @@ class ClientM(SimpleClientManager):
         # Create a custom colormap: dark white for not selected, soft blue for selected, red for poisoned
         cmap = LinearSegmentedColormap.from_list(
             "custom_cmap",
-            ["#f0f0f0", "#add8e6", "#ff0000"],  # dark white, soft blue, red
+            [(0, "#f0f0f0"),   # 0 - dark white (not selected)
+            (0.5, "#add8a7"), # 0.5 - soft blue (selected)
+            (1, "#ff0000")],  # 1 - red (poisoned)
             N=256
         )
 
         # Create a heatmap plot
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(25, 15))
         sns.heatmap(heatmap_data, cmap=cmap, cbar=False, 
                     xticklabels=all_clients,  # Use client IDs as x-axis labels
-                    yticklabels=[f"Round {i+1}" for i in range(num_rounds)])
+                    yticklabels=[f"{i+1}" for i in range(num_rounds)])
 
         # Set titles and labels
         plt.title("Client Selection and Poisoning Status Heatmap")
