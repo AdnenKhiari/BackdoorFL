@@ -60,12 +60,11 @@ class ClientM(SimpleClientManager):
         if self._wandb_active and num_clients > 0:
             for node in result:
                 # Check if the client is poisoned
+                round_data[node.node_id] = 0.5  # Selected but not poisoned
                 is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties()["can_poison"]
                 if is_poisoned:
                     poisoned_count += 1
                     round_data[node.node_id] = 1  # Poisoned
-                else:
-                    round_data[node.node_id] = 0.5  # Selected but not poisoned
 
             # Add non-selected clients with a value of 0 (not selected)
             for cid in self.clients:
