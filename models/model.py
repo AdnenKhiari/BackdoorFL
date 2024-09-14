@@ -96,7 +96,7 @@ def test(net, get_testloader, device,weights=None):
 
                 total_loss += loss.item()
                 mt.update(outputs, labels)
-            return total_loss / sum([1 for _ in get_testloader()]),mt.compute().cpu().item()
+            return total_loss,mt.compute().cpu().item()
 
     avg_loss,accuracy = get_metric(accuracy_metric)
     avg_loss,precision = get_metric(precision_metric)
