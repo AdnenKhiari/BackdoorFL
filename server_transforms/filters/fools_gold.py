@@ -207,7 +207,7 @@ class FoolsGoldWrapper(StrategyWrapper):
         sig_features_idx = np.arange(self.num_features)
         
         wv = self.foolsgold(
-            deltas=np.array(deltas),
+            deltas=deltas,
             summed_deltas=summed_deltas,
             sig_features_idx=sig_features_idx,
             topk_prop=self.topk_prop,
