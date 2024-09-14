@@ -30,6 +30,10 @@ class FlowerClient(fl.client.NumPyClient):
         res["can_poison"] = 0
         
     def get_weights(self,trainloader):
+        
+        self.model = instantiate(self.model_cfg)
+
+        
         # Step 1: Calculate class distribution from the training data
         class_counts = Counter()
         
@@ -40,6 +44,7 @@ class FlowerClient(fl.client.NumPyClient):
         # Step 2: Compute class weights as the inverse of the class frequencies
         total_samples = sum(class_counts.values())
         num_classes = self.model.num_classes
+        self.model = None
 
         # Inverse frequency for each class
         class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items()}
