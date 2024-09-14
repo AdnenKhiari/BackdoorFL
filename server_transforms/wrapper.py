@@ -48,11 +48,12 @@ class StrategyWrapper(Strategy, ABC):
         return parameters_to_ndarrays(get_parameters_res.parameters)
         
     def initialize_parameters(self, client_manager) -> Optional[Parameters]:
-        params=self._strategy.initialize_parameters(client_manager)
-        if params is not None:
-            self._global_model = parameters_to_ndarrays(params)
-        else:
-            self._global_model = self.get_random_params_from_one_client(client_manager)
+        # params=self._strategy.initialize_parameters(client_manager)
+        # if params is not None:
+        #     self._global_model = parameters_to_ndarrays(params)
+        # else:
+        self._global_model = self.get_random_params_from_one_client(client_manager)
+        return ndarrays_to_parameters(self._global_model)
 
     def configure_fit(
         self, server_round: int, parameters: Parameters, client_manager

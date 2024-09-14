@@ -25,6 +25,10 @@ class FlowerClient(fl.client.NumPyClient):
         self.grad_filter = grad_filter
         self.grad_filter_conf = grad_filter
         
+    def get_properties(self, config: Dict[str, bool | bytes | float | int | str]) -> Dict[str, bool | bytes | float | int | str]:
+        res= super().get_properties(config)
+        res["can_poison"] = 0
+        
     def get_weights(self,trainloader):
         # Step 1: Calculate class distribution from the training data
         class_counts = Counter()

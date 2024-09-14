@@ -22,10 +22,15 @@ class PoisonedFlowerClient(FlowerClient):
         self.target_poisoned = target_poisoned
         self.data_poisoner = data_poisoner
         self.poison_between =poison_between
+        self.can_poison_now = True
         
     def report_data(self):
         if self.global_run:
             super().report_data()
+            
+    def get_properties(self, config: Dict[str, bool | bytes | float | int | str]) -> Dict[str, bool | bytes | float | int | str]:
+        res= super().get_properties(config)
+        res["can_poison"] = self.can_poison_now
 
            
     def can_poison(self,poisoning_rounds, current_round):
@@ -53,7 +58,10 @@ class PoisonedFlowerClient(FlowerClient):
         current_round = config["current_round"]
         
         if not self.can_poison(self.poison_between, current_round):
+            self.can_poison_now = False
             return super().fit(parameters,config)
+        else:
+            self.can_poison_now = True
         
         self.report_data()
 

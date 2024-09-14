@@ -70,7 +70,7 @@ def main(cfg: DictConfig):
     strategy : fl.server.strategy.Strategy= instantiate(
         cfg.strategy,
         evaluate_fn=evaluate_fn,
-        fit_metrics_aggregation_fn=get_fit_stats_fn(global_run),
+        # fit_metrics_aggregation_fn=get_fit_stats_fn(global_run),
         evaluate_metrics_aggregation_fn=get_aggregation_metrics(global_run) if cfg.evaluate_metrics_aggregation_fn else None,
     )
     

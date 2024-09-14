@@ -7,12 +7,14 @@ import random
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.criterion import Criterion
 import numpy as np
+import wandb
 
 class ClientM(SimpleClientManager):
     
-    def __init__(self,seed):
-        # random.seed(seed)
+    def __init__(self,poisoned_client_ids: List[int],wandb_active: bool) -> None:
         super().__init__()
+        self._poisoned_client_ids = poisoned_client_ids
+        self._wandb_active = wandb_active
         
     def sample(
         self,
@@ -45,5 +47,18 @@ class ClientM(SimpleClientManager):
         sampled_cids = np.random.choice(available_cids, num_clients, replace=False)
         result = [self.clients[cid] for cid in sampled_cids]
         print("Sampled",list(map(lambda d: d.node_id,result)))
+        
+        poisoned_count = 0
+        
+        if self._wandb_active:
+            for node in result:
+                if (node.node_id in self._poisoned_client_ids) and node.get_properties()["can_poison"]:
+                    poisoned_count+=1
+            wandb.log({
+                "poisoning_stats":{
+                    "PoisonedClients": poisoned_count,
+                    "RoundPoisoningPercentage": poisoned_count/num_clients
+                }
+            })
         return result
         
