@@ -69,8 +69,9 @@ class ClientM(SimpleClientManager):
 
             # Add non-selected clients with a value of 0 (not selected)
             for cid in self.clients:
-                if cid not in round_data:
-                    round_data[cid] = 0  # Not selected
+                client = self.clients[cid]
+                if client.node_id not in round_data:
+                    round_data[client.node_id] = 0  # Not selected
 
             # Store the round data in the history dictionary
             self.history[len(self.history)] = round_data
@@ -94,7 +95,7 @@ class ClientM(SimpleClientManager):
             return  # No history to log
 
         # Convert history to a NumPy array for visualization
-        all_clients = list(self.clients.keys())  # Retrieve all client IDs
+        all_clients = list(map(lambda d: d.node_id,self.clients.values()))  # Retrieve all client IDs
         num_rounds = len(self.history)
         num_clients = len(all_clients)
 
@@ -102,8 +103,8 @@ class ClientM(SimpleClientManager):
         heatmap_data = np.zeros((num_rounds, num_clients))
 
         for round_num, client_data in self.history.items():
-            for cid, state in client_data.items():
-                client_idx = all_clients.index(cid)
+            for node_id, state in client_data.items():
+                client_idx = all_clients.index(node_id)
                 heatmap_data[round_num, client_idx] = state
 
         # Create a custom colormap: dark white for not selected, soft blue for selected, red for poisoned
