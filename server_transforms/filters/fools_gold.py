@@ -230,7 +230,7 @@ class FoolsGoldWrapper(StrategyWrapper):
             reweighted_weights.append((reweighted_params, num_examples, client_id))
             
             
-
+        client_id_to_wv = {client_id: wv[i] for i, (_, _, client_id) in enumerate(weights)}
         # Identify locally poisoned clients for the current round
         locally_poisoned_clients = [cid for cid in client_ids if cid in self._poisoned_clients]
         benign_clients = [cid for cid in client_ids if cid not in self._poisoned_clients]
