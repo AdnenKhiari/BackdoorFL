@@ -44,17 +44,17 @@ class FlowerClient(fl.client.NumPyClient):
         # Step 2: Compute class weights as the inverse of the class frequencies
         total_samples = sum(class_counts.values())
         num_classes = self.model.num_classes
-        self.model = None
 
         # Inverse frequency for each class
         class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items()}
         
-        class_weights.setdefault(0.5/num_classes)
+        class_weights.setdefault(1/num_classes)
 
         # Step 3: Convert weights to tensor
         mixed_weights = torch.tensor([class_weights.get(i) for i in range(num_classes)], dtype=torch.float) 
         
         normalized_weights = mixed_weights / mixed_weights.sum()
+        self.model = None
 
         return normalized_weights
         
