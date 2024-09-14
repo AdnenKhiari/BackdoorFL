@@ -1,3 +1,6 @@
 ---
 _target_: server_transforms.filters.fools_gold.FoolsGoldWrapper
 wandb_active: ${wandb.active}
+num_classes: ${model.num_classes}
+num_client_round: ${num_clients_per_round_fit}
+memory_budget: 4
