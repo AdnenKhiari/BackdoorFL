@@ -77,7 +77,7 @@ def main(cfg: DictConfig):
     strategy_with_defense = instantiate(
         cfg.defense_strategy,
         strategy=strategy,
-        poisoned_clients=poisoned_client_ids,
+        poisoned_clients=dict([(_id,clients_dict["malicious"][_id]) for _id in poisoned_client_ids]),
         client_ids=client_ids,
     ) if cfg.get("defense_strategy") is not None else strategy
    

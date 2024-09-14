@@ -48,9 +48,8 @@ class FlowerClient(fl.client.NumPyClient):
         # Inverse frequency for each class
         class_weights = {cls: total_samples / (num_classes * count) for cls, count in class_counts.items()}
         
-        class_weights.setdefault(1.0/num_classes)
         
-        new_weights = [class_weights.get(i) for i in range(num_classes)]
+        new_weights = [class_weights.get(i) if i in class_weights else 1.0/num_classes for i in range(num_classes)]
         print("New Weight Arriving Not Normalized",new_weights)
 
         # Step 3: Convert weights to tensor
