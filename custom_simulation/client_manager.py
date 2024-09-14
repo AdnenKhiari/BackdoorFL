@@ -61,7 +61,7 @@ class ClientM(SimpleClientManager):
             for node in result:
                 # Check if the client is poisoned
                 round_data[node.node_id] = 0.5  # Selected but not poisoned
-                is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties()["can_poison"]
+                is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties({})["can_poison"]
                 if is_poisoned:
                     poisoned_count += 1
                     round_data[node.node_id] = 1  # Poisoned

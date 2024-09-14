@@ -32,7 +32,7 @@ class StrategyWrapper(Strategy, ABC):
         
     @property
     def _poisoned_clients(self):
-        return [k for k,v in self._poisoned_clients_dict.items() if v.get_properties()["can_poison"]]
+        return [k for k,v in self._poisoned_clients_dict.items() if v.get_properties({})["can_poison"]]
         
     def get_random_params_from_one_client(self,client_manager):
                 # Get initial parameters from one of the clients
