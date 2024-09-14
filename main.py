@@ -38,7 +38,7 @@ def main(cfg: DictConfig):
             group_name = curr_datetime
             print("Group Name",group_name)
         global_run = wandb.init(project=project_name,name=run_name,group=group_name, tags=[],config=wandb_config)
-
+        global_run.define_metric("metrics.current_round")
 
     print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
