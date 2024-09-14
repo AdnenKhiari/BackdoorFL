@@ -49,7 +49,7 @@ Invalid Arguments in method:
 
 NodeToPartitionMapping = Dict[int, int]
 
-def get_client_ids(num_clients: int) -> List[str]:
+def get_client_ids(num_clients: int) -> List[int]:
     """Generate a list of client IDs."""
     client_ids = []
     for i in range(num_clients):

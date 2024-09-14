@@ -18,7 +18,7 @@ from server_transforms.wrapper import StrategyWrapper
 
 # TODO : Make it a matrix from the begin , use Module for removing and adding according to memory budget
 class FoolsGoldWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy, poisoned_clients,num_client_round: int, client_ids: List[int], num_features: int, num_classes: int, memory_budget: int, clip: int = 0, importance: bool = True, importance_hard: bool = False, topk_prop: float = 0.5,wandb_active=False):
+    def __init__(self, strategy: Strategy, poisoned_clients,num_client_round: int, client_ids: List[int],num_classes: int, memory_budget: int, clip: int = 0, importance: bool = True, importance_hard: bool = False, topk_prop: float = 0.5,wandb_active=False):
         """
         Initializes the FoolsGoldWrapper class with the given parameters.
 
@@ -47,10 +47,10 @@ class FoolsGoldWrapper(StrategyWrapper):
             history (Dict[int, np.ndarray]): Dictionary to keep track of the latest deltas for each client, with client IDs as keys.
             client_id_to_idx (Dict[int, int]): Dictionary mapping client IDs to their indices in the `client_ids` list.
         """
-        super().__init__(strategy,poisoned_clients,wandb_active)
+        super().__init__(strategy,poisoned_clients,client_ids,wandb_active)
         self.num_clients = num_client_round
         self.client_ids = client_ids
-        self.num_features = num_features
+        self.num_features = 0
         self.num_classes = num_classes
         self.memory_budget = memory_budget
         self.clip = clip
@@ -59,7 +59,6 @@ class FoolsGoldWrapper(StrategyWrapper):
         self.topk_prop = topk_prop
         
         # Initialize history with empty matrices
-        self.history = {client_id: np.zeros((memory_budget, num_features)) for client_id in client_ids}
         self.client_id_to_idx = {client_id: self.client_ids.index(client_id) for client_id in self.client_ids}
 
    
@@ -180,6 +179,12 @@ class FoolsGoldWrapper(StrategyWrapper):
 
 
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
+        
+        # Lazy Init
+        if self.num_features==0:
+            self.num_features = len(np.concatenate([layer.flatten() for layer in weights[0][0]]))
+            self.history = {client_id: np.zeros((self.memory_budget, self.num_features)) for client_id in client_ids}
+
         deltas = [
             np.concatenate([layer.flatten() for layer in params]) - np.concatenate([layer.flatten() for layer in self._global_model])
             for params, _, client_id in weights

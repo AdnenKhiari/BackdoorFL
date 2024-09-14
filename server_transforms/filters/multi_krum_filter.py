@@ -8,7 +8,7 @@ from server_transforms.wrapper import StrategyWrapper
 
 
 class KrumFilter(StrategyWrapper):
-    def __init__(self, strategy: Strategy,poisoned_clients, num_malicious: int, to_keep: int,wandb_active=False):
+    def __init__(self, strategy: Strategy,poisoned_clients, client_ids,num_malicious: int, to_keep: int,wandb_active=False):
         """
         Initialize the KrumFilter.
 
@@ -17,7 +17,7 @@ class KrumFilter(StrategyWrapper):
             num_malicious (int): The number of malicious clients.
             to_keep (int): The number of models to keep after applying Krum.
         """
-        super().__init__(strategy,poisoned_clients,wandb_active)
+        super().__init__(strategy,poisoned_clients,client_ids,wandb_active)
         self.num_malicious = num_malicious
         self.to_keep = to_keep
 
