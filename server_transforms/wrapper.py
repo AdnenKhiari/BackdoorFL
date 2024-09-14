@@ -27,8 +27,12 @@ class StrategyWrapper(Strategy, ABC):
         self.wandb_active = wandb_active
         self.server_round = 0
         self._metrics = None
-        self._poisoned_clients =poisoned_clients
+        self._poisoned_clients_dict =poisoned_clients
         self._all_client_ids = all_client_ids
+        
+    @property
+    def _poisoned_clients(self):
+        return [k for k,v in self._poisoned_clients_dict.items() if v.get_properties()["can_poison"]]
         
     def get_random_params_from_one_client(self,client_manager):
                 # Get initial parameters from one of the clients
