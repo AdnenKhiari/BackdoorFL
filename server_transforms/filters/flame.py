@@ -38,7 +38,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
             min_cluster_size (int): Minimum cluster size for HDBSCAN. If not specified, defaults to half the number of clients + 1.
         """
         super().__init__(strategy,poisoned_clients,client_ids,wandb_active)
-        self.lamda = lamda
+        self.lamda = 0
         self.min_cluster_size = min_cluster_size
     
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
