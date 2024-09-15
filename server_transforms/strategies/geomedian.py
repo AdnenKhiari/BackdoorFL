@@ -49,6 +49,7 @@ class GeoMedianStrategy(FedMedian):
 
         # Use geometric median to aggregate flattened weights
         aggregated_flat_weights = geometric_median(flat_weights)
+        print("AFFGG",aggregated_flat_weights.shape)
 
         # Unflatten the result back to original shape
         layer_shapes = [layer.shape for layer in weights_results[0]]
