@@ -28,7 +28,7 @@ from flwr.common import NDArrays
 from scipy.spatial.distance import cosine
 
 class FLAMEStrategyWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy,poisoned_clients,client_ids, lamda: float = 0.001, min_cluster_size: int = None,wandb_active=False):
+    def __init__(self, strategy: Strategy,poisoned_clients,client_ids, lamda: float = 0.001, min_cluster_size: int = 3,wandb_active=False):
         """
         Initialize the FLAME StrategyWrapper.
 
@@ -105,15 +105,15 @@ class FLAMEStrategyWrapper(StrategyWrapper):
             reweighted_weights[i] = (noisy_params, num_examples, client_id)
             
         
-        # Benign recall
-        benign_clients = [cid for cid in client_ids if cid not in poisoned_clients]
-        benign_recall = len([cid for cid in accepted_list if cid in benign_clients]) / len(benign_clients) if benign_clients else 0
-        print(f"Benign Recall (accuracy in accepting benign clients): {benign_recall:.2f}")
+        # # Benign recall
+        # benign_clients = [cid for cid in client_ids if cid not in poisoned_clients]
+        # benign_recall = len([cid for cid in accepted_list if cid in benign_clients]) / len(benign_clients) if benign_clients else 0
+        # print(f"Benign Recall (accuracy in accepting benign clients): {benign_recall:.2f}")
 
-        # Weakness percentage
-        poisoned_accepted = len([cid for cid in accepted_list if cid in poisoned_clients])
-        weakness_percentage = poisoned_accepted / len(poisoned_clients) if len(poisoned_clients) > 0 else 0
-        print(f"Weakness Percentage (poisoned clients mistakenly accepted): {weakness_percentage:.2f}")
+        # # Weakness percentage
+        # poisoned_accepted = len([cid for cid in accepted_list if cid in poisoned_clients])
+        # weakness_percentage = poisoned_accepted / len(poisoned_clients) if len(poisoned_clients) > 0 else 0
+        # print(f"Weakness Percentage (poisoned clients mistakenly accepted): {weakness_percentage:.2f}")
     
         
         if self.wandb_active:
@@ -122,8 +122,8 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 "Accepted Clients": len(accepted_list),
                 "Rejected Clients": len(rejected_list),
                 "metrics.current_round": self.server_round,
-                "benign_recall": benign_recall,
-                "weakness_percentage": weakness_percentage
+                # "benign_recall": benign_recall,
+                # "weakness_percentage": weakness_percentage
             })
 
         
