@@ -121,4 +121,4 @@ def weiszfeld_method(points, options={}):
 
         iters += 1
 
-    return guess
+    return np.array(guess)
