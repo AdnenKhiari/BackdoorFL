@@ -40,17 +40,6 @@ def get_fit_stats_fn(global_run):
     def fit_stats_wrapper(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
         res =  fit_stats(client_metrics)
         if global_run is not None:
-            round_data = {}  # To store the poisoning status and selection of each client for this round
-
-            
-            for a, metrics in client_metrics:
-                print("INT HDHE METRICS",a)
-                # for key, value in metrics.items():
-                #     if key == 'Poisoned':
-                #         total_items += 1.0
-                #         if value == 1:
-                #             poisoned_items += 1.0
-
             wandb.run.log({
                 "poisoning_stats": res,
                 "metrics":{
