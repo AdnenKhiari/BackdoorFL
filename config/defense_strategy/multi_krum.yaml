@@ -1,0 +1,5 @@
+---
+_target_: server_transforms.filters.multi_krum_filter.KrumFilter
+wandb_active: ${wandb.active}
+num_malicious: ${num_clients_per_round_fit}
+to_keep: 2
