@@ -28,7 +28,7 @@ from flwr.common import NDArrays
 from scipy.spatial.distance import cosine
 
 class FLAMEStrategyWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy,poisoned_clients,client_ids, lamda: float = 0.001, min_cluster_size: int = 3,wandb_active=False):
+    def __init__(self, strategy: Strategy,poisoned_clients,client_ids, lamda: float = 0.001, min_cluster_size: int = 2,wandb_active=False):
         """
         Initialize the FLAME StrategyWrapper.
 
@@ -89,6 +89,8 @@ class FLAMEStrategyWrapper(StrategyWrapper):
             
             if norm_threshold / norm_distances[i] < 1:
                 scale_factor = norm_threshold / norm_distances[i]
+                print("NOISY_FLAME_FACTOR",scale_factor)
+
                 scaled_params = [
                     layer * scale_factor for layer in params
                 ]
@@ -96,7 +98,6 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 scaled_params = params
             
             reweighted_weights.append((scaled_params, num_examples, client_id))
-        print("REWEIGHTED_FLAME",reweighted_weights)
         
         # Step 4: Add noise
         for i, (params, num_examples, client_id) in enumerate(reweighted_weights):
@@ -104,7 +105,6 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 layer + np.random.normal(0, self.lamda * norm_threshold, layer.shape) for layer in params
             ]
             reweighted_weights[i] = (noisy_params, num_examples, client_id)
-        print("NOISY_FLAME",reweighted_weights)
 
         
         # # Benign recall
