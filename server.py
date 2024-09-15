@@ -10,7 +10,9 @@ from poisoning_transforms.data.datapoisoner import DataPoisoner
 import numpy as np
 from torchvision.utils import make_grid
 import uuid  # Import the uuid module to generate random file names
-
+from matplotlib.colors import LinearSegmentedColormap
+import matplotlib.pyplot as plt
+import seaborn as sns
 def get_on_fit_config(config: DictConfig):
     """Return a function to configure the client's fit."""
 
@@ -38,6 +40,17 @@ def get_fit_stats_fn(global_run):
     def fit_stats_wrapper(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
         res =  fit_stats(client_metrics)
         if global_run is not None:
+            round_data = {}  # To store the poisoning status and selection of each client for this round
+
+            
+            for a, metrics in client_metrics:
+                print("INT HDHE METRICS",a)
+                # for key, value in metrics.items():
+                #     if key == 'Poisoned':
+                #         total_items += 1.0
+                #         if value == 1:
+                #             poisoned_items += 1.0
+
             wandb.run.log({
                 "poisoning_stats": res,
                 "metrics":{
@@ -45,6 +58,55 @@ def get_fit_stats_fn(global_run):
                 }
             })
         return res
+    
+
+    def log_heatmap_wandb(history,clients):
+        """Log the history of selected clients (poisoned/non-poisoned) as a heatmap to wandb."""
+        if not history:
+            return  # No history to log
+
+        # Convert history to a NumPy array for visualization
+        all_clients = list(map(lambda d: d.node_id,clients.values()))  # Retrieve all client IDs
+        num_rounds = len(history)
+        num_clients = len(all_clients)
+
+        # Create a matrix (rounds x clients) to hold the heatmap data
+        heatmap_data = np.zeros((num_rounds, num_clients))
+
+        for round_num, client_data in history.items():
+            for node_id, state in client_data.items():
+                client_idx = all_clients.index(node_id)
+                heatmap_data[round_num, client_idx] = state
+
+        # Create a custom colormap: dark white for not selected, soft blue for selected, red for poisoned
+        cmap = LinearSegmentedColormap.from_list(
+            "custom_cmap",
+            [(0, "#f0f0f0"),   # 0 - dark white (not selected)
+            (0.5, "#add8a7"), # 0.5 - soft blue (selected)
+            (1, "#ff0000")],  # 1 - red (poisoned)
+            N=256
+        )
+
+        # Create a heatmap plot
+        plt.figure(figsize=(25, 15))
+        sns.heatmap(heatmap_data, cmap=cmap, cbar=False, 
+                    xticklabels=all_clients,  # Use client IDs as x-axis labels
+                    yticklabels=[f"{i+1}" for i in range(num_rounds)])
+
+        # Set titles and labels
+        plt.title("Client Selection and Poisoning Status Heatmap")
+        plt.xlabel("Client IDs")
+        plt.ylabel("Rounds")
+
+        # Rotate the x-tick labels for better visibility
+        plt.xticks(rotation=90)
+
+        # Save the plot as an image and log to wandb
+        plt.savefig("client_poisoning_heatmap.png")
+        wandb.log({"Poisoning Heatmap": wandb.Image("client_poisoning_heatmap.png")})
+        plt.close()
+
+
     return fit_stats_wrapper
 
 def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
@@ -69,7 +131,7 @@ def fit_stats(client_metrics: List[Tuple[int, Dict[str, bool]]]) -> dict:
         for key, value in metrics.items():
             if key == 'Poisoned':
                 total_items += 1.0
-                if value:
+                if value == 1:
                     poisoned_items += 1.0
     
     # Calculate the proportion of poisoned items
