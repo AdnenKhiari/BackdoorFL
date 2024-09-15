@@ -96,6 +96,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 scaled_params = params
             
             reweighted_weights.append((scaled_params, num_examples, client_id))
+        print("REWEIGHTED_FLAME",reweighted_weights)
         
         # Step 4: Add noise
         for i, (params, num_examples, client_id) in enumerate(reweighted_weights):
@@ -103,7 +104,8 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 layer + np.random.normal(0, self.lamda * norm_threshold, layer.shape) for layer in params
             ]
             reweighted_weights[i] = (noisy_params, num_examples, client_id)
-            
+        print("NOISY_FLAME",reweighted_weights)
+
         
         # # Benign recall
         # benign_clients = [cid for cid in client_ids if cid not in poisoned_clients]
