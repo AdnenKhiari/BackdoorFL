@@ -28,7 +28,7 @@ from flwr.common import NDArrays
 from scipy.spatial.distance import cosine
 
 class FLAMEStrategyWrapper(StrategyWrapper):
-    def __init__(self, strategy: Strategy,poisoned_clients,client_ids, lamda: float = 0.001, min_cluster_size: int = 2,wandb_active=False):
+    def __init__(self, strategy: Strategy,poisoned_clients,client_ids, lamda: float = 0.000012, min_cluster_size: int = 2,wandb_active=False):
         """
         Initialize the FLAME StrategyWrapper.
 
@@ -38,7 +38,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
             min_cluster_size (int): Minimum cluster size for HDBSCAN. If not specified, defaults to half the number of clients + 1.
         """
         super().__init__(strategy,poisoned_clients,client_ids,wandb_active)
-        self.lamda = 0
+        self.lamda = lamda
         self.min_cluster_size = min_cluster_size
     
     def process_weights(self, weights: List[Tuple[NDArrays, int, int]]) -> List[Tuple[NDArrays, int, int]]:
