@@ -13,7 +13,7 @@ cfg:
   pos_list: 
     - ${as_tuple:15,15}
     - ${as_tuple:31,31}
-  magnitude: 30
+  magnitude: 60
   norm_scaling_factor: 1.2
   grad_filter: ${grad_filter}
   pgd_conf: ${pgd_conf}
