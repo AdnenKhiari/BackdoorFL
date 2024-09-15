@@ -19,6 +19,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
         self.channel_list = channel_list
         self.pos_list = pos_list
         self.magnitude = magnitude
+        self.counter = 0
 
     def RGB2YUV(self, x_rgb):
         # Conversion from RGB to YUV using OpenCV
@@ -63,7 +64,9 @@ class FrequencyDomainPoisoner(DataPoisoner):
         return x_idct
     
     def train(self):
-        pass
+        self.counter+= 1
+        if self.counter % 10 == 0:
+            self.magnitude  = max(self.magnitude-5,50)
 
     def transform(self, data: dict) -> dict:
         """
