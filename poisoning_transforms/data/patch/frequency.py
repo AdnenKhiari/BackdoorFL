@@ -66,7 +66,7 @@ class FrequencyDomainPoisoner(DataPoisoner):
     def train(self):
         self.counter+= 1
         if self.counter % 10 == 0:
-            self.magnitude  = max(self.magnitude-5,50)
+            self.magnitude  = max(self.magnitude-5,75)
 
     def transform(self, data: dict) -> dict:
         """
