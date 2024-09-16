@@ -66,7 +66,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
         norm_distances = np.array(norm_distances)
         
         # Step 2: Compute cosine distances and perform HDBSCAN clustering
-        cosine_distances = smp.cosine_distances(local_params)
+        cosine_distances = np.array(smp.cosine_distances(local_params)).astype("float64")
         hdbscan_clusterer = hdbscan.HDBSCAN(
             min_cluster_size=self.min_cluster_size or (len(weights) // 2 + 1), 
             min_samples=1, 
