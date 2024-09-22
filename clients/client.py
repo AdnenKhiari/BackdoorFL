@@ -3,7 +3,6 @@ from omegaconf import OmegaConf
 from clients.attackers.frequency_poisoned_client import FrequencyPoisonedClient
 from clients.attackers.randomized_simple_poisoned_client import RandomizedSimplePoisonedClient
 from clients.clean_client import FlowerClient
-from clients.attackers.iba_client import IbaClient
 from clients.attackers.simple_poisoned_client import SimplePoisonedClient
 from custom_simulation.simulation import get_client_ids
 from dataset.dataset import Dataset

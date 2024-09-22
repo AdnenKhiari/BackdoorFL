@@ -54,6 +54,6 @@ defaults:
   - strategy: fedavg
   - dataset: mnist
   - optimizers: sgd  
-  - poisoned_client: iba
+  - poisoned_client: simple
   - global_merger: single
   - defense_strategy: no_defense
