@@ -75,7 +75,7 @@ class StrategyWrapper(Strategy, ABC):
         Returns:
             List[Tuple[NDArrays, int]]: The processed list of tuples with numpy arrays and the number of examples and node_id.
         """
-        pass
+        return weights
     
     def post_process_weights(self, weights: NDArrays) -> NDArrays:
         """
