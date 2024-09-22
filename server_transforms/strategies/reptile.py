@@ -28,7 +28,7 @@ class ReptileWrapper(StrategyWrapper):
         self.reptile_lr = reptile_lr
     
     def process_weights(self, weights):
-        return self._strategy.process_weights(weights)
+        return weights
     
     def aggregate_fit(self, server_round: int, results: List[Tuple[ClientProxy, FitRes]], failures: List[Tuple[ClientProxy, FitRes] | BaseException]) -> Tuple[Parameters | None, Dict[str, bool | bytes | float | int | str]]:
         
