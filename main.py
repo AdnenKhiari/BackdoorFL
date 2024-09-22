@@ -64,13 +64,12 @@ def main(cfg: DictConfig):
         viz_dataset : Dataset= instantiate(cfg.dataset["class"],partitioner=train_partitioner,seed=cfg.global_seed)
         viz_dataset.viz_partition_distribution()
     
-    
     evaluate_fn = get_evalulate_fn(cfg.model, dataset.get_test_set(cfg.batch_size),global_data_poisoner(clients=clients_dict),global_run)
 
     strategy : fl.server.strategy.Strategy= instantiate(
         cfg.strategy,
         evaluate_fn=evaluate_fn,
-        # fit_metrics_aggregation_fn=get_fit_stats_fn(global_run),
+        fit_metrics_aggregation_fn=get_fit_stats_fn(global_run),
         evaluate_metrics_aggregation_fn=get_aggregation_metrics(global_run) if cfg.evaluate_metrics_aggregation_fn else None,
     )
     

@@ -55,8 +55,8 @@ class GeoMedianStrategy(FedMedian):
         aggregated_weights = []
         idx = 0
         for shape in layer_shapes:
-            size = np.prod(shape)
-            aggregated_weights.append(aggregated_flat_weights[idx:idx + size].reshape(shape))
+            size = int(np.prod(shape))
+            aggregated_weights.append(aggregated_flat_weights[idx:(idx + size)].reshape(shape))
             idx += size
 
         # Convert back to Parameters
@@ -121,4 +121,4 @@ def weiszfeld_method(points, options={}):
 
         iters += 1
 
-    return guess
+    return np.array(guess)

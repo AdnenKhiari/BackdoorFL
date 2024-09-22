@@ -9,9 +9,7 @@ from flwr.server.criterion import Criterion
 import numpy as np
 import wandb
         # Custom colormap for the heatmap
-from matplotlib.colors import LinearSegmentedColormap
-import matplotlib.pyplot as plt
-import seaborn as sns
+
 
 class ClientM(SimpleClientManager):
     
@@ -54,85 +52,26 @@ class ClientM(SimpleClientManager):
         result = [self.clients[cid] for cid in sampled_cids]
         print("Sampled", list(map(lambda d: d.node_id, result)))
 
-        poisoned_count = 0
-        round_data = {}  # To store the poisoning status and selection of each client for this round
-        ins = GetPropertiesIns({})
-        if self._wandb_active and num_clients > 0:
-            for node in result:
-                # Check if the client is poisoned
-                round_data[node.node_id] = 0.5  # Selected but not poisoned
-                is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties(ins=ins,timeout=1000,group_id=0).properties["can_poison"]
-                if is_poisoned:
-                    poisoned_count += 1
-                    round_data[node.node_id] = 1  # Poisoned
+        # poisoned_count = 0
+        # round_data = {}  # To store the poisoning status and selection of each client for this round
+        # ins = GetPropertiesIns({})
+        # if self._wandb_active and num_clients > 0:
+        #     for node in result:
+        #         # Check if the client is poisoned
+        #         round_data[node.node_id] = 0.5  # Selected but not poisoned
+        #         is_poisoned = (node.node_id in self._poisoned_client_ids) and node.get_properties(ins=ins,timeout=1000,group_id=0).properties["can_poison"]
+        #         if is_poisoned:
+        #             poisoned_count += 1
+        #             round_data[node.node_id] = 1  # Poisoned
 
-            # Add non-selected clients with a value of 0 (not selected)
-            for cid in self.clients:
-                client = self.clients[cid]
-                if client.node_id not in round_data:
-                    round_data[client.node_id] = 0  # Not selected
+        #     # Add non-selected clients with a value of 0 (not selected)
+        #     for cid in self.clients:
+        #         client = self.clients[cid]
+        #         if client.node_id not in round_data:
+        #             round_data[client.node_id] = 0  # Not selected
 
-            # Store the round data in the history dictionary
-            self.history[len(self.history)] = round_data
-
-            # Log poisoning stats to wandb
-            wandb.log({
-                "poisoning_stats": {
-                    "PoisonedClients": poisoned_count,
-                    "RoundPoisoningPercentage": poisoned_count / num_clients
-                },
-                "metrics":{
-                    "current_round": len(self.history)-1
-                }
-            })
-
-            # Generate and log heatmap to wandb
-            self.log_heatmap_wandb()
+        #     # Store the round data in the history dictionary
+        #     self.history[len(self.history)] = round_data
 
         return result
 
-    def log_heatmap_wandb(self):
-        """Log the history of selected clients (poisoned/non-poisoned) as a heatmap to wandb."""
-        if not self.history:
-            return  # No history to log
-
-        # Convert history to a NumPy array for visualization
-        all_clients = list(map(lambda d: d.node_id,self.clients.values()))  # Retrieve all client IDs
-        num_rounds = len(self.history)
-        num_clients = len(all_clients)
-
-        # Create a matrix (rounds x clients) to hold the heatmap data
-        heatmap_data = np.zeros((num_rounds, num_clients))
-
-        for round_num, client_data in self.history.items():
-            for node_id, state in client_data.items():
-                client_idx = all_clients.index(node_id)
-                heatmap_data[round_num, client_idx] = state
-
-        # Create a custom colormap: dark white for not selected, soft blue for selected, red for poisoned
-        cmap = LinearSegmentedColormap.from_list(
-            "custom_cmap",
-            [(0, "#f0f0f0"),   # 0 - dark white (not selected)
-            (0.5, "#add8a7"), # 0.5 - soft blue (selected)
-            (1, "#ff0000")],  # 1 - red (poisoned)
-            N=256
-        )
-
-        # Create a heatmap plot
-        plt.figure(figsize=(25, 15))
-        sns.heatmap(heatmap_data, cmap=cmap, cbar=False, 
-                    xticklabels=all_clients,  # Use client IDs as x-axis labels
-                    yticklabels=[f"{i+1}" for i in range(num_rounds)])
-
-        # Set titles and labels
-        plt.title("Client Selection and Poisoning Status Heatmap")
-        plt.xlabel("Client IDs")
-        plt.ylabel("Rounds")
-
-        # Rotate the x-tick labels for better visibility
-        plt.xticks(rotation=90)
-
-        # Save the plot as an image and log to wandb
-        plt.savefig("client_poisoning_heatmap.png")
-        wandb.log({"Poisoning Heatmap": wandb.Image("client_poisoning_heatmap.png")})
-        plt.close()

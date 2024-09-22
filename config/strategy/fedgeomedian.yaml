@@ -1,0 +1,16 @@
+---
+_target_: server_transforms.strategies.geomedian.GeoMedianStrategy # points to FedAvg (as if you were doing it in your python file)
+fraction_fit: 0.00001
+min_fit_clients: ${num_clients_per_round_fit} # you can refer to any other variable defined in the config (as long as it is part of the experiment you run)
+fraction_evaluate: 0.00001
+min_evaluate_clients: ${num_clients_per_round_eval} # this is a reference to the setting defined in `conf/base.yaml`
+min_available_clients: ${num_clients}
+on_fit_config_fn: # this is a function
+  _target_: server.get_on_fit_config
+  config: ${config_fit}
+on_evaluate_config_fn: # this is a function
+  _target_: server.get_on_eval_config
+  config: ${config_eval}
+# initial_parameters:
+#   _target_: models.model.model_to_parameters
+#   model: ${model} # note you don't need to do `${defaults.model}`, just `${model}`
