@@ -16,7 +16,7 @@ from flwr.server.strategy import Strategy
 
 class ReptileWrapper(StrategyWrapper):
     
-    def __init__(self, strategy: Strategy,poisoned_clients,all_client_ids,wandb_active = False,reptile_lr: float = 0.1):
+    def __init__(self, strategy: Strategy,poisoned_clients,client_ids,wandb_active = False,reptile_lr: float = 0.1):
         """
         Initialize the ReptileWrapper.
         
@@ -24,7 +24,7 @@ class ReptileWrapper(StrategyWrapper):
         - strategy (Strategy): The strategy to wrap.
         - reptile_lr (float): The learning rate for the Reptile algorithm.
         """
-        super().__init__(strategy,poisoned_clients,all_client_ids,wandb_active)
+        super().__init__(strategy,poisoned_clients,client_ids,wandb_active)
         self.reptile_lr = reptile_lr
     
     def process_weights(self, weights):
