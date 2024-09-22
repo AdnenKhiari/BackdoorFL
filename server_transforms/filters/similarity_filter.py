@@ -9,6 +9,8 @@ from server_transforms.wrapper import StrategyWrapper
 import wandb
 from PIL import Image
 import seaborn as sns
+
+#NOT USED
 class SimilarityFilter(StrategyWrapper):
     def __init__(self, strategy: Strategy,poisoned_clients,client_ids, similarity_metric: str, threshold: float, p: Optional[int] = None, wandb_active: bool = False):
         """

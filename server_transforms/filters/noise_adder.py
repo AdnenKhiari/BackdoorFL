@@ -14,6 +14,7 @@ import numpy as np
 import scipy.spatial.distance as ssd
 from server_transforms.wrapper import StrategyWrapper
 
+#NOT USED
 class NoiseAdder(StrategyWrapper):
     def __init__(self, strategy: Strategy, noise_scale: float):
         """

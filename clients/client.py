@@ -59,25 +59,6 @@ def randomized_simple_poisoned_client_fn(node_id,cfg,poison_between):
 
         )
     
-def iba_client_fn(node_id,cfg,poison_between):
-    return  IbaClient(
-                node_id,
-                model_cfg=cfg.model,
-                optimizer=cfg.optimizers,
-                optimizer_lr=cfg.config_fit.lr,
-                batch_poison_num=cfg.poisoned_batch_size,
-                target_poisoned=cfg.poisoned_target,
-                batch_size=cfg.batch_size,
-                lira_output_size=cfg.dataset.size,
-                lira_train_epoch=cfg.lira_train_epoch,
-                lira_eps=cfg.lira_eps,
-                lira_train_lr=cfg.lira_train_lr,
-                pgd_conf=cfg.pgd_conf,
-                grad_filter=cfg.grad_filter,
-                norm_scaling_factor=cfg.norm_scaling_factor,
-                poison_between=poison_between
-        )
-    
 def frequency_client_fn(node_id,cfg,poison_between):
     return  FrequencyPoisonedClient(
                 node_id,

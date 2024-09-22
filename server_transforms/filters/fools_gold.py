@@ -16,7 +16,7 @@ import wandb
 
 from server_transforms.wrapper import StrategyWrapper
 
-# TODO : Make it a matrix from the begin , use Module for removing and adding according to memory budget
+# NOT USED
 class FoolsGoldWrapper(StrategyWrapper):
     def __init__(self, strategy: Strategy, poisoned_clients,num_client_round: int, client_ids: List[int],num_classes: int, memory_budget: int, clip: int = 0, importance: bool = False, importance_hard: bool = False, topk_prop: float = 0.5,wandb_active=False):
         """
