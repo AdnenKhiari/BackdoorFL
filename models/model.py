@@ -71,13 +71,13 @@ def train(net: ModelBase, get_trainloader, optimizer, epochs, device: str,pgd,ma
             print(f"Epoch {epoch+1}: train loss {total_loss}, train accuracy {epoch_acc}")
 
 
-def test(net, get_testloader, device,weights=None):
+def test(net, get_testloader, device,weights=None,mode="macro"):
     """Evaluate the network on the entire test set using torchmetrics."""
     criterion = torch.nn.CrossEntropyLoss(weight=None).to(device)
-    accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
-    precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
-    recall_metric = torchmetrics.Recall(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
-    f1_metric = torchmetrics.F1Score(task="multiclass",num_classes=net.num_classes,average="macro").to(device)
+    accuracy_metric = torchmetrics.Accuracy(task="multiclass",num_classes=net.num_classes,average=mode).to(device)
+    precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes,average=mode).to(device)
+    recall_metric = torchmetrics.Recall(task="multiclass",num_classes=net.num_classes,average=mode).to(device)
+    f1_metric = torchmetrics.F1Score(task="multiclass",num_classes=net.num_classes,average=mode).to(device)
     # precision_metric = torchmetrics.Precision(task="multiclass",num_classes=net.num_classes).to(device)
     net.eval()
     net.to(device)

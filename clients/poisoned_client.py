@@ -105,7 +105,7 @@ class PoisonedFlowerClient(FlowerClient):
 
         mt_loss, mta_metrics = test(self.model, lambda : self.valloader, self.device,self.weights)
         backdoored_valid = lambda :self.test_data_poisoner.wrap_transform_iterator(self.valloader)
-        attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device,self.weights)
+        attack_loss, attack_metrics = test(self.model, backdoored_valid, self.device,self.weights,"micro")
         if self.global_run:
             wandb.run.log(
                 {"current_round":current_round ,"AttackLoss": attack_loss,"MTA": mta_metrics["accuracy"],"ASR": attack_metrics["accuracy"],
