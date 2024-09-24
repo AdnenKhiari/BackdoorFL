@@ -27,7 +27,7 @@ HYDRA_FULL_ERROR=1 && python "$script_path" \
   global_seed=42 \
   wandb.active=true \
   poison_between=[[8,25]] \
-  wandb.main_run_name="vit_breast_iid_neurotoxine_test_with" \
+  wandb.main_run_name="vit_breast_iid_neurotoxine_test_without" \
   wandb.group_name="neurotoxine" \
   wandb.project_name="official"
 
