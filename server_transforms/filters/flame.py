@@ -51,7 +51,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
         
         for params, _, client_id in weights:
             # Collect parameters into a single flat array
-            flat_params = np.concatenate([layer.flatten() for layer in params])
+            flat_params = np.concatenate([layer.flatten() for layer in params[-8:]])
             local_params.append(flat_params)
             
             #W&B
@@ -60,7 +60,7 @@ class FLAMEStrategyWrapper(StrategyWrapper):
                 poisoned_clients.append(client_id)
             
             # Calculate the norm distance for norm clipping later
-            norm_distances.append(np.linalg.norm(flat_params - np.concatenate([layer.flatten() for layer in self._global_model])))
+            norm_distances.append(np.linalg.norm(flat_params - np.concatenate([layer.flatten() for layer in self._global_model[-8:]])))
         
         local_params = np.array(local_params)
         norm_distances = np.array(norm_distances)
